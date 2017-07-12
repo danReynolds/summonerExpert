@@ -48,7 +48,8 @@ class ChampionGGApi < ExternalApi
     'killingSprees',
     'totalDamageTaken',
     'totalPositions',
-    'averageGamesScore'
+    'averageGamesScore',
+    'previousOverallPerformanceScore'
   ].freeze
 
   class << self

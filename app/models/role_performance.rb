@@ -1,10 +1,24 @@
 class RolePerformance
   include ActiveModel::Validations
 
+  validates :elo, presence: true
+  validates :role, presence: true
+  validates :name, presence: true
+
   ACCESSORS = [
     :elo, :role, :name
   ].freeze
   ACCESSORS.each do |accessor|
+    attr_accessor accessor
+  end
+
+  # Accessors coming directly from the data object
+  RELAY_ACCESSORS = [
+    :winRate, :kills, :totalDamageTaken, :wardsKilled, :averageGames,
+    :largestKillingSpree, :assists, :playRate, :gamesPlayed, :percentRolePlayed,
+    :goldEarned, :deaths, :wardPlaced, :banRate, :minionsKilled
+  ].freeze
+  RELAY_ACCESSORS.each do |accessor|
     attr_accessor accessor
   end
 
@@ -28,6 +42,12 @@ class RolePerformance
     args.each do |key, value|
       instance_variable_set("@#{key}", value)
     end
+
+    if @data
+      RELAY_ACCESSORS.each do |accessor|
+        instance_variable_set("@#{accessor}", @data[accessor.to_s])
+      end
+    end
   end
 
   def ability_order(metric)
@@ -35,7 +55,24 @@ class RolePerformance
       .split('-')[1..-1].join(', ')
   end
 
-  def valid?
-    @data.present?
+  def position(position_name)
+    {
+      position: @data['positions'][position_name.to_s],
+      total_positions: Rails.cache.read(role: @role, elo: @elo, position: position_name).length
+    }
+  end
+
+  def kda
+    {
+      kills: @kills,
+      deaths: @deaths,
+      assists: @assists
+    }
+  end
+
+  def error_message
+    errors.messages.map do |key, value|
+      "#{key} #{value.first}"
+    end.en.conjunction(article: false)
   end
 end

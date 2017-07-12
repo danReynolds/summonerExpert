@@ -37,3 +37,11 @@ en:
             name:
               blank: 'of champion was not provided.'
               inclusion: 'provided is not a valid champion name, to the best of my knowledge.'
+        role_performance:
+          attributes:
+            name:
+              blank: 'of champion was not provided.'
+            role:
+              blank: "was not provided. Please specify the champion's role."
+            elo:
+              blank: "was not specified. Please provide the elo you are looking for."

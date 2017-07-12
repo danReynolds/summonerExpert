@@ -7,7 +7,7 @@ Rails.application.routes.draw do
     post :enemy_tips
     post :ability
     post :cooldown
-    post :lane
+    post :role_performance_summary
     post :build
     post :ability_order
     post :counters

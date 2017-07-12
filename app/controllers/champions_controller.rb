@@ -2,7 +2,7 @@ class ChampionsController < ApplicationController
   include RiotApi
   include Sortable
   before_action :load_champion, except: [:ranking]
-  before_action :load_role_performance, only: [:ability_order, :build, :counters, :lane]
+  before_action :load_role_performance, only: [:ability_order, :build, :counters, :role_performance_summary]
 
   MIN_MATCHUPS = 100
   STAT_PER_LEVEL = :perlevel
@@ -178,18 +178,28 @@ class ChampionsController < ApplicationController
     }
   end
 
-  def lane
-    overall = @role_performance[:overallPosition]
-    role_size = Rails.cache.read(rankings: @role).length.en.numwords
-    change = overall[:change] > 0 ? 'better' : 'worse'
+  # Provides a summary of a champion's performance in a lane
+  # including factors such as KDA, overall performance ranking, percentage played in that
+  # lane and more.
+  def role_performance_summary
+    overall_performance = @role_performance.position(:overallPerformanceScore)
+    previous_overall_performance = @role_performance.position(:previousOverallPerformanceScore)
+    position = overall_performance[:position]
+
+    args = {
+      elo: @role_performance.elo.humanize,
+      role: @role_performance.role.humanize,
+      name: @role_performance.name,
+      win_rate: "#{(@role_performance.winRate * 100).round(2)}%",
+      ban_rate: "#{(@role_performance.banRate * 100).round(2)}%",
+      kda: @role_performance.kda.values.map { |val| val.round(2) }.join('/'),
+      position: position.en.ordinal,
+      total_positions: overall_performance[:total_positions],
+      position_change: position - previous_overall_performance[:position] > 0 ? 'better' : 'worse'
+    }
 
     render json: {
-      speech: (
-        "#{@champion.name} got #{change} in the last patch and is currently " \
-        "ranked #{overall[:position].en.ordinate} out of #{role_size} with a " \
-        "#{@role_performance[:patchWin].last}% win rate and a " \
-        "#{@role_performance[:patchPlay].last}% play rate as #{@role}."
-      )
+      speech: ApiResponse.get_response({ champions: :role_performance_summary }, args)
     }
   end
 
@@ -268,20 +278,6 @@ class ChampionsController < ApplicationController
     end
   end
 
-  def ask_for_role_response(name)
-    {
-      speech: ApiResponse.get_response(
-        { champions: { followups: :ask_for_role } },
-        { name: name }
-      ),
-      data: {
-        google: {
-          expect_user_response: true # Used to keep mic open when a response is needed
-        }
-      }
-    }
-  end
-
   def ask_for_level_response
     {
       speech: 'What level is the champion?',
@@ -304,8 +300,10 @@ class ChampionsController < ApplicationController
     )
 
     unless @role_performance.valid?
-      if role.blank?
-        render json: ask_for_role_response(@champion.name)
+      if role.blank? || elo.blank?
+        render json: {
+          speech: @role_performance.error_message
+        }
       else
         args = {
           name: @champion.name,

@@ -19,11 +19,11 @@ champions:
   ability_order:
     - 'The {metric} ability order for {name} {role} in {elo} is {ability_order}.'
     - 'As {name} {role}, the {metric} ability ordering is {ability_order} in {elo}.'
+  role_performance_summary:
+    - '{name} is doing {position_change} this patch in {role} and is ranked {position} out of {total_positions} with a {kda} KDA, {win_rate} win rate and a {ban_rate} ban rate in {elo} division.'
+    - '{name} got {position_change} this patch and is ranked {position} out of {total_positions} in {role} with a {kda} KDA, {win_rate} win rate and a {ban_rate} ban rate in {elo} divison.'
   errors:
     does_not_play:
       - "There is no recommended way to play {name} {role} in {elo}."
       - "I have not seen {name} {role} enough in {elo} to give any useful feedback."
   followups:
-    ask_for_role:
-      - "What role is {name} in?"
-      - "In what role is {name} playing?"
