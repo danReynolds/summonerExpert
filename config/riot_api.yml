@@ -4,5 +4,5 @@ summoner:
   champions: https://{region}.api.pvp.net/api/lol/{region}/v1.3/stats/by-summoner/{id}/ranked
   id: https://{region}.api.pvp.net/api/lol/{region}/v1.4/summoner/by-name
   details: https://{region}.api.pvp.net/api/lol/{region}/v1.3/stats/by-summoner
-champions: https://global.api.pvp.net/api/lol/static-data/na/v1.2/champion?champData=all
-items: https://global.api.pvp.net/api/lol/static-data/na/v1.2/item?itemListData=stats
+champions: https://na1.api.riotgames.com/lol/static-data/v3/champions?locale=en_US&dataById=false{tags}
+items: https://na1.api.riotgames.com/lol/static-data/v3/items?locale=en_US&tags=all

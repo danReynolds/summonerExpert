@@ -7,6 +7,9 @@ module RiotApi
     @api_key = ENV['RIOT_API_KEY']
     @api = load_api('riot_api')
 
+    # Default tags to use for requesting champions
+    DEFAULT_TAGS = [:allytips, :blurb, :enemytips, :info, :spells, :stats, :tags]
+
     # Constants related to the Riot Api
     TOP = 'Top'.freeze
     JUNGLE = 'Jungle'.freeze
@@ -34,8 +37,13 @@ module RiotApi
     }.freeze
 
     class << self
-      def get_champions
-        fetch_response(@api[:champions])
+      def get_champions(**args)
+        args[:tags] ||= DEFAULT_TAGS.map do |tag|
+          "&tags=#{tag}"
+        end.join('')
+
+        url = replace_url(@api[:champions], args)
+        fetch_response(url)
       end
 
       def get_items

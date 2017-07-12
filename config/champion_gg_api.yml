@@ -1,1 +1,1 @@
-champion: http://api.champion.gg/champion/{key}
+champion_roles: http://api.champion.gg/v2/champions?champData=all&skip={skip}&limit={limit}&elo={elo}
