@@ -52,9 +52,9 @@ class ChampionGGApi < ExternalApi
   ].freeze
 
   class << self
-    def get_champion_roles(args = {})
+    def get_champion_roles(**args)
       url = replace_url(@api[:champion_roles], args)
-      a = fetch_response(url)
+      fetch_response(url)
     end
   end
 end

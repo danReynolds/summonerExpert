@@ -8,7 +8,7 @@ module RiotApi
     @api = load_api('riot_api')
 
     # Default tags to use for requesting champions
-    DEFAULT_TAGS = [:allytips, :blurb, :enemytips, :info, :spells, :stats, :tags]
+    DEFAULT_TAGS = [:allytips, :blurb, :enemytips, :info, :spells, :stats, :tags, :lore]
 
     # Constants related to the Riot Api
     TOP = 'Top'.freeze
@@ -17,12 +17,7 @@ module RiotApi
     ADC = 'ADC'.freeze
     MIDDLE = 'Middle'.freeze
     ROLES = [TOP, JUNGLE, SUPPORT, ADC, MIDDLE]
-    ABILITIES = {
-      first: 0,
-      second: 1,
-      third: 2,
-      fourth: 3
-    }.freeze
+    
     STATS = {
       armor: 'armor',
       attackdamage: 'attack damage',

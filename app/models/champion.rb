@@ -1,27 +1,20 @@
 class Champion < Collection
-  include ActiveModel::Validations
-  ACCESSORS = [
-    :name, :roles, :stats, :tags, :title, :passive, :spells, :allytips,
-    :enemytips, :key, :id
+  COLLECTION = Rails.cache.read(collection_key.pluralize)
+  RELAY_ACCESSORS = [
+    :name, :title, :lore, :passive
   ].freeze
-  ACCESSORS.each do |accessor|
+  RELAY_ACCESSORS.each do |accessor|
     attr_accessor accessor
   end
 
-  validates :name, presence: true
+  ABILITIES = {
+    first: 0,
+    second: 1,
+    third: 2,
+    fourth: 3
+  }.freeze
 
-  def find_by_role(role)
-    if role.blank?
-      return @roles.length == 1 ? @roles.first : nil
-    end
-
-    @roles.detect do |role_data|
-      role_data[:role] == role
-    end
-  end
-
-  def win_percent(role)
-    return unless role = find_by_role(role)
-    role[:patchWin].last.round(2)
+  def ability(ability_position)
+    @data['spells'][ABILITIES[ability_position]].slice(:sanitizedDescription, :name)
   end
 end

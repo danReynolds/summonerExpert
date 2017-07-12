@@ -1,0 +1,11 @@
+champions:
+  title:
+    - '{name} has the illustrious title of {title}.'
+    - 'That champ and I go way back, if I had to call him anything it would be {name} {title}.'
+    - '{name} has the title of {title}.'
+  lore:
+    - 'I will tell you about the history of {name}. Stop me if you have heard it: {lore}'
+    - '{name} has such an interesting past. Here it is, stop me if you have heard it: {lore}'
+  ability:
+    - "{champion_name}'s {position} ability is called {ability_name}. {description}"
+    - "Here is a description of {ability_name}, {champion_name}'s {position} ability: {description}"

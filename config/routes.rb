@@ -3,7 +3,6 @@ Rails.application.routes.draw do
 
   namespace :champions do
     post :title
-    post :description
     post :ally_tips
     post :enemy_tips
     post :ability
@@ -15,6 +14,7 @@ Rails.application.routes.draw do
     post :matchup
     post :ranking
     post :stats
+    post :relay_action
   end
 
   namespace :items do

@@ -75,36 +75,50 @@ namespace :riot do
 
   def remove_tags(description)
     prepared_text = description.split("<br>")
-      .reject { |effect| effect.blank? }.join("\n")
+      .reject { |effect| effect.blank? }.join("")
     strip_tags(prepared_text)
+  end
+
+  def cache_collection(key, collection)
+    names_to_ids = collection.inject({}) do |acc, collection_entry|
+      acc.tap do
+        acc[collection_entry['name']] = collection_entry['id']
+      end
+    end
+
+    Rails.cache.write(key, names_to_ids)
   end
 
   desc 'Cache items'
   task cache_items: :environment do
     puts 'Fetching item data from Riot'
 
-    RiotApi::RiotApi.get_items.each do |id, item_data|
+    items = RiotApi::RiotApi.get_items.values
+    cache_collection(:items, items)
+
+    items.each do |item_data|
       next unless item_data['name'] && item_data['description']
       item_data['description'] = remove_tags(item_data[:description])
-      Rails.cache.write({ items: id }, item_data)
-      Rails.cache.write({ item_id_by_key: item_data['name'] }, id)
+      Rails.cache.write({ item: item_data['name'] }, item_data)
     end
 
-    puts 'Fetched item data'
+    puts 'Cached item data from Riot'
   end
 
   desc 'Cache champions'
   task cache_champions: :environment do
     puts 'Fetching champion data from Riot'
 
-    RiotApi::RiotApi.get_champions.each do |key, champion_data|
+    champions = RiotApi::RiotApi.get_champions.values
+    cache_collection(:champions, champions)
+
+    champions.each do |champion_data|
       id = champion_data['id']
       champion_data['blurb'] = remove_tags(champion_data['blurb'])
-
-      Rails.cache.write({ champions: id }, champion_data)
-      Rails.cache.write({ champion_id_by_key: key }, id)
+      champion_data['lore'] = remove_tags(champion_data['lore'])
+      Rails.cache.write({ champion: champion_data['name'] }, champion_data)
     end
 
-    puts 'Cached champions from Riot'
+    puts 'Cached champion data from Riot'
   end
 end

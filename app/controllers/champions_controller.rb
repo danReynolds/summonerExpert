@@ -200,18 +200,17 @@ class ChampionsController < ApplicationController
   end
 
   def ability
-    ability = champion_params[:ability].to_sym
-    if ability == :passive
-      spell = @champion.passive
-    else
-      spell = @champion.spells[RiotApi::ABILITIES[ability]]
-    end
+    ability_position = champion_params[:ability_position]
+    ability = @champion.ability(ability_position.to_sym)
+    args = {
+      position: ability_position,
+      description: ability[:sanitizedDescription],
+      champion_name: @champion.name,
+      ability_name: ability[:name]
+    }
 
     render json: {
-      speech: (
-        "#{@champion.name}'s #{ability} ability is called " \
-        "#{spell[:name]}. #{spell[:sanitizedDescription]}"
-      )
+      speech: ApiResponse.get_response(:champions, :ability, args)
     }
   end
 
@@ -228,9 +227,26 @@ class ChampionsController < ApplicationController
     }
   end
 
-  def title
+  # Relays the requested information to the champion model and returns an
+  # assorted response
+  def relay_action
+    relay_accessor = champion_params[:relay_accessor].to_sym
+    raise unless Champion::RELAY_ACCESSORS.include?(relay_accessor)
+    args = champion_params
+    args[relay_accessor] = @champion.send(relay_accessor)
+
     render json: {
-      speech: "#{@champion.name}'s title is #{@champion.title}."
+      speech: ApiResponse.get_response(:champions, relay_accessor, champion_params)
+    }
+  end
+
+  def title
+    args = {
+      title: @champion.title,
+      name: @champion.name
+    }
+    render json: {
+      speech: ApiResponse.get_response(:champions, :title, args)
     }
   end
 
@@ -278,11 +294,7 @@ class ChampionsController < ApplicationController
   end
 
   def load_champion
-    @champion = Champion.new(name: champion_params[:champion])
-    unless @champion.valid?
-      render json: { speech: @champion.error_message }
-      return false
-    end
+    @champion = Champion.new(name: champion_params[:name])
   end
 
   def do_not_play_response(name, role)
@@ -338,8 +350,8 @@ class ChampionsController < ApplicationController
 
   def champion_params
     params.require(:result).require(:parameters).permit(
-      :champion, :champion1, :ability, :rank, :lane, :list_size, :list_position,
-      :list_order, :stat, :level, :tag
+      :name, :champion1, :ability_position, :rank, :lane, :list_size, :list_position,
+      :list_order, :stat, :level, :tag, :relay_accessor
     )
   end
 end
