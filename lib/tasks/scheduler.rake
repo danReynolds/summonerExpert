@@ -38,7 +38,14 @@ namespace :champion_gg do
         end.map do |champion_position|
           champion_position[:id]
         end
-        Rails.cache.write({ elo: elo, position: position_name, role: role }, ranked_champion_ids)
+        Rails.cache.write(
+          {
+            elo: elo,
+            position: position_name,
+            role: ChampionGGApi::ROLES[role.to_sym]
+          },
+          ranked_champion_ids
+        )
       end
     end
   end
@@ -72,7 +79,7 @@ namespace :champion_gg do
 
         # Cache how that champion does in that role overall
         role_data = champion_role
-        Rails.cache.write({ name: name, role: role, elo: elo_key }, role_data)
+        Rails.cache.write({ name: name, role: ChampionGGApi::ROLES[role.to_sym], elo: elo_key }, role_data)
       end
       cache_champion_rankings(champion_rankings, elo_key)
     end

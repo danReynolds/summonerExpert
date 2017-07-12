@@ -16,8 +16,8 @@ class ChampionGGApi < ExternalApi
     TOP: 'TOP',
     MIDDLE: 'MIDDLE',
     JUNGLE: 'JUNGLE',
-    ADC: 'DUO_CARRY', # Champion is playing ADC
-    SUPPORT: 'DUO_SUPPORT' # Champion is playing Support
+    DUO_CARRY: 'ADC', # Champion is playing ADC
+    DUO_SUPPORT: 'SUPPORT' # Champion is playing Support
   }.freeze
 
   # Matchup Role Options
