@@ -9,3 +9,21 @@ champions:
   ability:
     - "{champion_name}'s {position} ability is called {ability_name}. {description}"
     - "Here is a description of {ability_name}, {champion_name}'s {position} ability: {description}"
+  allytips:
+    - "Here's something you should know about {name}: {tip}"
+    - "Many times have I fought with {name} by my side. This is what I would take to heart: {tip}"
+    - "I know {name} personally, you should know the following: {tip}"
+  enemytips:
+    - "I have seen {name} fall in battle before and this is what I would recommend: {tip}"
+    - "While strong, {name} is not invincible. Remember the following: {tip}"
+  ability_order:
+    - 'The {metric} ability order for {name} {role} in {elo} is {ability_order}.'
+    - 'As {name} {role}, the {metric} ability ordering is {ability_order} in {elo}.'
+  errors:
+    does_not_play:
+      - "There is no recommended way to play {name} {role} in {elo}."
+      - "I have not seen {name} {role} enough in {elo} to give any useful feedback."
+  followups:
+    ask_for_role:
+      - "What role is {name} in?"
+      - "In what role is {name} playing?"

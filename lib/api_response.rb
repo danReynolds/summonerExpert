@@ -10,8 +10,13 @@ class ApiResponse
       end
     end
 
-    def get_response(namespace, response, args)
-      replace_response(API_RESPONSES[namespace][response].sample, args)
+    def get_response(namespace, args, responses = API_RESPONSES)
+      if namespace.class == Hash
+        key = namespace.keys.first
+        get_response(namespace[key], args, responses[key])
+      else
+        replace_response(responses[namespace].sample, args)
+      end
     end
   end
 end

@@ -8,7 +8,7 @@ class ChampionGGApi < ExternalApi
     SILVER: 'SILVER',
     GOLD: 'GOLD',
     PLATINUM: 'PLATINUM',
-    PLATINUM_PLUS: 'PLATINUM,DIAMOND,MASTER,CHALLENGER'
+    PLATINUM_PLUS: '' # It is the default if you send nothing
   }.freeze
 
   # Role Options
@@ -16,8 +16,8 @@ class ChampionGGApi < ExternalApi
     TOP: 'TOP',
     MIDDLE: 'MIDDLE',
     JUNGLE: 'JUNGLE',
-    DUO_CARRY: 'DUO_CARRY', # Champion is playing ADC
-    DUO_SUPPORT: 'DUO_SUPPORT' # Champion is playing Support
+    ADC: 'DUO_CARRY', # Champion is playing ADC
+    SUPPORT: 'DUO_SUPPORT' # Champion is playing Support
   }.freeze
 
   # Matchup Role Options

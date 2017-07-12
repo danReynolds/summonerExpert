@@ -2,11 +2,16 @@ class ChampionsController < ApplicationController
   include RiotApi
   include Sortable
   before_action :load_champion, except: [:ranking]
-  before_action :verify_role, only: [:ability_order, :build, :counters, :lane]
+  before_action :load_role_performance, only: [:ability_order, :build, :counters, :lane]
 
   MIN_MATCHUPS = 100
   STAT_PER_LEVEL = :perlevel
   HTML_TAGS = /<("[^"]*"|'[^']*'|[^'">])*>/
+
+  METRICS = {
+    highestWinrate: 'highest win rate',
+    highestCount: 'most frequent'
+  }
 
   def ranking
     role = champion_params[:lane]
@@ -19,8 +24,8 @@ class ChampionsController < ApplicationController
       collection: rankings
     }.merge(champion_params.slice(:list_position, :list_size, :list_order)))
 
-    rankings = sortable_rankings.sort.map do |role_data|
-      champions[role_data[:key]][:name]
+    rankings = sortable_rankings.sort.map do |role_performance|
+      champions[role_performance[:key]][:name]
     end
     list_size_message = sortable_rankings.list_size_message
     list_position_message = sortable_rankings.list_position_message
@@ -60,32 +65,21 @@ class ChampionsController < ApplicationController
     }
   end
 
-  def description
-    play_style = @champion.tags.en.conjunction
-    roles = @champion.roles.map { |variant| variant[:role] }
-      .en.conjunction(article: false)
-
-    render json: {
-      speech: (
-        "#{@champion.name}, the #{@champion.title}, is #{play_style} and " \
-        "is played as #{roles}."
-      )
-    }
-  end
-
   def ability_order
-    order = parse_ability_order(@role_data[:skills][:highestWinPercent][:order])
+    args = {
+      name: @champion.name,
+      metric: METRICS[champion_params[:metric].to_sym],
+      ability_order: @role_performance.ability_order(champion_params[:metric]),
+      elo: @role_performance.elo.humanize,
+      role: @role_performance.role.humanize
+    }
     render json: {
-      speech: (
-        "The highest win rate on #{@champion.name} #{@role} has you start " \
-        "#{order[:firstOrder].join(', ')} and then max " \
-        "#{order[:maxOrder].join(', ')}."
-      )
+      speech: ApiResponse.get_response({ champions: :ability_order }, args)
     }
   end
 
   def build
-    build = @role_data[:items][:highestWinPercent][:items].map do |item|
+    build = @role_performance[:items][:highestWinPercent][:items].map do |item|
       item[:name]
     end.en.conjunction(article: false)
 
@@ -106,10 +100,10 @@ class ChampionsController < ApplicationController
       return false
     end
 
-    shared_roles = @champion.roles.map do |role_data|
-      role_data[:role]
-    end & other_champion.roles.map do |role_data|
-      role_data[:role]
+    shared_roles = @champion.roles.map do |role_performance|
+      role_performance[:role]
+    end & other_champion.roles.map do |role_performance|
+      role_performance[:role]
     end
 
     if shared_roles.length.zero? || !role.blank? && !shared_roles.include?(role)
@@ -147,7 +141,7 @@ class ChampionsController < ApplicationController
   end
 
   def counters
-    matchups = @role_data[:matchups].select do |matchup|
+    matchups = @role_performance[:matchups].select do |matchup|
       matchup[:games] >= MIN_MATCHUPS
     end
 
@@ -185,7 +179,7 @@ class ChampionsController < ApplicationController
   end
 
   def lane
-    overall = @role_data[:overallPosition]
+    overall = @role_performance[:overallPosition]
     role_size = Rails.cache.read(rankings: @role).length.en.numwords
     change = overall[:change] > 0 ? 'better' : 'worse'
 
@@ -193,8 +187,8 @@ class ChampionsController < ApplicationController
       speech: (
         "#{@champion.name} got #{change} in the last patch and is currently " \
         "ranked #{overall[:position].en.ordinate} out of #{role_size} with a " \
-        "#{@role_data[:patchWin].last}% win rate and a " \
-        "#{@role_data[:patchPlay].last}% play rate as #{@role}."
+        "#{@role_performance[:patchWin].last}% win rate and a " \
+        "#{@role_performance[:patchPlay].last}% play rate as #{@role}."
       )
     }
   end
@@ -210,7 +204,7 @@ class ChampionsController < ApplicationController
     }
 
     render json: {
-      speech: ApiResponse.get_response(:champions, :ability, args)
+      speech: ApiResponse.get_response({ champions: :ability }, args)
     }
   end
 
@@ -227,67 +221,39 @@ class ChampionsController < ApplicationController
     }
   end
 
-  # Relays the requested information to the champion model and returns an
-  # assorted response
-  def relay_action
-    relay_accessor = champion_params[:relay_accessor].to_sym
-    raise unless Champion::RELAY_ACCESSORS.include?(relay_accessor)
-    args = champion_params
-    args[relay_accessor] = @champion.send(relay_accessor)
-
+  def lore
+    args = { name: @champion.name, lore: @champion.lore }
     render json: {
-      speech: ApiResponse.get_response(:champions, relay_accessor, champion_params)
+      speech: ApiResponse.get_response({ champions: :lore }, args)
     }
   end
 
   def title
-    args = {
-      title: @champion.title,
-      name: @champion.name
-    }
+    args = { title: @champion.title, name: @champion.name }
     render json: {
-      speech: ApiResponse.get_response(:champions, :title, args)
+      speech: ApiResponse.get_response({ champions: :title }, args)
     }
   end
 
   def ally_tips
     tip = remove_html_tags(@champion.allytips.sample.to_s)
+    args = { name: @champion.name, tip: tip }
+
     render json: {
-      speech: "Here's a tip for playing as #{@champion.name}: #{tip}"
+      speech: ApiResponse.get_response({ champions: :allytips }, args)
     }
   end
 
   def enemy_tips
     tip = remove_html_tags(@champion.enemytips.sample.to_s)
+    args = { name: @champion.name, tip: tip }
+
     render json: {
-      speech: "Here's a tip for playing against #{@champion.name}: #{tip}"
+      speech: ApiResponse.get_response({ champions: :enemytips }, args)
     }
   end
 
   private
-
-  def insufficient_champions_message(size, type)
-    return '' if champion_params[:list_size].to_i == size
-    "The current patch only has enough data for #{size.en.numwords} " \
-    "#{type.en.pluralize(size)}. "
-  end
-
-  def parse_ability_order(abilities)
-    first_abilities = abilities.first(3)
-
-    # Handle the case where you take two of the same ability to begin
-    if first_abilities == first_abilities.uniq
-      max_order_abilities = abilities[3..-1]
-    else
-      first_abilities = abilities.first(4)
-      max_order_abilities = abilities[4..-1]
-    end
-
-    {
-      firstOrder: first_abilities,
-      maxOrder: max_order_abilities.uniq.reject { |ability| ability == 'R' }
-    }
-  end
 
   def remove_html_tags(speech)
     speech.gsub(HTML_TAGS, '')
@@ -295,22 +261,19 @@ class ChampionsController < ApplicationController
 
   def load_champion
     @champion = Champion.new(name: champion_params[:name])
+
+    unless @champion.valid?
+      render json: { speech: @champion.error_message }
+      return false
+    end
   end
 
-  def do_not_play_response(name, role)
+  def ask_for_role_response(name)
     {
-      speech: (
-        <<~HEREDOC
-          There is no recommended way to play #{name} as #{role}. This is not
-          a good idea in the current meta.
-        HEREDOC
-      )
-    }
-  end
-
-  def ask_for_role_response
-    {
-      speech: 'What role are they in?',
+      speech: ApiResponse.get_response(
+        { champions: { followups: :ask_for_role } },
+        { name: name }
+      ),
       data: {
         google: {
           expect_user_response: true # Used to keep mic open when a response is needed
@@ -330,18 +293,31 @@ class ChampionsController < ApplicationController
     }
   end
 
-  def verify_role
-    @role = champion_params[:lane]
-    unless @role_data = @champion.find_by_role(@role)
-      if @role.blank?
-        render json: ask_for_role_response
+  def load_role_performance
+    elo = champion_params[:elo]
+    role = champion_params[:role]
+
+    @role_performance = RolePerformance.new(
+      elo: elo,
+      role: role,
+      name: @champion.name
+    )
+
+    unless @role_performance.valid?
+      if role.blank?
+        render json: ask_for_role_response(@champion.name)
       else
-        render json: do_not_play_response(@champion.name, @role)
+        args = {
+          name: @champion.name,
+          role: role.humanize,
+          elo: elo.humanize
+        }
+        render json: {
+          speech: ApiResponse.get_response({ champions: { errors: :does_not_play } }, args)
+        }
       end
       return false
     end
-
-    @role = @role_data[:role] if @role.blank?
   end
 
   def tag_message(tag, size)
@@ -350,8 +326,8 @@ class ChampionsController < ApplicationController
 
   def champion_params
     params.require(:result).require(:parameters).permit(
-      :name, :champion1, :ability_position, :rank, :lane, :list_size, :list_position,
-      :list_order, :stat, :level, :tag, :relay_accessor
+      :name, :champion1, :ability_position, :rank, :role, :list_size, :list_position,
+      :list_order, :stat, :level, :tag, :elo, :metric
     )
   end
 end

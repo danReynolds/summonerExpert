@@ -14,7 +14,7 @@ Rails.application.routes.draw do
     post :matchup
     post :ranking
     post :stats
-    post :relay_action
+    post :lore
   end
 
   namespace :items do

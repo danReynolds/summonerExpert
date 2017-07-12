@@ -6,9 +6,10 @@ class Collection
     search_key = {}
     search_key[collection_key] = name
 
-    @data = Rails.cache.read(search_key) || match_collection_data(name)
-    self.class::RELAY_ACCESSORS.each do |key|
-      instance_variable_set("@#{key}", @data[key])
+    if @data = Rails.cache.read(search_key) || match_collection_data(name)
+      self.class::ACCESSORS.each do |key|
+        instance_variable_set("@#{key}", @data[key])
+      end
     end
   end
 
@@ -16,7 +17,7 @@ class Collection
     matcher = Matcher::Matcher.new(name)
     search_key = Hash.new
 
-    if match = matcher.find_match(self.class::COLLECTION.keys, SIMILARITY_THRESHOLD)
+    if match = matcher.find_match(self.class::COLLECTION.values, SIMILARITY_THRESHOLD)
       search_key[collection_key] = match.result
       Rails.cache.read(search_key)
     end
@@ -28,5 +29,11 @@ class Collection
 
   def self.collection_key
     self.to_s.downcase
+  end
+
+  def error_message
+    errors.messages.map do |key, value|
+      "#{key} #{value.first}"
+    end.en.conjunction(article: false)
   end
 end

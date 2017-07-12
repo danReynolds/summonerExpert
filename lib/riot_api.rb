@@ -17,7 +17,7 @@ module RiotApi
     ADC = 'ADC'.freeze
     MIDDLE = 'Middle'.freeze
     ROLES = [TOP, JUNGLE, SUPPORT, ADC, MIDDLE]
-    
+
     STATS = {
       armor: 'armor',
       attackdamage: 'attack damage',

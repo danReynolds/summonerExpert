@@ -8,14 +8,24 @@ namespace :champion_gg do
   task all: [:cache_champion_performance]
 
   # Cache how a champion does in matchups against other champs in that role
-  def cache_champion_matchups(matchup_data, elo)
+  def cache_champion_matchups(name, id, elo, matchup_data)
     matchup_data.to_a.each do |matchup_role, matchups|
+      champion_matchups = {}
+
       matchups.each do |matchup|
-        matchup_key = [matchup['champ1_id'], matchup['champ2_id']].sort.join('-')
-        unless Rails.cache.exist?({ matchup: matchup_key, matchup_role: matchup_role })
-          Rails.cache.write({ matchup: matchup_key, matchup_role: matchup_role, elo: elo }, matchup)
+        if id == matchup['champ1_id']
+          other_id = matchup['champ2_id']
+          champion_matchups[other_id] = {}
+          champion_matchups[other_id][id] = matchup['champ1']
+          champion_matchups[other_id][other_id] = matchup['champ2']
+        else
+          other_id = matchup['champ1_id']
+          champion_matchups[other_id] = {}
+          champion_matchups[other_id][id] = matchup['champ2']
+          champion_matchups[other_id][other_id] = matchup['champ1']
         end
       end
+      Rails.cache.write({ champion: name, role: matchup_role, elo: elo }, champion_matchups)
     end
   end
 
@@ -40,13 +50,16 @@ namespace :champion_gg do
     # Arbitrarily high enough number used for variable combinations of champions x roles
     champion_roles_limit = 10000
 
-    ChampionGGApi::ELOS.values.each do |elo|
-      puts "Fetching Champion data for #{elo}"
+    champion_ids_to_names = Rails.cache.read(:champions)
+
+    ChampionGGApi::ELOS.to_a.each do |elo_key, elo_name|
+      puts "Fetching Champion data for #{elo_key}"
       champion_rankings = {}
-      champion_roles = ChampionGGApi::get_champion_roles(limit: champion_roles_limit, skip: 0, elo: elo)
+      champion_roles = ChampionGGApi::get_champion_roles(limit: champion_roles_limit, skip: 0, elo: elo_name)
 
       champion_roles.each do |champion_role|
         id = champion_role['championId']
+        name = champion_ids_to_names[id]
         role = champion_role['role']
 
         # Add champion rankings in different positions (metrics) to the ranking lists
@@ -55,14 +68,13 @@ namespace :champion_gg do
           champion_rankings[role][position_name] ||= []
           champion_rankings[role][position_name] << { position: position, id: id }
         end
-
-        cache_champion_matchups(champion_role.delete('matchups'), elo)
+        cache_champion_matchups(name, id, elo_key, champion_role.delete('matchups'))
 
         # Cache how that champion does in that role overall
         role_data = champion_role
-        Rails.cache.write({ id: id, role: role, elo: elo }, role_data)
+        Rails.cache.write({ name: name, role: role, elo: elo_key }, role_data)
       end
-      cache_champion_rankings(champion_rankings, elo)
+      cache_champion_rankings(champion_rankings, elo_key)
     end
 
     puts 'Cached champion data from Champion.gg'
@@ -80,13 +92,13 @@ namespace :riot do
   end
 
   def cache_collection(key, collection)
-    names_to_ids = collection.inject({}) do |acc, collection_entry|
+    ids_to_names = collection.inject({}) do |acc, collection_entry|
       acc.tap do
-        acc[collection_entry['name']] = collection_entry['id']
+        acc[collection_entry['id']] = collection_entry['name']
       end
     end
 
-    Rails.cache.write(key, names_to_ids)
+    Rails.cache.write(key, ids_to_names)
   end
 
   desc 'Cache items'

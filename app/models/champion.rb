@@ -1,9 +1,11 @@
 class Champion < Collection
+  include ActiveModel::Validations
+
   COLLECTION = Rails.cache.read(collection_key.pluralize)
-  RELAY_ACCESSORS = [
-    :name, :title, :lore, :passive
+  ACCESSORS = [
+    :name, :title, :lore, :passive, :allytips, :enemytips, :id
   ].freeze
-  RELAY_ACCESSORS.each do |accessor|
+  ACCESSORS.each do |accessor|
     attr_accessor accessor
   end
 
@@ -13,6 +15,9 @@ class Champion < Collection
     third: 2,
     fourth: 3
   }.freeze
+
+  validates :name, presence: true
+  validates :name, inclusion: { in: COLLECTION.values }
 
   def ability(ability_position)
     @data['spells'][ABILITIES[ability_position]].slice(:sanitizedDescription, :name)
