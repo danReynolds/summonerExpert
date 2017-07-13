@@ -1,8 +1,8 @@
 module Sortable
   class Sortable
     ORDER = {
-      asc: :worst,
-      desc: :best
+      asc: :lowest,
+      desc: :highest
     }.freeze
 
     ACCESSORS = [

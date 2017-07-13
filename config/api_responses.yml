@@ -22,6 +22,8 @@ champions:
   role_performance_summary:
     - '{name} is doing {position_change} this patch in {role} and is ranked {position} out of {total_positions} with a {kda} KDA, {win_rate} win rate and a {ban_rate} ban rate in {elo} division.'
     - '{name} got {position_change} this patch and is ranked {position} out of {total_positions} in {role} with a {kda} KDA, {win_rate} win rate and a {ban_rate} ban rate in {elo} divison.'
+  ranking:
+    - 'The {list_position}{list_size}{champion_conjugation} with the {list_order} {position} in {role} from {elo} division {names_conjugation} {names}.'
   errors:
     does_not_play:
       - "There is no recommended way to play {name} {role} in {elo}."

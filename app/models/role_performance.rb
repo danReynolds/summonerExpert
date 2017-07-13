@@ -5,12 +5,7 @@ class RolePerformance
   validates :role, presence: true
   validates :name, presence: true
 
-  ACCESSORS = [
-    :elo, :role, :name
-  ].freeze
-  ACCESSORS.each do |accessor|
-    attr_accessor accessor
-  end
+  attr_accessor :elo, :role, :name
 
   # Accessors coming directly from the data object
   RELAY_ACCESSORS = [
@@ -58,7 +53,7 @@ class RolePerformance
   def position(position_name)
     {
       position: @data['positions'][position_name.to_s],
-      total_positions: Rails.cache.read(role: @role, elo: @elo, position: position_name).length
+      total_positions: @data['positions']['totalPositions']
     }
   end
 

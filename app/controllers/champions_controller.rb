@@ -14,31 +14,31 @@ class ChampionsController < ApplicationController
   }
 
   def ranking
-    role = champion_params[:lane]
-    tag = champion_params[:tag]
+    ids_to_names = Rails.cache.read(:champions)
+    ranking_ids = Rails.cache.read(champion_params.slice(:position, :elo, :role).to_h)
 
-    champions = Rails.cache.read(:champions)
-    rankings = Rails.cache.read(rankings: role)
-    rankings = rankings.select { |ranking| ranking[:tags].include?(tag) } unless tag.blank?
-    sortable_rankings = Sortable.new({
-      collection: rankings
+    sortable_ranking_ids = Sortable.new({
+      collection: ranking_ids
     }.merge(champion_params.slice(:list_position, :list_size, :list_order)))
 
-    rankings = sortable_rankings.sort.map do |role_performance|
-      champions[role_performance[:key]][:name]
+    ranking_names = sortable_ranking_ids.sort.map do |ranking_id|
+      ids_to_names[ranking_id]
     end
-    list_size_message = sortable_rankings.list_size_message
-    list_position_message = sortable_rankings.list_position_message
-    topic_message = tag_message(tag, rankings.size)
+
+    args = {
+      position: ChampionGGApi::POSITIONS[champion_params[:position].to_sym],
+      role: champion_params[:role].humanize,
+      elo: champion_params[:elo].humanize,
+      names: ranking_names.en.conjunction(article: false),
+      list_size: sortable_ranking_ids.list_size_message,
+      list_position: sortable_ranking_ids.list_position_message,
+      list_order: sortable_ranking_ids.list_order,
+      names_conjugation: "is".en.plural_verb(sortable_ranking_ids.list_size.to_i),
+      champion_conjugation: "champion".en.pluralize(sortable_ranking_ids.list_size.to_i)
+    }
 
     render json: {
-      speech: (
-        "#{insufficient_champions_message(rankings.size, 'ranking')}The " \
-        "#{list_position_message}#{sortable_rankings.list_order} " \
-        "#{list_size_message}#{topic_message} in #{role} " \
-        "#{"is".en.plural_verb(sortable_rankings.list_size)} " \
-        "#{rankings.en.conjunction(article: false)}."
-      )
+      speech: ApiResponse.get_response({ champions: :ranking }, args)
     }
   end
 
@@ -278,17 +278,6 @@ class ChampionsController < ApplicationController
     end
   end
 
-  def ask_for_level_response
-    {
-      speech: 'What level is the champion?',
-      data: {
-        google: {
-          expect_user_response: true # Used to keep mic open when a response is needed
-        }
-      }
-    }
-  end
-
   def load_role_performance
     elo = champion_params[:elo]
     role = champion_params[:role]
@@ -325,7 +314,7 @@ class ChampionsController < ApplicationController
   def champion_params
     params.require(:result).require(:parameters).permit(
       :name, :champion1, :ability_position, :rank, :role, :list_size, :list_position,
-      :list_order, :stat, :level, :tag, :elo, :metric
+      :list_order, :stat, :level, :tag, :elo, :metric, :position
     )
   end
 end

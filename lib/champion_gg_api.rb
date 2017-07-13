@@ -33,24 +33,24 @@ class ChampionGGApi < ExternalApi
   }.freeze
 
   # Champion Positions currently being ranked and cached
-  POSITIONS = [
-    'deaths',
-    'winRates',
-    'minionsKilled',
-    'banRates',
-    'assists',
-    'kills',
-    'playRates',
-    'damageDealt',
-    'goldEarned',
-    'overallPerformanceScore',
-    'totalHeal',
-    'killingSprees',
-    'totalDamageTaken',
-    'totalPositions',
-    'averageGamesScore',
-    'previousOverallPerformanceScore'
-  ].freeze
+  POSITIONS = {
+    deaths: 'deaths',
+    winRates: 'win rate',
+    minionsKilled: 'creep score',
+    banRates: 'ban rate',
+    assists: 'assists',
+    kills: 'kills',
+    playRates: 'play rate',
+    damageDealt: 'damage dealt',
+    goldEarned: 'gold earned',
+    overallPerformanceScore: 'overall performance',
+    totalHeal: 'healing done',
+    killingSprees: 'average killing sprees',
+    totalDamageTaken: 'total damage taken',
+    averageGamesScore: 'average games played',
+    totalPositions: '', # These 2 positions are useful internally but are not requested by users
+    previousOverallPerformanceScore: ''
+  }.freeze
 
   class << self
     def get_champion_roles(**args)

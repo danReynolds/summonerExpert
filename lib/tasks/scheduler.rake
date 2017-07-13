@@ -38,6 +38,13 @@ namespace :champion_gg do
         end.map do |champion_position|
           champion_position[:id]
         end
+
+        # An exception is made for the deaths ranking which is ranked by least
+        # = best deaths unlike all other rankings which are in terms of most CS,
+        # most # kills, etc. being equal to best. So if someone asks for the
+        # person with most deaths, they want the worst ranked person so the list
+        # is reversed.
+        ranked_champion_ids.reverse! if position_name == ChampionGGApi::POSITIONS[:deaths]
         Rails.cache.write(
           {
             elo: elo,
@@ -70,7 +77,8 @@ namespace :champion_gg do
         role = champion_role['role']
 
         # Add champion rankings in different positions (metrics) to the ranking lists
-        champion_role['positions'].slice(*ChampionGGApi::POSITIONS).to_a.each do |position_name, position|
+        supported_position_rankings = ChampionGGApi::POSITIONS.keys.map(&:to_s)
+        champion_role['positions'].slice(*supported_position_rankings).to_a.each do |position_name, position|
           champion_rankings[role] ||= {}
           champion_rankings[role][position_name] ||= []
           champion_rankings[role][position_name] << { position: position, id: id }
