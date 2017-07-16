@@ -1,7 +1,8 @@
 class ChampionsController < ApplicationController
   include RiotApi
   include Sortable
-  before_action :load_champion, except: [:ranking]
+  before_action :load_champion, except: [:ranking, :matchup]
+  before_action :load_matchup, only: :matchup
   before_action :load_role_performance, only: [:ability_order, :build, :counters, :role_performance_summary]
 
   MIN_MATCHUPS = 100
@@ -91,52 +92,45 @@ class ChampionsController < ApplicationController
   end
 
   def matchup
-    role = champion_params[:lane]
-    champion_query = champion_params[:champion1].strip
-    other_champion = Champion.new(name: champion_query)
+    position = champion_params[:matchup_position]
+    matchup_position = ChampionGGApi::MATCHUP_POSITIONS[position.to_sym]
+    champ1_result = @matchup.position(position, @matchup.name1)
+    champ2_result = @matchup.position(position, @matchup.name2)
+    role1 = ChampionGGApi::MATCHUP_ROLES[@matchup.position('role', @matchup.name1).to_sym]
+    role2 = ChampionGGApi::MATCHUP_ROLES[@matchup.position('role', @matchup.name2).to_sym]
 
-    unless other_champion.valid?
-      render json: { speech: other_champion.error_message }
-      return false
+    response_query = {}
+
+    matchup_key = if @matchup.role1 == ChampionGGApi::MATCHUP_ROLES[:SYNERGY]
+      :synergy
+    elsif role1 == role2
+      :single_role
+    else
+      :duo_role
     end
 
-    shared_roles = @champion.roles.map do |role_performance|
-      role_performance[:role]
-    end & other_champion.roles.map do |role_performance|
-      role_performance[:role]
+    if matchup_position == ChampionGGApi::MATCHUP_POSITIONS[:winrate]
+      champ1_result *= 100
+      champ2_result *= 100
+      response_query[matchup_key] = :winrate
+    else
+      response_query[matchup_key] = :general
     end
 
-    if shared_roles.length.zero? || !role.blank? && !shared_roles.include?(role)
-      return render json: {
-        speech: (
-          "#{@champion.name} and #{other_champion.name} do not typically " \
-          "play against eachother in #{role.blank? ? 'any role' : role}."
-        )
-      }
-    end
+    args = {
+      position: matchup_position,
+      champ1_result: champ1_result.round(2),
+      champ2_result: champ2_result.round(2),
+      elo: @matchup.elo.humanize,
+      role1: role1.humanize,
+      role2: role2.humanize,
+      name1: @matchup.name1,
+      name2: @matchup.name2,
+      match_result: champ1_result > champ2_result ? 'higher' : 'lower'
+    }
 
-    if role.blank?
-      if shared_roles.length == 1
-        role = shared_roles.first
-      else
-        return render json: ask_for_role_response
-      end
-    end
-
-    champion_role = @champion.find_by_role(role)
-    other_champion_role = other_champion.find_by_role(role)
-
-    matchup = champion_role[:matchups].detect do |matchup|
-      matchup[:key] == other_champion.key
-    end
-    change = matchup[:winRateChange] > 0 ? 'better' : 'worse'
-
-    return render json: {
-      speech: (
-        "#{@champion.name} got #{change} against #{other_champion.name} in " \
-        "the latest patch and has a win rate of #{matchup[:winRate]}% " \
-        "against #{other_champion.title} in #{role}."
-      )
+    render json: {
+      speech: ApiResponse.get_response({ champions: { matchup: response_query } }, args)
     }
   end
 
@@ -269,8 +263,23 @@ class ChampionsController < ApplicationController
     speech.gsub(HTML_TAGS, '')
   end
 
+  def load_matchup
+    @matchup = Matchup.new(
+      name1: champion_params[:name1],
+      name2: champion_params[:name2],
+      elo: champion_params[:elo],
+      role1: champion_params[:role1],
+      role2: champion_params[:role2]
+    )
+
+    unless @matchup.valid?
+      render json: { speech: @matchup.error_message }
+      return false
+    end
+  end
+
   def load_champion
-    @champion = Champion.new(name: champion_params[:name])
+    @champion = Champion.new(name: name)
 
     unless @champion.valid?
       render json: { speech: @champion.error_message }
@@ -314,7 +323,7 @@ class ChampionsController < ApplicationController
   def champion_params
     params.require(:result).require(:parameters).permit(
       :name, :champion1, :ability_position, :rank, :role, :list_size, :list_position,
-      :list_order, :stat, :level, :tag, :elo, :metric, :position
+      :list_order, :stat, :level, :tag, :elo, :metric, :position, :name1, :name2, :matchup_position, :role1, :role2
     )
   end
 end

@@ -24,6 +24,22 @@ champions:
     - '{name} got {position_change} this patch and is ranked {position} out of {total_positions} in {role} with a {kda} KDA, {win_rate} win rate and a {ban_rate} ban rate in {elo} divison.'
   ranking:
     - 'The {list_position}{list_size}{champion_conjugation} with the {list_order} {position} in {role} from {elo} division {names_conjugation} {names}.'
+  matchup:
+    single_role:
+      general:
+        - '{name1} and {name2} have {champ1_result} and {champ2_result} {position} respectively playing {role1} in {elo} division.'
+      winrate:
+        - '{name1} and {name2} have a {champ1_result}% and {champ2_result}% {position} respectively playing {role1} in {elo} division.'
+    duo_role:
+      general:
+        - '{name1} averages {champ1_result} {position} in {role1}, {match_result} than {name2} who averages {champ2_result} {position} when playing {role2} in {elo} division.'
+      winrate:
+        - '{name1} averages a {champ1_result}% {position} in {role1}, {match_result} than {name2} who averages a {champ2_result}% {position} when playing {role2} in {elo} division.'
+    synergy:
+      general:
+        - '{name1} averages {champ1_result} {position} in {role1} when playing with {name2} {role2} in {elo}.'
+      winrate:
+        - '{name1} averages a {champ1_result}% {position} in {role1} when playing alongside {name2} {role2} in {elo}.'
   errors:
     does_not_play:
       - "There is no recommended way to play {name} {role} in {elo}."

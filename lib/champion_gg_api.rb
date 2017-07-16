@@ -8,7 +8,7 @@ class ChampionGGApi < ExternalApi
     SILVER: 'SILVER',
     GOLD: 'GOLD',
     PLATINUM: 'PLATINUM',
-    PLATINUM_PLUS: '' # It is the default if you send nothing
+    PLATINUM_PLUS: 'PLATINUM_PLUS'
   }.freeze
 
   # Role Options
@@ -28,8 +28,19 @@ class ChampionGGApi < ExternalApi
     MIDDLE: 'MIDDLE',
     SYNERGY: 'SYNERGY', # Matchup compares the champion to its lane partner
     ADCSUPPORT: 'ADCSUPPORT', # Matchup compares the champion to its bot lane opponent of the other role
-    DUO_CARRY: 'DUO_CARRY', # Matchup compares the champion as an ADC to the opposing ADC
-    DUO_SUPPORT: 'DUO_SUPPORT' # Matchup compares the champion as a Support to the opposing Support
+    DUO_CARRY: 'ADC', # Matchup compares the champion as an ADC to the opposing ADC
+    DUO_SUPPORT: 'SUPPORT' # Matchup compares the champion as a Support to the opposing Support
+  }.freeze
+
+  MATCHUP_POSITIONS = {
+    kills: 'kills',
+    deaths: 'deaths',
+    minionsKilled: 'CS',
+    goldEarned: 'gold',
+    winrate: 'win rate',
+    totalDamageDealtToChampions: 'total damage dealt to champions',
+    assists: 'assists',
+    killingSprees: 'killing sprees'
   }.freeze
 
   # Champion Positions currently being ranked and cached

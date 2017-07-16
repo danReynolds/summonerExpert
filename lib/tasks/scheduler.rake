@@ -9,23 +9,37 @@ namespace :champion_gg do
 
   # Cache how a champion does in matchups against other champs in that role
   def cache_champion_matchups(name, id, elo, matchup_data)
+    ids_to_names = Rails.cache.read(:champions)
+
     matchup_data.to_a.each do |matchup_role, matchups|
       champion_matchups = {}
 
       matchups.each do |matchup|
         if id == matchup['champ1_id']
           other_id = matchup['champ2_id']
-          champion_matchups[other_id] = {}
-          champion_matchups[other_id][id] = matchup['champ1']
-          champion_matchups[other_id][other_id] = matchup['champ2']
+          other_name = ids_to_names[other_id]
+          champion_matchups[other_name] = {}
+          champion_matchups[other_name][name] = matchup['champ1']
+          champion_matchups[other_name][other_name] = matchup['champ2']
         else
           other_id = matchup['champ1_id']
-          champion_matchups[other_id] = {}
-          champion_matchups[other_id][id] = matchup['champ2']
-          champion_matchups[other_id][other_id] = matchup['champ1']
+          other_name = ids_to_names[other_id]
+          champion_matchups[other_name] = {}
+          champion_matchups[other_name][name] = matchup['champ2']
+          champion_matchups[other_name][other_name] = matchup['champ1']
         end
       end
-      Rails.cache.write({ champion: name, role: matchup_role, elo: elo }, champion_matchups)
+
+      Rails.cache.write(
+        {
+          matchups: {
+            name: name,
+            role: ChampionGGApi::MATCHUP_ROLES[matchup_role.to_sym],
+            elo: elo
+          }
+        },
+        champion_matchups
+      )
     end
   end
 
@@ -66,10 +80,17 @@ namespace :champion_gg do
 
     champion_ids_to_names = Rails.cache.read(:champions)
 
-    ChampionGGApi::ELOS.to_a.each do |elo_key, elo_name|
-      puts "Fetching Champion data for #{elo_key}"
+    ChampionGGApi::ELOS.values.each do |elo|
+      puts "Fetching Champion data for #{elo}"
       champion_rankings = {}
-      champion_roles = ChampionGGApi::get_champion_roles(limit: champion_roles_limit, skip: 0, elo: elo_name)
+
+      # Platinum plus should be sent as empty string since it is the default if
+      # no elo is specified.
+      if elo == ChampionGGApi::ELOS[:PLATINUM_PLUS]
+        champion_roles = ChampionGGApi::get_champion_roles(limit: champion_roles_limit, skip: 0, elo: '')
+      else
+        champion_roles = ChampionGGApi::get_champion_roles(limit: champion_roles_limit, skip: 0, elo: elo)
+      end
 
       champion_roles.each do |champion_role|
         id = champion_role['championId']
@@ -83,13 +104,13 @@ namespace :champion_gg do
           champion_rankings[role][position_name] ||= []
           champion_rankings[role][position_name] << { position: position, id: id }
         end
-        cache_champion_matchups(name, id, elo_key, champion_role.delete('matchups'))
+        cache_champion_matchups(name, id, elo, champion_role.delete('matchups'))
 
         # Cache how that champion does in that role overall
         role_data = champion_role
-        Rails.cache.write({ name: name, role: ChampionGGApi::ROLES[role.to_sym], elo: elo_key }, role_data)
+        Rails.cache.write({ name: name, role: ChampionGGApi::ROLES[role.to_sym], elo: elo }, role_data)
       end
-      cache_champion_rankings(champion_rankings, elo_key)
+      cache_champion_rankings(champion_rankings, elo)
     end
 
     puts 'Cached champion data from Champion.gg'
