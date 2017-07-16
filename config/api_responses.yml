@@ -40,8 +40,3 @@ champions:
         - '{name1} averages {champ1_result} {position} in {role1} when playing with {name2} {role2} in {elo}.'
       winrate:
         - '{name1} averages a {champ1_result}% {position} in {role1} when playing alongside {name2} {role2} in {elo}.'
-  errors:
-    does_not_play:
-      - "There is no recommended way to play {name} {role} in {elo}."
-      - "I have not seen {name} {role} enough in {elo} to give any useful feedback."
-  followups:

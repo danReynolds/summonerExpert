@@ -2,18 +2,19 @@ class Matchup
   include CollectionHelper
   include ActiveModel::Validations
 
+  CHAMPIONS = Rails.cache.read(:champions)
+
   validates :elo, presence: true
   validates :role1, presence: true
-  validates :name1, presence: true
-  validates :name2, presence: true
-
+  validates :name1, presence: true, inclusion: CHAMPIONS.values
+  validates :name2, presence: true, inclusion: CHAMPIONS.values
+  validate :matchup
 
   attr_accessor :elo, :role1, :role2, :name1, :name2
 
   def initialize(**args)
-    ids_to_names = Rails.cache.read(:champions)
-    args[:name1] = CollectionHelper::match_collection(args[:name1], ids_to_names.values)
-    args[:name2] = CollectionHelper::match_collection(args[:name2], ids_to_names.values)
+    args[:name1] = CollectionHelper::match_collection(args[:name1], CHAMPIONS.values)
+    args[:name2] = CollectionHelper::match_collection(args[:name2], CHAMPIONS.values)
 
     args.each do |key, value|
       instance_variable_set("@#{key}", value)
@@ -40,5 +41,13 @@ class Matchup
     errors.messages.map do |key, value|
       "#{key} #{value.first}"
     end.en.conjunction(article: false)
+  end
+
+  private
+
+  def matchup
+    if @matchup.nil?
+      errors.add(:Matchup, "could not be found for the given champions in the provided role and elo.")
+    end
   end
 end

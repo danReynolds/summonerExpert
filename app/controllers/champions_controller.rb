@@ -3,7 +3,7 @@ class ChampionsController < ApplicationController
   include Sortable
   before_action :load_champion, except: [:ranking, :matchup]
   before_action :load_matchup, only: :matchup
-  before_action :load_role_performance, only: [:ability_order, :build, :counters, :role_performance_summary]
+  before_action :load_role_performance, only: [:role_performance_summary]
 
   MIN_MATCHUPS = 100
   STAT_PER_LEVEL = :perlevel
@@ -279,7 +279,7 @@ class ChampionsController < ApplicationController
   end
 
   def load_champion
-    @champion = Champion.new(name: name)
+    @champion = Champion.new(name: champion_params[:name])
 
     unless @champion.valid?
       render json: { speech: @champion.error_message }
@@ -298,20 +298,7 @@ class ChampionsController < ApplicationController
     )
 
     unless @role_performance.valid?
-      if role.blank? || elo.blank?
-        render json: {
-          speech: @role_performance.error_message
-        }
-      else
-        args = {
-          name: @champion.name,
-          role: role.humanize,
-          elo: elo.humanize
-        }
-        render json: {
-          speech: ApiResponse.get_response({ champions: { errors: :does_not_play } }, args)
-        }
-      end
+      render json: { speech: @role_performance.error_message }
       return false
     end
   end

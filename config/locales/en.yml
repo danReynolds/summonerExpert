@@ -23,6 +23,16 @@ en:
   activemodel:
     errors:
       models:
+        matchup:
+          attributes:
+            name1:
+              inclusion: 'is not a valid champion name, to the best of my knowledge.'
+              blank: 'was not provided.'
+            name2:
+              inclusion: 'is not a valid champion name, to the best of my knowledge.'
+              blank: 'was not provided.'
+            role1:
+              blank: 'was not provided.'
         summoner:
           attributes:
             id:

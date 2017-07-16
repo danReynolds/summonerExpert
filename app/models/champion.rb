@@ -16,8 +16,7 @@ class Champion < Collection
     fourth: 3
   }.freeze
 
-  validates :name, presence: true
-  validates :name, inclusion: { in: COLLECTION.values }
+  validates :name, presence: true, inclusion: COLLECTION.values
 
   def ability(ability_position)
     @data['spells'][ABILITIES[ability_position]].slice(:sanitizedDescription, :name)
