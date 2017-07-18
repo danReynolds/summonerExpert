@@ -3,17 +3,12 @@ class ChampionsController < ApplicationController
   include Sortable
   before_action :load_champion, except: [:ranking, :matchup, :matchup_ranking]
   before_action :load_matchup, only: :matchup
-  before_action :load_role_performance, only: [:role_performance_summary]
+  before_action :load_role_performance, only: [:role_performance_summary, :build]
   before_action :load_matchup_ranking, only: :matchup_ranking
 
   MIN_MATCHUPS = 100
   STAT_PER_LEVEL = :perlevel
   HTML_TAGS = /<("[^"]*"|'[^']*'|[^'">])*>/
-
-  METRICS = {
-    highestWinrate: 'highest win rate',
-    highestCount: 'most frequent'
-  }
 
   def ranking
     rankings = Rails.cache.read(champion_params.slice(:position, :elo, :role).to_h)
@@ -65,7 +60,7 @@ class ChampionsController < ApplicationController
   def ability_order
     args = {
       name: @champion.name,
-      metric: METRICS[champion_params[:metric].to_sym],
+      metric: ChampionGGApi::METRICS[champion_params[:metric].to_sym],
       ability_order: @role_performance.ability_order(champion_params[:metric]),
       elo: @role_performance.elo.humanize,
       role: @role_performance.role.humanize
@@ -76,14 +71,22 @@ class ChampionsController < ApplicationController
   end
 
   def build
-    build = @role_performance[:items][:highestWinPercent][:items].map do |item|
-      item[:name]
+    metric = champion_params[:metric]
+    ids_to_names = Rails.cache.read(:items)
+    item_names = @role_performance.item_ids(metric).map do |id|
+      ids_to_names[id]
     end.en.conjunction(article: false)
 
+    args = {
+      elo: @role_performance.elo.humanize,
+      role: @role_performance.role.humanize,
+      item_names: item_names,
+      name: @role_performance.name,
+      metric: ChampionGGApi::METRICS[metric.to_sym]
+    }
+
     render json: {
-      speech: (
-        "The highest win rate build for #{@champion.name} #{@role} is #{build}."
-      )
+      speech: ApiResponse.get_response({ champions: :build }, args)
     }
   end
 

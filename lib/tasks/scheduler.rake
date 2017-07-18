@@ -141,11 +141,12 @@ namespace :riot do
   task cache_items: :environment do
     puts 'Fetching item data from Riot'
 
-    items = RiotApi::RiotApi.get_items.values
+    items = RiotApi::RiotApi.get_items.values.select do |item|
+      item['name'] && item['description']
+    end
     cache_collection(:items, items)
 
     items.each do |item_data|
-      next unless item_data['name'] && item_data['description']
       item_data['description'] = remove_tags(item_data[:description])
       Rails.cache.write({ item: item_data['name'] }, item_data)
     end

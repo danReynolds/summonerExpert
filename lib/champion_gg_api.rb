@@ -11,6 +11,13 @@ class ChampionGGApi < ExternalApi
     PLATINUM_PLUS: 'PLATINUM_PLUS'
   }.freeze
 
+  # Metric Options
+  # for builds and ability order performance in a role
+  METRICS = {
+    highestWinrate: 'highest win rate',
+    highestCount: 'most frequent'
+  }
+
   # Role Options
   ROLES = {
     TOP: 'TOP',

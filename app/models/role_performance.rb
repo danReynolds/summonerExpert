@@ -51,6 +51,10 @@ class RolePerformance
       .split('-')[1..-1].join(', ')
   end
 
+  def item_ids(metric)
+    @role_performance['hashes']['finalitemshashfixed'][metric]['hash'].split('-')[1..-1].map(&:to_i)
+  end
+
   def position(position_name)
     {
       position: @role_performance['positions'][position_name.to_s],
@@ -77,7 +81,7 @@ class RolePerformance
   private
 
   def role_performance
-    if @role_performance.nil?
+    if errors.empty? && @role_performance.nil?
       errors.add(:Performance, "could not be found for the given champion in the provided role and elo.")
     end
   end

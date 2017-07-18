@@ -47,3 +47,5 @@ champions:
       - 'The {list_position}{list_size}{champion_conjugation} with the {list_order} {position} when playing {unnamed_role} against {name} {named_role} in {elo} division {names_conjugation} {ranked_names}.'
     synergy:
       - 'The {list_position}{list_size}{champion_conjugation} with the {list_order} {position} when playing {unnamed_role} with {name} {named_role} in {elo} division {names_conjugation} {ranked_names}.'
+  build:
+    - 'The {metric} build for {name} {role} in {elo} division is {item_names}.'
