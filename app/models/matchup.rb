@@ -8,9 +8,9 @@ class Matchup
   validates :role1, presence: true
   validates :name1, presence: true, inclusion: CHAMPIONS.values
   validates :name2, presence: true, inclusion: CHAMPIONS.values
-  validate :matchup
+  validate :matchup_validator
 
-  attr_accessor :elo, :role1, :role2, :name1, :name2
+  attr_accessor :elo, :role1, :role2, :name1, :name2, :matchup_role
 
   def initialize(**args)
     args[:name1] = CollectionHelper::match_collection(args[:name1], CHAMPIONS.values)
@@ -20,15 +20,21 @@ class Matchup
       instance_variable_set("@#{key}", value)
     end
 
+    synergy = ChampionGGApi::MATCHUP_ROLES[:SYNERGY]
+    adc = ChampionGGApi::MATCHUP_ROLES[:ADC]
+    support = ChampionGGApi::MATCHUP_ROLES[:SUPPORT]
+    # Prioritize the synergy role if two are specified.
+    @matchup_role = if role1 == synergy || role2 == synergy
+      synergy
     # The ADCSUPPORT matchup allow for dual role inquiries. The single
     # role defining these cases must be assigned from these two roles
-    role = if role1.present? && role2.present?
+    elsif role1 == adc && role2 == support || role1 == support && role2 == adc
       ChampionGGApi::MATCHUP_ROLES[:ADCSUPPORT]
     else
       role1
     end
 
-    if matchups = Rails.cache.read(matchups: { name: @name1, role: role, elo: @elo })
+    if matchups = Rails.cache.read(matchups: { name: @name1, role: @matchup_role, elo: @elo })
       @matchup = matchups[@name2]
     end
   end
@@ -45,7 +51,7 @@ class Matchup
 
   private
 
-  def matchup
+  def matchup_validator
     if @matchup.nil?
       errors.add(:Matchup, "could not be found for the given champions in the provided role and elo.")
     end

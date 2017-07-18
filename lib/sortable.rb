@@ -1,12 +1,12 @@
 module Sortable
   class Sortable
     ORDER = {
-      asc: :lowest,
-      desc: :highest
+      highest: :highest,
+      lowest: :lowest
     }.freeze
 
     ACCESSORS = [
-      :list_position, :list_size, :list_order, :collection, :sort_order
+      :list_position, :list_size, :list_order, :collection, :sort_value
     ].freeze
     ACCESSORS.each do |accessor|
       attr_accessor accessor
@@ -19,18 +19,18 @@ module Sortable
       collection: []
     }.freeze
 
-    def initialize(attributes = {})
-      attributes = attributes.with_indifferent_access
+    def initialize(args = {})
+      args = args.with_indifferent_access
       self.class::ACCESSORS.each do |key|
-        instance_variable_set("@#{key}", attributes[key].present? ? attributes[key] : DEFAULTS[key])
+        instance_variable_set("@#{key}", args[key].present? ? args[key] : DEFAULTS[key])
       end
     end
 
     def sort
       collection = @collection
-      collection = collection.sort_by(&@sort_order) if @sort_order
+      collection = collection.sort_by(&@sort_value) if @sort_value
       collection = collection[((@list_position.to_i) - 1)..-1]
-      collection.reverse! if @list_order.to_sym == ORDER[:asc]
+      collection.reverse! if @list_order.to_sym == ORDER[:lowest]
       collection.first(@list_size.to_i)
     end
 

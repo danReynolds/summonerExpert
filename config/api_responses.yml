@@ -40,3 +40,10 @@ champions:
         - '{name1} averages {champ1_result} {position} in {role1} when playing with {name2} {role2} in {elo}.'
       winrate:
         - '{name1} averages a {champ1_result}% {position} in {role1} when playing alongside {name2} {role2} in {elo}.'
+  matchup_ranking:
+    single_role:
+      - 'The {list_position}{list_size}{champion_conjugation} with the {list_order} {position} against {name} {named_role} in {elo} division {names_conjugation} {ranked_names}.'
+    duo_role:
+      - 'The {list_position}{list_size}{champion_conjugation} with the {list_order} {position} when playing {unnamed_role} against {name} {named_role} in {elo} division {names_conjugation} {ranked_names}.'
+    synergy:
+      - 'The {list_position}{list_size}{champion_conjugation} with the {list_order} {position} when playing {unnamed_role} with {name} {named_role} in {elo} division {names_conjugation} {ranked_names}.'

@@ -44,13 +44,13 @@ namespace :champion_gg do
   end
 
   # Cache the ranking lists for champion performance on metrics like KDA in that role
-  def cache_champion_rankings(champion_rankings, elo)
+  def cache_champion_rankings(champion_rankings, elo, ids_to_names)
     champion_rankings.each do |role, position_names|
       position_names.each do |position_name, champion_positions|
-        ranked_champion_ids = champion_positions.sort_by do |champion_position|
+        ranked_champions = champion_positions.sort_by do |champion_position|
           champion_position[:position]
         end.map do |champion_position|
-          champion_position[:id]
+          ids_to_names[champion_position[:id]]
         end
 
         # An exception is made for the deaths ranking which is ranked by least
@@ -58,14 +58,14 @@ namespace :champion_gg do
         # most # kills, etc. being equal to best. So if someone asks for the
         # person with most deaths, they want the worst ranked person so the list
         # is reversed.
-        ranked_champion_ids.reverse! if position_name == ChampionGGApi::POSITIONS[:deaths]
+        ranked_champions.reverse! if position_name == ChampionGGApi::POSITIONS[:deaths]
         Rails.cache.write(
           {
             elo: elo,
             position: position_name,
             role: ChampionGGApi::ROLES[role.to_sym]
           },
-          ranked_champion_ids
+          ranked_champions
         )
       end
     end
@@ -78,7 +78,7 @@ namespace :champion_gg do
     # Arbitrarily high enough number used for variable combinations of champions x roles
     champion_roles_limit = 10000
 
-    champion_ids_to_names = Rails.cache.read(:champions)
+    ids_to_names = Rails.cache.read(:champions)
 
     ChampionGGApi::ELOS.values.each do |elo|
       puts "Fetching Champion data for #{elo}"
@@ -94,7 +94,7 @@ namespace :champion_gg do
 
       champion_roles.each do |champion_role|
         id = champion_role['championId']
-        name = champion_ids_to_names[id]
+        name = ids_to_names[id]
         role = champion_role['role']
 
         # Add champion rankings in different positions (metrics) to the ranking lists
@@ -110,7 +110,7 @@ namespace :champion_gg do
         role_data = champion_role
         Rails.cache.write({ name: name, role: ChampionGGApi::ROLES[role.to_sym], elo: elo }, role_data)
       end
-      cache_champion_rankings(champion_rankings, elo)
+      cache_champion_rankings(champion_rankings, elo, ids_to_names)
     end
 
     puts 'Cached champion data from Champion.gg'

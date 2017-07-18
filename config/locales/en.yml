@@ -27,12 +27,19 @@ en:
           attributes:
             name1:
               inclusion: 'is not a valid champion name, to the best of my knowledge.'
-              blank: 'was not provided.'
+              blank: 'of champion was not provided.'
             name2:
               inclusion: 'is not a valid champion name, to the best of my knowledge.'
-              blank: 'was not provided.'
+              blank: 'of champion was not provided.'
             role1:
               blank: 'was not provided.'
+        matchup_ranking:
+          attributes:
+            name:
+              inclusion: 'is not a valid champion name, to the best of my knowledge.'
+              blank: 'of champion was not provided.'
+            role1:
+              blank: 'of champion was not provided.'
         summoner:
           attributes:
             id:

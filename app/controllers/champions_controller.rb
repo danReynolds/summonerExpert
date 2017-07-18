@@ -1,9 +1,10 @@
 class ChampionsController < ApplicationController
   include RiotApi
   include Sortable
-  before_action :load_champion, except: [:ranking, :matchup]
+  before_action :load_champion, except: [:ranking, :matchup, :matchup_ranking]
   before_action :load_matchup, only: :matchup
   before_action :load_role_performance, only: [:role_performance_summary]
+  before_action :load_matchup_ranking, only: :matchup_ranking
 
   MIN_MATCHUPS = 100
   STAT_PER_LEVEL = :perlevel
@@ -15,27 +16,22 @@ class ChampionsController < ApplicationController
   }
 
   def ranking
-    ids_to_names = Rails.cache.read(:champions)
-    ranking_ids = Rails.cache.read(champion_params.slice(:position, :elo, :role).to_h)
-
-    sortable_ranking_ids = Sortable.new({
-      collection: ranking_ids
+    rankings = Rails.cache.read(champion_params.slice(:position, :elo, :role).to_h)
+    sortable_rankings = Sortable.new({
+      collection: rankings
     }.merge(champion_params.slice(:list_position, :list_size, :list_order)))
-
-    ranking_names = sortable_ranking_ids.sort.map do |ranking_id|
-      ids_to_names[ranking_id]
-    end
+    filtered_rankings = sortable_rankings.sort
 
     args = {
       position: ChampionGGApi::POSITIONS[champion_params[:position].to_sym],
       role: champion_params[:role].humanize,
       elo: champion_params[:elo].humanize,
-      names: ranking_names.en.conjunction(article: false),
-      list_size: sortable_ranking_ids.list_size_message,
-      list_position: sortable_ranking_ids.list_position_message,
-      list_order: sortable_ranking_ids.list_order,
-      names_conjugation: "is".en.plural_verb(sortable_ranking_ids.list_size.to_i),
-      champion_conjugation: "champion".en.pluralize(sortable_ranking_ids.list_size.to_i)
+      names: filtered_rankings.en.conjunction(article: false),
+      list_size: sortable_rankings.list_size_message,
+      list_position: sortable_rankings.list_position_message,
+      list_order: sortable_rankings.list_order,
+      names_conjugation: 'is'.en.plural_verb(sortable_rankings.list_size.to_i),
+      champion_conjugation: 'champion'.en.pluralize(sortable_rankings.list_size.to_i)
     }
 
     render json: {
@@ -99,9 +95,7 @@ class ChampionsController < ApplicationController
     role1 = ChampionGGApi::MATCHUP_ROLES[@matchup.position('role', @matchup.name1).to_sym]
     role2 = ChampionGGApi::MATCHUP_ROLES[@matchup.position('role', @matchup.name2).to_sym]
 
-    response_query = {}
-
-    matchup_key = if @matchup.role1 == ChampionGGApi::MATCHUP_ROLES[:SYNERGY]
+    matchup_key = if @matchup.matchup_role == ChampionGGApi::MATCHUP_ROLES[:SYNERGY]
       :synergy
     elsif role1 == role2
       :single_role
@@ -109,6 +103,7 @@ class ChampionsController < ApplicationController
       :duo_role
     end
 
+    response_query = {}
     if matchup_position == ChampionGGApi::MATCHUP_POSITIONS[:winrate]
       champ1_result *= 100
       champ2_result *= 100
@@ -134,41 +129,47 @@ class ChampionsController < ApplicationController
     }
   end
 
-  def counters
-    matchups = @role_performance[:matchups].select do |matchup|
-      matchup[:games] >= MIN_MATCHUPS
+  def matchup_ranking
+    matchup_position = champion_params[:matchup_position]
+    matchup_role = @matchup_ranking.matchup_role
+    name = @matchup_ranking.name
+
+    sortable_rankings = Sortable.new({
+      collection: @matchup_ranking.matchups,
+      # the default sort order is best = lowest
+      sort_value: ->(name, matchup) { matchup[name][matchup_position] * -1 }
+    }.merge(champion_params.slice(:list_position, :list_size, :list_order)))
+    ranked_names = sortable_rankings.sort.map { |ranking_name| ranking_name.first.dup }
+
+
+    matchup_key = if matchup_role == ChampionGGApi::MATCHUP_ROLES[:SYNERGY]
+      :synergy
+    elsif matchup_role == ChampionGGApi::MATCHUP_ROLES[:ADCSUPPORT]
+      :duo_role
+    else
+      :single_role
     end
 
-    if matchups.blank?
-      return render json: {
-        speech: (
-          "There is not enough data for #{@champion.name} in the current patch."
-        )
-      }
+    if matchup_position == ChampionGGApi::MATCHUP_POSITIONS[:winrate]
+      champ1_result *= 100
+      champ2_result *= 100
     end
 
-    sortable_counters = Sortable.new({
-      collection: matchups,
-      sort_order: -> matchup { matchup[:statScore] }
-    }.merge(champion_params.slice(:list_size, :list_position, :list_order)))
-    champions = Rails.cache.read(:champions)
-
-    counters = sortable_counters.sort.map do |counter|
-      "#{champions[counter[:key]][:name]} at a " \
-      "#{(100 - counter[:winRate]).round(2)}% win rate"
-    end
-    list_size_message = sortable_counters.list_size_message
-    list_position_message = sortable_counters.list_position_message
-    list_size = sortable_counters.list_size.to_i
-
+    args = {
+      elo: @matchup_ranking.elo.humanize,
+      position: ChampionGGApi::MATCHUP_POSITIONS[matchup_position.to_sym],
+      unnamed_role: @matchup_ranking.unnamed_role.humanize,
+      named_role: @matchup_ranking.named_role.humanize,
+      name: @matchup_ranking.name,
+      ranked_names: ranked_names.en.conjunction(article: false),
+      list_size: sortable_rankings.list_size_message,
+      list_position: sortable_rankings.list_position_message,
+      list_order: sortable_rankings.list_order,
+      names_conjugation: 'is'.en.plural_verb(sortable_rankings.list_size.to_i),
+      champion_conjugation: 'champion'.en.pluralize(sortable_rankings.list_size.to_i)
+    }
     render json: {
-      speech: (
-        "#{insufficient_champions_message(counters.size, 'counter')}The " \
-        "#{list_position_message}#{sortable_counters.list_order} " \
-        "#{list_size_message}#{'counter'.en.pluralize(counters.size)} " \
-        "for #{@champion.name} #{@role} #{'is'.en.plural_verb(counters.size)} " \
-        "#{counters.en.conjunction(article: false)}."
-      )
+      speech: ApiResponse.get_response({ champions: { matchup_ranking: matchup_key } }, args)
     }
   end
 
@@ -278,6 +279,20 @@ class ChampionsController < ApplicationController
     end
   end
 
+  def load_matchup_ranking
+    @matchup_ranking = MatchupRanking.new(
+      name: champion_params[:name],
+      elo: champion_params[:elo],
+      role1: champion_params[:role1],
+      role2: champion_params[:role2]
+    )
+
+    unless @matchup_ranking.valid?
+      render json: { speech: @matchup_ranking.error_message }
+      return false
+    end
+  end
+
   def load_champion
     @champion = Champion.new(name: champion_params[:name])
 
@@ -310,7 +325,8 @@ class ChampionsController < ApplicationController
   def champion_params
     params.require(:result).require(:parameters).permit(
       :name, :champion1, :ability_position, :rank, :role, :list_size, :list_position,
-      :list_order, :stat, :level, :tag, :elo, :metric, :position, :name1, :name2, :matchup_position, :role1, :role2
+      :list_order, :stat, :level, :tag, :elo, :metric, :position, :name1, :name2,
+      :matchup_position, :role1, :role2
     )
   end
 end
