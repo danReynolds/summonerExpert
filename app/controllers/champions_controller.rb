@@ -6,10 +6,6 @@ class ChampionsController < ApplicationController
   before_action :load_role_performance, only: [:role_performance_summary, :build, :ability_order]
   before_action :load_matchup_ranking, only: :matchup_ranking
 
-  MIN_MATCHUPS = 100
-  STAT_PER_LEVEL = :perlevel
-  HTML_TAGS = /<("[^"]*"|'[^']*'|[^'">])*>/
-
   def ranking
     rankings = Rails.cache.read(champion_params.slice(:position, :elo, :role).to_h)
     sortable_rankings = Sortable.new({
@@ -35,25 +31,18 @@ class ChampionsController < ApplicationController
   end
 
   def stats
-    name = @champion.name
-    stats = @champion.stats
-    stat = champion_params[:stat]
+    stat_key = champion_params[:stat]
     level = champion_params[:level].to_i
-    stat_value = stats[stat]
-    stat_name = RiotApi::STATS[stat.to_sym]
-    level_message = ''
 
-    if stat_modifier = stats["#{stat}#{STAT_PER_LEVEL}"]
-      return render json: ask_for_level_response unless level.positive?
-
-      level_message = " at level #{level}"
-      stat_value += stat_modifier * (level - 1)
-    end
+    args = {
+      name: @champion.name,
+      level: level,
+      stat_name: RiotApi::STATS[stat_key.to_sym],
+      stat: @champion.stat(stat_key, level).round(2)
+    }
 
     render json: {
-      speech: (
-        "#{name} has #{stat_value.round} #{stat_name}#{level_message}."
-      )
+      speech: ApiResponse.get_response({ champions: :stats }, args)
     }
   end
 
@@ -268,6 +257,7 @@ class ChampionsController < ApplicationController
 
   private
 
+  HTML_TAGS = /<("[^"]*"|'[^']*'|[^'">])*>/
   def remove_html_tags(speech)
     speech.gsub(HTML_TAGS, '')
   end
@@ -324,10 +314,6 @@ class ChampionsController < ApplicationController
       render json: { speech: @role_performance.error_message }
       return false
     end
-  end
-
-  def tag_message(tag, size)
-    tag.blank? ? 'champion'.pluralize(size) : tag.en.downcase.pluralize(size)
   end
 
   def champion_params

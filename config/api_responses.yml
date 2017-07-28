@@ -52,6 +52,8 @@ champions:
       - 'The {list_position}{list_size}{champion_conjugation} with the {list_order} {position} when playing {unnamed_role} with {name} {named_role} in {elo} division {names_conjugation} {ranked_names}.'
   build:
     - 'The {metric} build for {name} {role} in {elo} division is {item_names}.'
+  stats:
+    - '{name} has {stat} {stat_name} at level {level}.'
 items:
   build:
     - 'The items used to build {name} are {item_names}.'
