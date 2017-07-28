@@ -19,7 +19,8 @@ Rails.application.routes.draw do
   end
 
   namespace :items do
-    post :show
+    post :description
+    post :build
   end
 
   namespace :summoners do

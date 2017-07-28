@@ -19,6 +19,10 @@ class Champion < Collection
   validates :name, presence: true, inclusion: COLLECTION.values
 
   def ability(ability_position)
-    @data['spells'][ABILITIES[ability_position]].slice(:sanitizedDescription, :name)
+    @data['spells'][ABILITIES[ability_position]].slice(
+      :cooldown,
+      :sanitizedDescription,
+      :name
+    )
   end
 end

@@ -24,6 +24,9 @@ champions:
     - '{name} got {position_change} this patch and is ranked {position} out of {total_positions} in {role} with a {kda} KDA, {win_rate} win rate and a {ban_rate} ban rate in {elo} divison.'
   ranking:
     - 'The {list_position}{list_size}{champion_conjugation} with the {list_order} {position} in {role} from {elo} division {names_conjugation} {names}.'
+  cooldown:
+    - "The cooldown of {name}'s {ability_position} ability, {ability_name}, is {ability_cooldown} seconds at rank {rank}."
+    - "{name}'s {ability_position} ability, {ability_name}, has a cooldown of {ability_cooldown} at rank {rank}."
   matchup:
     single_role:
       general:
@@ -49,3 +52,8 @@ champions:
       - 'The {list_position}{list_size}{champion_conjugation} with the {list_order} {position} when playing {unnamed_role} with {name} {named_role} in {elo} division {names_conjugation} {ranked_names}.'
   build:
     - 'The {metric} build for {name} {role} in {elo} division is {item_names}.'
+items:
+  build:
+    - 'The items used to build {name} are {item_names}.'
+  description:
+    - "I have seen many champions use {name} on the field of battle. It costs {total_cost} gold and can be sold for {sell_cost}. Here is what it does:\n {description}"

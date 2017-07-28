@@ -3,7 +3,7 @@ class ChampionsController < ApplicationController
   include Sortable
   before_action :load_champion, except: [:ranking, :matchup, :matchup_ranking]
   before_action :load_matchup, only: :matchup
-  before_action :load_role_performance, only: [:role_performance_summary, :build]
+  before_action :load_role_performance, only: [:role_performance_summary, :build, :ability_order]
   before_action :load_matchup_ranking, only: :matchup_ranking
 
   MIN_MATCHUPS = 100
@@ -217,15 +217,20 @@ class ChampionsController < ApplicationController
   end
 
   def cooldown
-    ability = champion_params[:ability].to_sym
-    spell = @champion.spells[RiotApi::ABILITIES[ability]]
+    ability_position = champion_params[:ability_position].to_sym
     rank = champion_params[:rank].split(' ').last.to_i
+    ability = @champion.ability(ability_position)
+
+    args = {
+      name: @champion.name,
+      rank: rank,
+      ability_position: ability_position,
+      ability_name: ability[:name],
+      ability_cooldown: ability[:cooldown][rank].to_i
+    }
 
     render json: {
-      speech: (
-        "#{@champion.name}'s #{ability} ability, #{spell[:name]}, has a " \
-        "cooldown of #{spell[:cooldown][rank - 1].to_i} seconds at rank #{rank}."
-      )
+      speech: ApiResponse.get_response({ champions: :cooldown }, args)
     }
   end
 
