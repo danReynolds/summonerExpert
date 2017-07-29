@@ -36,8 +36,8 @@ en:
         matchup_ranking:
           attributes:
             name:
-              inclusion: 'is not a valid champion name, to the best of my knowledge'
               blank: 'of champion was not provided'
+              inclusion: 'is not a valid champion name, to the best of my knowledge'
             role1:
               blank: 'of champion was not provided'
         summoner:
@@ -47,7 +47,7 @@ en:
         item:
           attributes:
             name:
-              blank: 'of item was not provided'
+              blank: 'was not provided'
               inclusion: 'provided is not a valid item name, to the best of my knowledge'
         champion:
           attributes:

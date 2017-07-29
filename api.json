@@ -1,7 +1,7 @@
 {
 	"_type": "export",
 	"__export_format": 3,
-	"__export_date": "2017-07-29T01:42:23.968Z",
+	"__export_date": "2017-07-29T20:13:32.210Z",
 	"__export_source": "insomnia.desktop.app:v5.5.2",
 	"resources": [
 		{
@@ -94,7 +94,7 @@
 		{
 			"_id": "req_653ffbc0b2cc4404bd70e4eed4e0b6bd",
 			"parentId": "wrk_6d555102de1a469aa75025d23e488d2b",
-			"modified": 1501219251254,
+			"modified": 1501310672158,
 			"created": 1481917042270,
 			"url": "{{ url }}",
 			"name": "champions/ability",
@@ -102,7 +102,7 @@
 			"method": "POST",
 			"body": {
 				"mimeType": "application/json",
-				"text": "{\n  \"id\": \"d13c0ccd-c465-4812-8083-19e9089667d8\",\n  \"timestamp\": \"2016-12-16T19:37:09.612Z\",\n  \"result\": {\n    \"source\": \"agent\",\n    \"resolvedQuery\": \"What is Ivern's second ability?\",\n    \"action\": \"champions/ability\",\n    \"actionIncomplete\": false,\n    \"parameters\": {\n      \"ability_position\": \"second\",\n      \"name\": \"Ivern\"\n    },\n    \"contexts\": [],\n    \"metadata\": {\n      \"intentId\": \"1c370fa4-4e6e-41ab-90b6-649b5f83f47b\",\n      \"webhookUsed\": \"true\",\n      \"webhookForSlotFillingUsed\": \"true\",\n      \"intentName\": \"champions/ability\"\n    },\n    \"fulfillment\": {\n      \"speech\": \"Ivern's second ability is called\\nBrushmaker.In brush, Ivern's attacks are ranged and deal bonus magic damage. Ivern can activate this ability to create a patch of brush.\\n\",\n      \"messages\": [\n        {\n          \"type\": 0,\n          \"speech\": \"Ivern's second ability is called\\nBrushmaker.In brush, Ivern's attacks are ranged and deal bonus magic damage. Ivern can activate this ability to create a patch of brush.\\n\"\n        }\n      ]\n    },\n    \"score\": 0.92\n  },\n  \"status\": {\n    \"code\": 200,\n    \"errorType\": \"success\"\n  },\n  \"sessionId\": \"e73bf291-8c55-4a67-9941-837aced9bf16\"\n}"
+				"text": "{\n  \"id\": \"741fd0e4-8363-40c6-956d-3fa05edd4bea\",\n  \"timestamp\": \"2017-07-29T06:44:11.93Z\",\n  \"lang\": \"en\",\n  \"result\": {\n    \"source\": \"agent\",\n    \"resolvedQuery\": \"zac build\",\n    \"action\": \"champions/build\",\n    \"actionIncomplete\": false,\n    \"parameters\": {\n      \"elo\": \"PLATINUM_PLUS\",\n      \"metric\": \"highestCount\",\n      \"name\": \"zac\",\n      \"role\": \"\"\n    },\n    \"contexts\": [\n      {\n        \"name\": \"championsbuild_v2-followup-2\",\n        \"parameters\": {\n          \"name.original\": \"zac\",\n          \"role\": \"\",\n          \"metric\": \"highestCount\",\n          \"metric.original\": \"\",\n          \"name\": \"zac\",\n          \"elo\": \"PLATINUM_PLUS\",\n          \"role.original\": \"\",\n          \"elo.original\": \"\"\n        },\n        \"lifespan\": 2\n      },\n      {\n        \"name\": \"build\",\n        \"parameters\": {\n          \"name.original\": \"zac\",\n          \"role\": \"\",\n          \"metric\": \"highestCount\",\n          \"metric.original\": \"\",\n          \"name\": \"zac\",\n          \"elo\": \"PLATINUM_PLUS\",\n          \"role.original\": \"\",\n          \"elo.original\": \"\"\n        },\n        \"lifespan\": 5\n      },\n      {\n        \"name\": \"championsbuild_v2-followup\",\n        \"parameters\": {\n          \"name.original\": \"zac\",\n          \"role\": \"\",\n          \"metric\": \"highestCount\",\n          \"metric.original\": \"\",\n          \"name\": \"zac\",\n          \"elo\": \"PLATINUM_PLUS\",\n          \"role.original\": \"\",\n          \"elo.original\": \"\"\n        },\n        \"lifespan\": 2\n      }\n    ],\n    \"metadata\": {\n      \"intentId\": \"61d64176-8c08-4bf3-935d-a0397f7f3d1d\",\n      \"webhookUsed\": \"true\",\n      \"webhookForSlotFillingUsed\": \"true\",\n      \"webhookResponseTime\": 405,\n      \"intentName\": \"champions/build_v2\"\n    },\n    \"fulfillment\": {\n      \"speech\": \"The most frequent build for Zac Jungle in Platinum plus division is Enchantment: Cinderhulk, Ninja Tabi, Spirit Visage, Thornmail, Gargoyle Stoneplate, and Warmog's Armor.\",\n      \"messages\": [\n        {\n          \"type\": 0,\n          \"speech\": \"The most frequent build for Zac Jungle in Platinum plus division is Enchantment: Cinderhulk, Ninja Tabi, Spirit Visage, Thornmail, Gargoyle Stoneplate, and Warmog's Armor.\"\n        }\n      ]\n    },\n    \"score\": 1\n  },\n  \"status\": {\n    \"code\": 200,\n    \"errorType\": \"success\"\n  },\n  \"sessionId\": \"14aca756-2050-4682-9ac5-53b1b0e42a81\"\n}"
 			},
 			"parameters": [],
 			"headers": [
@@ -152,7 +152,7 @@
 		{
 			"_id": "req_420d468a6f164a43bfa8d832e3e318fb",
 			"parentId": "wrk_6d555102de1a469aa75025d23e488d2b",
-			"modified": 1501219214691,
+			"modified": 1501311612226,
 			"created": 1481917417587,
 			"url": "{{ url }}",
 			"name": "champions/enemy_tips",
@@ -160,7 +160,7 @@
 			"method": "POST",
 			"body": {
 				"mimeType": "application/json",
-				"text": "{\n  \"id\": \"3a258edd-d6b3-4803-b485-02779f67ce6e\",\n  \"timestamp\": \"2016-12-16T19:43:15.319Z\",\n  \"result\": {\n    \"source\": \"agent\",\n    \"resolvedQuery\": \"How should I play against LeBlanc?\",\n    \"action\": \"champions/enemy_tips\",\n    \"actionIncomplete\": false,\n    \"parameters\": {\n      \"name\": \"Leblanc\"\n    },\n    \"contexts\": [],\n    \"metadata\": {\n      \"intentId\": \"3d65f174-bd6b-4d59-be1b-a0fdc9f2c198\",\n      \"webhookUsed\": \"true\",\n      \"webhookForSlotFillingUsed\": \"true\",\n      \"intentName\": \"champions/enemy_tips\"\n    },\n    \"fulfillment\": {\n      \"speech\": \"\\\"Here's a tip for playing against LeBlanc:\\nStunning or silencing LeBlanc will prevent her from activating the return part of Distortion.\\\"\\n\",\n      \"messages\": [\n        {\n          \"type\": 0,\n          \"speech\": \"\\\"Here's a tip for playing against LeBlanc:\\nStunning or silencing LeBlanc will prevent her from activating the return part of Distortion.\\\"\\n\"\n        }\n      ]\n    },\n    \"score\": 0.76\n  },\n  \"status\": {\n    \"code\": 200,\n    \"errorType\": \"success\"\n  },\n  \"sessionId\": \"e73bf291-8c55-4a67-9941-837aced9bf16\"\n}"
+				"text": "{\n  \"id\": \"f81436fc-23b6-4159-8488-077affc4c669\",\n  \"timestamp\": \"2017-07-29T07:00:05.955Z\",\n  \"lang\": \"en\",\n  \"result\": {\n    \"source\": \"agent\",\n    \"resolvedQuery\": \"lux\",\n    \"action\": \"champions/enemy_tips\",\n    \"actionIncomplete\": false,\n    \"parameters\": {\n      \"name\": \"lux\"\n    },\n    \"contexts\": [\n      {\n        \"name\": \"enemy_tips\",\n        \"parameters\": {\n          \"name.original\": \"lux\",\n          \"name\": \"lux\"\n        },\n        \"lifespan\": 4\n      },\n      {\n        \"name\": \"championsenemy_tips-followup\",\n        \"parameters\": {\n          \"name.original\": \"lux\",\n          \"name\": \"lux\"\n        },\n        \"lifespan\": 1\n      }\n    ],\n    \"metadata\": {\n      \"intentId\": \"a1bb33cd-0100-494d-b513-a261b44fa65c\",\n      \"webhookUsed\": \"true\",\n      \"webhookForSlotFillingUsed\": \"false\",\n      \"webhookResponseTime\": 264,\n      \"intentName\": \"champions/enemy_tips - name\"\n    },\n    \"fulfillment\": {\n      \"speech\": \"I have seen Lux fall in battle before and this is what I would recommend: Lux has powerful zone control abilities. Try to spread out and attack from different directions so she cannot lock down a specific area.\",\n      \"messages\": [\n        {\n          \"type\": 0,\n          \"speech\": \"I have seen Lux fall in battle before and this is what I would recommend: Lux has powerful zone control abilities. Try to spread out and attack from different directions so she cannot lock down a specific area.\"\n        }\n      ]\n    },\n    \"score\": 1\n  },\n  \"status\": {\n    \"code\": 200,\n    \"errorType\": \"success\"\n  },\n  \"sessionId\": \"14aca756-2050-4682-9ac5-53b1b0e42a81\"\n}"
 			},
 			"parameters": [],
 			"headers": [
@@ -297,7 +297,7 @@
 		{
 			"_id": "req_e3313ffbf8bc499cb9ddf908d9d9cad3",
 			"parentId": "wrk_6d555102de1a469aa75025d23e488d2b",
-			"modified": 1501219106409,
+			"modified": 1501294715056,
 			"created": 1482275704759,
 			"url": "{{ url }}",
 			"name": "champions/ability_order",
@@ -305,7 +305,7 @@
 			"method": "POST",
 			"body": {
 				"mimeType": "application/json",
-				"text": "{\n  \"id\": \"95b1bcdb-96b2-489e-b926-43e2fa0b82e1\",\n  \"timestamp\": \"2017-07-28T05:17:40.183Z\",\n  \"lang\": \"en\",\n  \"result\": {\n    \"source\": \"agent\",\n    \"resolvedQuery\": \"jax skill order top lane\",\n    \"action\": \"champions/ability_order\",\n    \"actionIncomplete\": false,\n    \"parameters\": {\n      \"elo\": \"SILVER\",\n      \"metric\": \"highestCount\",\n      \"name\": \"Azir\",\n      \"role\": \"MIDDLE\"\n    },\n    \"contexts\": [\n      {\n        \"name\": \"ability_order\",\n        \"parameters\": {\n          \"name.original\": \"jax\",\n          \"role\": \"TOP\",\n          \"metric\": \"highestCount\",\n          \"metric.original\": \"\",\n          \"name\": \"jax\",\n          \"elo\": \"PLATINUM_PLUS\",\n          \"role.original\": \"top\",\n          \"elo.original\": \"\"\n        },\n        \"lifespan\": 5\n      },\n      {\n        \"name\": \"championsability_order_v2-followup\",\n        \"parameters\": {\n          \"name.original\": \"jax\",\n          \"role\": \"TOP\",\n          \"metric\": \"highestCount\",\n          \"metric.original\": \"\",\n          \"name\": \"jax\",\n          \"elo\": \"PLATINUM_PLUS\",\n          \"role.original\": \"top\",\n          \"elo.original\": \"\"\n        },\n        \"lifespan\": 2\n      }\n    ],\n    \"metadata\": {\n      \"intentId\": \"988464be-d423-4f29-939c-47af4c9d6676\",\n      \"webhookUsed\": \"true\",\n      \"webhookForSlotFillingUsed\": \"true\",\n      \"intentName\": \"champions/ability_order_v2\"\n    },\n    \"fulfillment\": {\n      \"speech\": \"\",\n      \"messages\": [\n        {\n          \"type\": 0,\n          \"speech\": \"\"\n        }\n      ]\n    },\n    \"score\": 1\n  },\n  \"status\": {\n    \"code\": 206,\n    \"errorType\": \"partial_content\",\n    \"errorDetails\": \"Webhook call failed. Error: 404 Not Found\"\n  },\n  \"sessionId\": \"14aca756-2050-4682-9ac5-53b1b0e42a81\"\n}"
+				"text": "{\n  \"id\": \"e19309e7-08eb-4249-a6e8-cadf22315d11\",\n  \"timestamp\": \"2017-07-29T02:18:28.555Z\",\n  \"lang\": \"en\",\n  \"result\": {\n    \"source\": \"agent\",\n    \"resolvedQuery\": \"jungle\",\n    \"action\": \"champions/ability_order\",\n    \"actionIncomplete\": false,\n    \"parameters\": {\n      \"elo\": \"PLATINUM_PLUS\",\n      \"metric\": \"highestCount\",\n      \"name\": \"Twitch\",\n      \"role\": \"JUNGLE\"\n    },\n    \"contexts\": [\n      {\n        \"name\": \"ability_order\",\n        \"parameters\": {\n          \"name.original\": \"\",\n          \"role\": \"JUNGLE\",\n          \"metric\": \"highestCount\",\n          \"metric.original\": \"\",\n          \"name\": \"Twitch\",\n          \"elo\": \"PLATINUM_PLUS\",\n          \"role.original\": \"jungle\",\n          \"elo.original\": \"\"\n        },\n        \"lifespan\": 3\n      },\n      {\n        \"name\": \"championsability_order_v2-followup\",\n        \"parameters\": {\n          \"name.original\": \"\",\n          \"role\": \"JUNGLE\",\n          \"metric\": \"highestCount\",\n          \"metric.original\": \"\",\n          \"name\": \"Twitch\",\n          \"elo\": \"PLATINUM_PLUS\",\n          \"role.original\": \"jungle\",\n          \"elo.original\": \"\"\n        },\n        \"lifespan\": 3\n      }\n    ],\n    \"metadata\": {\n      \"intentId\": \"4c2fba6b-efd4-463e-8967-fdea480bda2c\",\n      \"webhookUsed\": \"false\",\n      \"webhookForSlotFillingUsed\": \"false\",\n      \"intentName\": \"champions/ability_order_v2 - role\"\n    },\n    \"fulfillment\": {\n      \"speech\": \"\",\n      \"messages\": [\n        {\n          \"type\": 0,\n          \"speech\": \"\"\n        }\n      ]\n    },\n    \"score\": 1\n  },\n  \"status\": {\n    \"code\": 200,\n    \"errorType\": \"success\"\n  },\n  \"sessionId\": \"14aca756-2050-4682-9ac5-53b1b0e42a81\"\n}"
 			},
 			"parameters": [],
 			"headers": [
@@ -326,7 +326,7 @@
 		{
 			"_id": "req_30337ed27c9444deb392be7f6b1ff2be",
 			"parentId": "wrk_6d555102de1a469aa75025d23e488d2b",
-			"modified": 1500354953229,
+			"modified": 1501346277863,
 			"created": 1482600505061,
 			"url": "{{ url }}",
 			"name": "champions/matchup_ranking",
@@ -334,7 +334,7 @@
 			"method": "POST",
 			"body": {
 				"mimeType": "application/json",
-				"text": "{\n  \"id\": \"34ad1009-97c9-48b9-bf39-5e294ba9fe60\",\n  \"timestamp\": \"2017-07-18T04:26:10.176Z\",\n  \"lang\": \"en\",\n  \"result\": {\n    \"source\": \"agent\",\n    \"resolvedQuery\": \"which adc has the lowest win rate against jinx\",\n    \"action\": \"champions/matchup_ranking\",\n    \"actionIncomplete\": false,\n    \"parameters\": {\n      \"elo\": \"PLATINUM_PLUS\",\n      \"list_order\": \"highest\",\n      \"matchup_position\": \"winrate\",\n      \"name\": \"jinx\",\n      \"role1\": \"ADC\",\n      \"role2\": \"\"\n    },\n    \"contexts\": [\n      {\n        \"name\": \"which\",\n        \"parameters\": {\n          \"name.original\": \"jinx\",\n          \"role1\": \"ADC\",\n          \"role2.original\": \"\",\n          \"role2\": \"\",\n          \"name\": \"jinx\",\n          \"list_order\": \"lowest\",\n          \"role1.original\": \"adc\",\n          \"elo\": \"PLATINUM_PLUS\",\n          \"matchup_position.original\": \"win rate\",\n          \"matchup_position\": \"winrate\",\n          \"list_order.original\": \"lowest\",\n          \"elo.original\": \"\"\n        },\n        \"lifespan\": 5\n      },\n      {\n        \"name\": \"c\",\n        \"parameters\": {\n          \"name.original\": \"jinx\",\n          \"role1\": \"ADC\",\n          \"role2.original\": \"\",\n          \"role2\": \"\",\n          \"name\": \"jinx\",\n          \"list_order\": \"lowest\",\n          \"role1.original\": \"adc\",\n          \"elo\": \"PLATINUM_PLUS\",\n          \"matchup_position.original\": \"win rate\",\n          \"matchup_position\": \"winrate\",\n          \"list_order.original\": \"lowest\",\n          \"elo.original\": \"\"\n        },\n        \"lifespan\": 4\n      },\n      {\n        \"name\": \"counters\",\n        \"parameters\": {\n          \"name.original\": \"jinx\",\n          \"role1\": \"ADC\",\n          \"role2.original\": \"\",\n          \"role2\": \"\",\n          \"name\": \"jinx\",\n          \"list_order\": \"lowest\",\n          \"role1.original\": \"adc\",\n          \"elo\": \"PLATINUM_PLUS\",\n          \"matchup_position.original\": \"win rate\",\n          \"matchup_position\": \"winrate\",\n          \"list_order.original\": \"lowest\",\n          \"elo.original\": \"\"\n        },\n        \"lifespan\": 5\n      }\n    ],\n    \"metadata\": {\n      \"intentId\": \"7fbc7812-0bda-452f-8a7d-1bf8bb134a4b\",\n      \"webhookUsed\": \"true\",\n      \"webhookForSlotFillingUsed\": \"true\",\n      \"intentName\": \"champions/matchup_ranking\"\n    },\n    \"fulfillment\": {\n      \"speech\": \"\",\n      \"messages\": [\n        {\n          \"type\": 0,\n          \"speech\": \"\"\n        }\n      ]\n    },\n    \"score\": 1\n  },\n  \"status\": {\n    \"code\": 206,\n    \"errorType\": \"partial_content\",\n    \"errorDetails\": \"Webhook call failed. Error: 404 Not Found\"\n  },\n  \"sessionId\": \"37bb2c1a-f7a7-4657-9c4c-d8968351c5fd\"\n}"
+				"text": "{\n  \"id\": \"1efc7fbc-e804-44a5-8ab1-66bdf408e34f\",\n  \"timestamp\": \"2017-07-29T16:37:39.591Z\",\n  \"lang\": \"en\",\n  \"result\": {\n    \"source\": \"agent\",\n    \"resolvedQuery\": \"who gets the most kills against xerath mid\",\n    \"action\": \"champions/matchup_ranking\",\n    \"actionIncomplete\": false,\n    \"parameters\": {\n      \"elo\": \"PLATINUM_PLUS\",\n      \"list_order\": \"highest\",\n      \"matchup_position\": \"kills\",\n      \"name\": \"Xerath\",\n      \"role1\": \"MIDDLE\",\n      \"role2\": \"\"\n    },\n    \"contexts\": [\n      {\n        \"name\": \"matchup_ranking\",\n        \"parameters\": {\n          \"name.original\": \"xerath\",\n          \"lane.original\": \"mid\",\n          \"role1\": \"MIDDLE\",\n          \"role2\": \"\",\n          \"role1.original\": \"mid\",\n          \"elo\": \"PLATINUM_PLUS\",\n          \"list_order.original\": \"most\",\n          \"role2.original\": \"\",\n          \"name\": \"Xerath\",\n          \"list_order\": \"highest\",\n          \"matchup_position.original\": \"kills\",\n          \"matchup_position\": \"kills\",\n          \"lane\": \"MIDDLE\",\n          \"elo.original\": \"\"\n        },\n        \"lifespan\": 5\n      }\n    ],\n    \"metadata\": {\n      \"intentId\": \"7fbc7812-0bda-452f-8a7d-1bf8bb134a4b\",\n      \"webhookUsed\": \"true\",\n      \"webhookForSlotFillingUsed\": \"true\",\n      \"webhookResponseTime\": 686,\n      \"intentName\": \"champions/matchup_ranking\"\n    },\n    \"fulfillment\": {\n      \"speech\": \"\",\n      \"messages\": [\n        {\n          \"type\": 0,\n          \"speech\": \"\"\n        }\n      ]\n    },\n    \"score\": 0.9800000190734863\n  },\n  \"status\": {\n    \"code\": 206,\n    \"errorType\": \"partial_content\",\n    \"errorDetails\": \"Webhook call failed. Error: Webhook response was empty.\"\n  },\n  \"sessionId\": \"14aca756-2050-4682-9ac5-53b1b0e42a81\"\n}"
 			},
 			"parameters": [],
 			"headers": [
@@ -491,6 +491,64 @@
 			],
 			"authentication": {},
 			"metaSortKey": -1501220925998,
+			"settingStoreCookies": true,
+			"settingSendCookies": true,
+			"settingDisableRenderRequestBody": false,
+			"settingEncodeUrl": true,
+			"_type": "request"
+		},
+		{
+			"_id": "req_bf7ac7b747c14dc5aa360538b73a72ce",
+			"parentId": "wrk_6d555102de1a469aa75025d23e488d2b",
+			"modified": 1501352786966,
+			"created": 1501352595669,
+			"url": "{{ url }}",
+			"name": "application/patch",
+			"description": "",
+			"method": "POST",
+			"body": {
+				"mimeType": "application/json",
+				"text": "{\n  \"id\": \"d5b1d0d9-04ef-44c0-83d9-e404f34547cc\",\n  \"timestamp\": \"2017-07-29T18:24:16.878Z\",\n  \"lang\": \"en\",\n  \"result\": {\n    \"source\": \"agent\",\n    \"resolvedQuery\": \"patch info\",\n    \"action\": \"patch\",\n    \"actionIncomplete\": false,\n    \"parameters\": {},\n    \"contexts\": [],\n    \"metadata\": {\n      \"intentId\": \"87f45540-3b13-4791-b6f1-9e9e344ea4b2\",\n      \"webhookUsed\": \"true\",\n      \"webhookForSlotFillingUsed\": \"false\",\n      \"intentName\": \"application/patch\"\n    },\n    \"fulfillment\": {\n      \"speech\": \"\",\n      \"messages\": [\n        {\n          \"type\": 0,\n          \"speech\": \"\"\n        }\n      ]\n    },\n    \"score\": 1\n  },\n  \"status\": {\n    \"code\": 206,\n    \"errorType\": \"partial_content\",\n    \"errorDetails\": \"Webhook call failed. Error: 404 Not Found\"\n  },\n  \"sessionId\": \"14aca756-2050-4682-9ac5-53b1b0e42a81\"\n}"
+			},
+			"parameters": [],
+			"headers": [
+				{
+					"name": "Content-Type",
+					"value": "application/json",
+					"id": "pair_6ab9c38d7ef74208866e0a2dd2bf9b23"
+				}
+			],
+			"authentication": {},
+			"metaSortKey": -1501352595669,
+			"settingStoreCookies": true,
+			"settingSendCookies": true,
+			"settingDisableRenderRequestBody": false,
+			"settingEncodeUrl": true,
+			"_type": "request"
+		},
+		{
+			"_id": "req_9e10cc81509a45db9592fad21391f384",
+			"parentId": "wrk_6d555102de1a469aa75025d23e488d2b",
+			"modified": 1501353245560,
+			"created": 1501353233111,
+			"url": "{{ url }}",
+			"name": "application/reset",
+			"description": "",
+			"method": "POST",
+			"body": {
+				"mimeType": "application/json",
+				"text": "{\n  \"id\": \"f0fd3760-56d7-4e79-b787-79b41c3b0d1c\",\n  \"timestamp\": \"2017-07-29T18:31:55.336Z\",\n  \"lang\": \"en\",\n  \"result\": {\n    \"source\": \"agent\",\n    \"resolvedQuery\": \"reset\",\n    \"action\": \"reset\",\n    \"actionIncomplete\": false,\n    \"parameters\": {},\n    \"contexts\": [\n      {\n        \"name\": \"item_build\",\n        \"parameters\": {\n          \"name.original\": \"bork\",\n          \"name\": \"Blade of the Ruined King\"\n        },\n        \"lifespan\": 4\n      },\n      {\n        \"name\": \"itemsbuild-followup\",\n        \"parameters\": {\n          \"name.original\": \"bork\",\n          \"name\": \"Blade of the Ruined King\"\n        },\n        \"lifespan\": 1\n      }\n    ],\n    \"metadata\": {\n      \"intentId\": \"9dfbcea2-e523-44a7-b12b-92485def1fdb\",\n      \"webhookUsed\": \"true\",\n      \"webhookForSlotFillingUsed\": \"false\",\n      \"webhookResponseTime\": 1380,\n      \"intentName\": \"application/reset\"\n    },\n    \"fulfillment\": {\n      \"messages\": [\n        {\n          \"type\": 0,\n          \"speech\": \"\"\n        }\n      ]\n    },\n    \"score\": 1\n  },\n  \"status\": {\n    \"code\": 200,\n    \"errorType\": \"success\"\n  },\n  \"sessionId\": \"14aca756-2050-4682-9ac5-53b1b0e42a81\"\n}"
+			},
+			"parameters": [],
+			"headers": [
+				{
+					"name": "Content-Type",
+					"value": "application/json",
+					"id": "pair_3154eeefa3524170927125457c5a0b36"
+				}
+			],
+			"authentication": {},
+			"metaSortKey": -1501353233111,
 			"settingStoreCookies": true,
 			"settingSendCookies": true,
 			"settingDisableRenderRequestBody": false,

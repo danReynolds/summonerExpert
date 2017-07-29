@@ -3,14 +3,14 @@ include CollectionHelper
 class Collection
   def initialize(**args)
     # Fuzzy match the name for the collection
-    name = args[:name].strip
-    name = CollectionHelper::match_collection(
+    @name = args[:name].strip
+    @name = CollectionHelper::match_collection(
       args[:name].strip,
       Rails.cache.read(collection_key.pluralize).values
     )
 
     search_key = {}
-    search_key[collection_key] = name
+    search_key[collection_key] = @name
 
     if @data = Rails.cache.read(search_key)
       self.class::ACCESSORS.each do |key|

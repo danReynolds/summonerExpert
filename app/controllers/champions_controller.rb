@@ -1,6 +1,7 @@
 class ChampionsController < ApplicationController
   include RiotApi
   include Sortable
+  include Utils
   before_action :load_champion, except: [:ranking, :matchup, :matchup_ranking]
   before_action :load_matchup, only: :matchup
   before_action :load_role_performance, only: [:role_performance_summary, :build, :ability_order]
@@ -12,21 +13,40 @@ class ChampionsController < ApplicationController
       collection: rankings
     }.merge(champion_params.slice(:list_position, :list_size, :list_order)))
     filtered_rankings = sortable_rankings.sort
+    list_position = sortable_rankings.list_position.to_i
+
+    real_size = rankings.size # Number of champions available to return
+    requested_size = sortable_rankings.list_size.to_i # Number of champions requested to return
+    filtered_size = filtered_rankings.size # Number of champions returned given position and real size
 
     args = {
       position: ChampionGGApi::POSITIONS[champion_params[:position].to_sym],
       role: champion_params[:role].humanize,
       elo: champion_params[:elo].humanize,
       names: filtered_rankings.en.conjunction(article: false),
-      list_size: sortable_rankings.list_size_message,
-      list_position: sortable_rankings.list_position_message,
+      real_size: real_size.en.numwords,
+      requested_size: requested_size.en.numwords,
+      filtered_size: filtered_size.en.numwords,
+      list_position: list_position.en.ordinate, # starting position requested
+      filtered_position_offset: (list_position + filtered_size).en.ordinate, # end position given position and real size
       list_order: sortable_rankings.list_order,
-      names_conjugation: 'is'.en.plural_verb(sortable_rankings.list_size.to_i),
-      champion_conjugation: 'champion'.en.pluralize(sortable_rankings.list_size.to_i)
+      real_size_champion_conjugation: 'champion'.en.pluralize(real_size)
     }
 
+    ranking_type = filtered_size == requested_size ? :complete : :incomplete
+    position_type = list_position == 1 ? :normal : :offset
+    size_type = case filtered_size
+    when 0
+      :empty
+    when 1
+      :single
+    else
+      :multiple
+    end
+    namespace = dig_set([:ranking, size_type, position_type, ranking_type])
+
     render json: {
-      speech: ApiResponse.get_response({ champions: :ranking }, args)
+      speech: ApiResponse.get_response({ champions: namespace }, args)
     }
   end
 

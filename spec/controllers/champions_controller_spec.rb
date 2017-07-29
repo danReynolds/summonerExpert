@@ -22,90 +22,11 @@ describe ChampionsController, type: :controller do
     end
   end
 
-  shared_examples 'verify role' do
-    it 'should verify the role' do
-      expect(controller).to receive(:verify_role).and_call_original
-      post action, params
-    end
-  end
-
-  describe '#verify_role' do
-    let(:champion) { Champion.new(name: 'Bard') }
-
-    before :each do
-      controller.instance_variable_set(:@champion, champion)
-    end
-
-    context 'with role' do
-      let(:role) { 'Support' }
-
-      context 'with role data' do
-        let(:role_data) {
-          champion.roles.first
-        }
-
-        it 'should return the role data' do
-          allow(controller).to receive(:champion_params).and_return({
-            champion: champion.name,
-            lane: role
-          })
-          expect(champion).to receive(:find_by_role).and_return(role_data)
-          controller.send(:verify_role)
-        end
-      end
-
-      context 'without role data' do
-        it 'should return the do not play response' do
-          allow(controller).to receive(:champion_params).and_return({
-            champion: champion.name,
-            lane: role
-          })
-          expect(champion).to receive(:find_by_role).and_return(nil)
-          expect(controller).to receive(:render).with({
-            json: controller.send(:do_not_play_response, champion.name, role)
-          })
-          expect(controller.send(:verify_role)).to eq false
-        end
-      end
-    end
-
-    context 'without role' do
-      let(:role) { '' }
-
-      context 'with only one role' do
-        let(:role_data) {
-          Champion.new(name: 'Bard').roles.first
-        }
-
-        it 'should return the only role data' do
-          allow(controller).to receive(:champion_params).and_return({
-            champion: champion.name
-          })
-          expect(champion).to receive(:find_by_role).and_return(role_data)
-          controller.send(:verify_role)
-        end
-      end
-
-      context 'with multiple roles' do
-        it 'should return the ask for role response' do
-          allow(controller).to receive(:champion_params).and_return({
-            champion: champion.name
-          })
-          expect(champion).to receive(:find_by_role).and_return(nil)
-          expect(controller).to receive(:render).with({
-            json: controller.send(:ask_for_role_response)
-          })
-          expect(controller.send(:verify_role)).to eq false
-        end
-      end
-    end
-  end
-
   describe '#load_champion' do
     context 'with exact champion name' do
       it 'should load the champion' do
         allow(controller).to receive(:champion_params).and_return({
-          champion: 'Bard'
+          name: 'Bard'
         })
 
         controller.send(:load_champion)
@@ -118,7 +39,7 @@ describe ChampionsController, type: :controller do
     context 'with similar champion name' do
       it 'should load the champion' do
         allow(controller).to receive(:champion_params).and_return({
-          champion: 'Bardo'
+          name: 'Bardo'
         })
 
         controller.send(:load_champion)
@@ -131,11 +52,11 @@ describe ChampionsController, type: :controller do
     context 'with dissimilar champion name' do
       it 'should respond with champion not found' do
         allow(controller).to receive(:champion_params).and_return({
-          champion: 'This is not a valid name'
+          name: 'This is not a valid name'
         })
 
         expect(controller).to receive(:render).with(
-          json: { speech: 'name provided is not a valid champion name, to the best of my knowledge.' }
+          json: { speech: 'name provided is not a valid champion name, to the best of my knowledge' }
         )
         expect(controller.send(:load_champion)).to eq false
         expect(assigns(:champion).valid?).to eq false
@@ -144,10 +65,10 @@ describe ChampionsController, type: :controller do
 
     context 'with no champion name' do
       it 'should respond with champion not specified' do
-        allow(controller).to receive(:champion_params).and_return(champion: '')
+        allow(controller).to receive(:champion_params).and_return(name: '')
 
         expect(controller).to receive(:render).with(
-          json: { speech: 'name of champion was not provided.' }
+          json: { speech: 'name of champion was not provided' }
         )
         expect(controller.send(:load_champion)).to eq false
         expect(assigns(:champion).valid?).to eq false
@@ -157,51 +78,129 @@ describe ChampionsController, type: :controller do
 
   describe 'POST ranking' do
     let(:action) { :ranking }
-
-    before :each do
-      allow(controller).to receive(:champion_params).and_return(
+    let(:champion_params) do
+      {
         list_size: '3',
-        lane: 'Top',
+        role: 'TOP',
         list_position: '1',
-        list_order: 'best'
-      )
+        list_order: 'highest',
+        elo: 'SILVER',
+        position: 'kills'
+      }
+    end
+    let(:query_params) do
+      { position: 'kills', elo: 'SILVER', role: 'TOP' }
     end
 
-    context 'without enough champions' do
+    before :each do
+      allow(controller).to receive(:champion_params).and_return(champion_params)
+    end
+
+    context 'with no champions returned' do
       let(:champion) { Champion.new(name: 'Bard') }
-      let(:role_data) do
-        champion.roles.first.tap do |role|
-          role[:matchups] = role[:matchups].select do |matchup|
-            matchup[:games] >= 100
-          end.first(1)
+
+      context 'with normal list position' do
+        before :each do
+          allow(Rails.cache).to receive(:read).with(query_params).and_return([])
+          allow(Rails.cache).to receive(:read).with('champions').and_call_original
+        end
+
+        context 'with complete champions returned' do
+          before :each do
+            champion_params[:list_size] = '0'
+          end
+
+          it 'should indicate that 0 champions were requested' do
+            post action, params
+            expect(speech).to eq 'No champions were requested.'
+          end
+        end
+
+        context 'with incomplete champions returned' do
+          it 'should indicate that there are no champions for that role and elo' do
+            post action, params
+            expect(speech).to eq 'There are no champions available playing Top in Silver division in the current patch.'
+          end
         end
       end
 
-      before :each do
-        allow(Rails.cache).to receive(:read).with(rankings: 'Top').and_return(
-          Rails.cache.read(rankings: 'Top').first(1)
-        )
-        allow(Rails.cache).to receive(:read).with(:champions).and_call_original
+      context 'with offset list position' do
+        before :each do
+          champion_params[:list_position] = '2'
+        end
+
+        context 'with complete champions returned' do
+          before :each do
+            champion_params[:list_size] = '0'
+          end
+
+          it 'should indicate that 0 champions were requested' do
+            post action, params
+            expect(speech).to eq 'No champions were requested.'
+          end
+        end
+
+        context 'with incomplete champions returned' do
+          before :each do
+            allow(Rails.cache).to receive(:read).with(query_params).and_return(
+              Rails.cache.read(query_params).first(1)
+            )
+            allow(Rails.cache).to receive(:read).with('champions').and_call_original
+          end
+
+          it 'should indicate that there are no champions for that role and elo at that position' do
+            post action, params
+            expect(speech).to eq 'The current patch only has data for one champion playing Top in Silver division. There are no champions beginning at the second position.'
+          end
+        end
+      end
+    end
+
+    context 'with single champion returned' do
+      context 'with normal list position' do
+        context 'with complete champions returned' do
+          before :each do
+            allow(Rails.cache).to receive(:read).with(query_params).and_return(
+              Rails.cache.read(query_params).first(1)
+            )
+            allow(Rails.cache).to receive(:read).with('champions').and_call_original
+            champion_params[:list_size] = '1'
+          end
+
+          it 'should return the champion' do
+            post action, params
+            expect(speech).to eq 'The champion with the highest kills in Top from Silver division is Talon.'
+          end
+        end
+
+        context 'with incomplete champions returned' do
+          before :each do
+            allow(Rails.cache).to receive(:read).with(query_params).and_return(
+              Rails.cache.read(query_params).first(1)
+            )
+            allow(Rails.cache).to receive(:read).with('champions').and_call_original
+          end
+
+          it 'should indicate that there are not enough champions' do
+            post action, params
+            expect(speech).to eq 'The current patch only has data for one champion playing Top in Silver division. The champion with the highest kills playing Top in Silver is Talon.'
+          end
+        end
       end
 
-      it 'should indicate that there were not enough champions' do
-        post action, params
-        expect(speech).to eq 'The current patch only has enough data for one ranking. The best champion in Top are Darius.'
+      context 'with offset list position' do
+        
       end
     end
 
     context 'with list position' do
       before :each do
-        allow(controller).to receive(:champion_params).and_return(
-          list_size: '1',
-          lane: 'Support',
-          list_position: '2'
-        )
+        champion_params[:list_position] = 2
       end
 
-      it 'should determine the worst champions' do
+      it 'should determine the champions offset by list position' do
         post action, params
-        expect(speech).to eq 'The second best champion in Support is Nami.'
+        expect(speech).to eq 'The second three champions with the highest kills in Top from Silver division are Rengar, Quinn, and Pantheon.'
       end
     end
 
@@ -481,7 +480,6 @@ describe ChampionsController, type: :controller do
       "The highest win rate build for Bard Support is Boots of Mobility, Sightstone, Frost Queen's Claim, Redemption, Knight's Vow, and Locket of the Iron Solari."
     }
 
-    it_should_behave_like 'verify role'
     it_should_behave_like 'load champion'
 
     it 'should provide a build for a champion' do
@@ -497,7 +495,6 @@ describe ChampionsController, type: :controller do
     }
 
     it_should_behave_like 'load champion'
-    it_should_behave_like 'verify role'
 
     context 'with repeated 3 starting abililties' do
       it 'should return the 4 first order and max order for abilities' do
@@ -529,7 +526,6 @@ describe ChampionsController, type: :controller do
       "The best counter for Jayce Top is Jarvan IV at a 58.19% win rate."
     }
 
-    it_should_behave_like 'verify role'
     it_should_behave_like 'load champion'
 
     context 'without enough matchups' do
@@ -631,7 +627,6 @@ describe ChampionsController, type: :controller do
       "Jax got better in the last patch and is currently ranked forty-first out of fifty-seven with a 49.69% win rate and a 3.76% play rate as Top."
     }
 
-    it_should_behave_like 'verify role'
     it_should_behave_like 'load champion'
 
     it 'should indicate the strength of champions in the given lane' do
