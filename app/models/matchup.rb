@@ -21,8 +21,8 @@ class Matchup
     end
 
     synergy = ChampionGGApi::MATCHUP_ROLES[:SYNERGY]
-    adc = ChampionGGApi::MATCHUP_ROLES[:ADC]
-    support = ChampionGGApi::MATCHUP_ROLES[:SUPPORT]
+    adc = ChampionGGApi::MATCHUP_ROLES[:DUO_CARRY]
+    support = ChampionGGApi::MATCHUP_ROLES[:DUO_SUPPORT]
     # Prioritize the synergy role if two are specified.
     @matchup_role = if role1 == synergy || role2 == synergy
       synergy

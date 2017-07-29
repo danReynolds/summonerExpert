@@ -1,7 +1,7 @@
 champions:
   title:
     - '{name} has the illustrious title of {title}.'
-    - 'That champ and I go way back, if I had to call him anything it would be {name} {title}.'
+    - 'That champ and I go way back, if I had to call him anything it would be {name}, {title}.'
     - '{name} has the title of {title}.'
   lore:
     - 'I will tell you about the history of {name}. Stop me if you have heard it: {lore}'
@@ -32,12 +32,12 @@ champions:
       general:
         - '{name1} and {name2} have {champ1_result} and {champ2_result} {position} respectively playing {role1} in {elo} division.'
       winrate:
-        - '{name1} and {name2} have a {champ1_result}% and {champ2_result}% {position} respectively playing {role1} in {elo} division.'
+        - '{name1} has a {champ1_result}% {position} against {name2} playing {role1} in {elo} division.'
     duo_role:
       general:
         - '{name1} averages {champ1_result} {position} in {role1}, {match_result} than {name2} who averages {champ2_result} {position} when playing {role2} in {elo} division.'
       winrate:
-        - '{name1} averages a {champ1_result}% {position} in {role1}, {match_result} than {name2} who averages a {champ2_result}% {position} when playing {role2} in {elo} division.'
+        - '{name1} averages a {champ1_result}% {position} in {role1}, {match_result} than {name2} playing {role2} in {elo} division.'
     synergy:
       general:
         - '{name1} averages {champ1_result} {position} in {role1} when playing with {name2} {role2} in {elo}.'
@@ -67,3 +67,9 @@ errors:
     level:
       - 'A valid level is between 1 and 18.'
       - 'Only levels between 1 and 18 can be specified.'
+application:
+  patch:
+    - 'All data is currently based off of patch {patch}.'
+    - 'All information is using patch {patch}.'
+  reset:
+    - 'Conversation reset! Nothing said previously will affect our current conversation.'

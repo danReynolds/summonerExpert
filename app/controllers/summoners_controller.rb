@@ -34,7 +34,7 @@ class SummonersController < ApplicationController
 
   def summoner_params
     params.require(:result).require(:parameters).permit(
-      :summoner, :region, :champion, :queue
+      :name, :region, :champion, :queue
     )
   end
 
@@ -45,7 +45,7 @@ class SummonersController < ApplicationController
       return false
     end
 
-    @summoner = Summoner.new(name: summoner_params[:summoner])
+    @summoner = Summoner.new(name: summoner_params[:name])
     @summoner.id = RiotApi.get_summoner_id(
       name: @summoner.name,
       region: @region.region

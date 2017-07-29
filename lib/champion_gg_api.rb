@@ -75,5 +75,9 @@ class ChampionGGApi < ExternalApi
       url = replace_url(@api[:champion_roles], args)
       fetch_response(url)
     end
+
+    def get_site_information
+      fetch_response(@api[:site_information])
+    end
   end
 end

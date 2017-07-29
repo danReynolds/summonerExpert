@@ -5,7 +5,7 @@ include RiotApi
 include ActionView::Helpers::SanitizeHelper
 
 namespace :champion_gg do
-  task all: [:cache_champion_performance]
+  task all: [:cache_champion_performance, :cache_site_information]
 
   # Cache how a champion does in matchups against other champs in that role
   def cache_champion_matchups(name, id, elo, matchup_data)
@@ -71,6 +71,12 @@ namespace :champion_gg do
     end
   end
 
+  desc 'Cache general Champion.gg site information'
+  task cache_site_information: :environment do
+    information = ChampionGGApi::get_site_information
+    Rails.cache.write(:patch, information.first['patch'])
+  end
+
   desc 'Cache champion role and matchup performance'
   task cache_champion_performance: :environment do
     puts 'Fetching champion data from Champion.gg'
@@ -86,10 +92,10 @@ namespace :champion_gg do
 
       # Platinum plus should be sent as empty string since it is the default if
       # no elo is specified.
-      if elo == ChampionGGApi::ELOS[:PLATINUM_PLUS]
-        champion_roles = ChampionGGApi::get_champion_roles(limit: champion_roles_limit, skip: 0, elo: '')
+      champion_roles = if elo == ChampionGGApi::ELOS[:PLATINUM_PLUS]
+        ChampionGGApi::get_champion_roles(limit: champion_roles_limit, skip: 0, elo: '')
       else
-        champion_roles = ChampionGGApi::get_champion_roles(limit: champion_roles_limit, skip: 0, elo: elo)
+        ChampionGGApi::get_champion_roles(limit: champion_roles_limit, skip: 0, elo: elo)
       end
 
       champion_roles.each do |champion_role|

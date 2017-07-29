@@ -1,5 +1,7 @@
 Rails.application.routes.draw do
   root to: 'application#status'
+  post :patch, to: 'application#patch'
+  post :reset, to: 'application#reset'
 
   namespace :champions do
     post :title

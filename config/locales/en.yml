@@ -26,39 +26,39 @@ en:
         matchup:
           attributes:
             name1:
-              inclusion: 'is not a valid champion name, to the best of my knowledge.'
-              blank: 'of champion was not provided.'
+              inclusion: 'is not a valid champion name, to the best of my knowledge'
+              blank: 'of champion was not provided'
             name2:
-              inclusion: 'is not a valid champion name, to the best of my knowledge.'
-              blank: 'of champion was not provided.'
+              inclusion: 'is not a valid champion name, to the best of my knowledge'
+              blank: 'of champion was not provided'
             role1:
-              blank: 'was not provided.'
+              blank: 'was not provided'
         matchup_ranking:
           attributes:
             name:
-              inclusion: 'is not a valid champion name, to the best of my knowledge.'
-              blank: 'of champion was not provided.'
+              inclusion: 'is not a valid champion name, to the best of my knowledge'
+              blank: 'of champion was not provided'
             role1:
-              blank: 'of champion was not provided.'
+              blank: 'of champion was not provided'
         summoner:
           attributes:
             id:
-              not_a_number: 'could not be found for the given summoner name.'
+              not_a_number: 'could not be found for the given summoner name'
         item:
           attributes:
             name:
-              blank: 'of item was not provided.'
-              inclusion: 'provided is not a valid item name, to the best of my knowledge.'
+              blank: 'of item was not provided'
+              inclusion: 'provided is not a valid item name, to the best of my knowledge'
         champion:
           attributes:
             name:
-              blank: 'of champion was not provided.'
-              inclusion: 'provided is not a valid champion name, to the best of my knowledge.'
+              blank: 'of champion was not provided'
+              inclusion: 'provided is not a valid champion name, to the best of my knowledge'
         role_performance:
           attributes:
             name:
-              blank: 'of champion was not provided.'
+              blank: 'of champion was not provided'
             role:
-              blank: "was not provided. Please specify the champion's role."
+              blank: "was not provided Please specify the champion's role"
             elo:
-              blank: "was not specified. Please provide the elo you are looking for."
+              blank: "was not specified Please provide the elo you are looking for"
