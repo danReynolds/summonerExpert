@@ -10,7 +10,7 @@ class ApiResponse
       end
     end
 
-    def get_response(namespace, args, responses = API_RESPONSES)
+    def get_response(namespace, args = {}, responses = API_RESPONSES)
       if namespace.class == Hash
         key = namespace.keys.first
         get_response(namespace[key], args, responses[key])

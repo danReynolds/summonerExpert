@@ -26,7 +26,7 @@ champions:
     - 'The {list_position}{list_size}{champion_conjugation} with the {list_order} {position} in {role} from {elo} division {names_conjugation} {names}.'
   cooldown:
     - "The cooldown of {name}'s {ability_position} ability, {ability_name}, is {ability_cooldown} seconds at rank {rank}."
-    - "{name}'s {ability_position} ability, {ability_name}, has a cooldown of {ability_cooldown} at rank {rank}."
+    - "{name}'s {ability_position} ability, {ability_name}, has a cooldown of {ability_cooldown} seconds at rank {rank}."
   matchup:
     single_role:
       general:
@@ -58,7 +58,12 @@ items:
   build:
     - 'The items used to build {name} are {item_names}.'
   description:
-    - "I have seen many champions use {name} on the field of battle. It costs {total_cost} gold and can be sold for {sell_cost}. Here is what it does:\n {description}"
+    - "I have seen many champions use {name} on the field of battle. It costs {total_cost} gold and can be sold for {sell_cost}. Here is what it does: {description}"
 summoners:
   description:
     - "{name} is ranked {elo} {rank} in {queue}. The summoner currently has a {winrate}% win rate and is {hot_streak} a hot streak."
+errors:
+  stats:
+    level:
+      - 'A valid level is between 1 and 18.'
+      - 'Only levels between 1 and 18 can be specified.'

@@ -34,6 +34,10 @@ class ChampionsController < ApplicationController
     stat_key = champion_params[:stat]
     level = champion_params[:level].to_i
 
+    return render json: {
+      speech: ApiResponse.get_response({ errors: { stats: :level }})
+    } if level < 0 || level > 18
+
     args = {
       name: @champion.name,
       level: level,
