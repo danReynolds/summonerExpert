@@ -11,6 +11,7 @@ gem 'linguistics'
 gem 'keen'
 gem 'sshkit', '~> 1.13.0'
 gem 'rspec-rails', '~> 3.5'
+gem 'whenever'
 gem 'coveralls', require: false
 
 group :development, :test do
