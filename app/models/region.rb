@@ -2,7 +2,7 @@ class Region
   include ActiveModel::Validations
   attr_accessor :region
 
-  REGIONS = %w(br eune euw jp kr lan las na oce ru tr).freeze
+  REGIONS = %w(br1 eun1 euw1 jp1 kr la1 la2 na1 oc1 ru tr1).freeze
 
   validates :region, inclusion: { in: REGIONS }
 

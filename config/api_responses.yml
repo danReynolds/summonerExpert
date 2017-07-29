@@ -59,3 +59,6 @@ items:
     - 'The items used to build {name} are {item_names}.'
   description:
     - "I have seen many champions use {name} on the field of battle. It costs {total_cost} gold and can be sold for {sell_cost}. Here is what it does:\n {description}"
+summoners:
+  description:
+    - "{name} is ranked {elo} {rank} in {queue}. The summoner currently has a {winrate}% win rate and is {hot_streak} a hot streak."

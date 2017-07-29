@@ -18,6 +18,11 @@ module RiotApi
     MIDDLE = 'Middle'.freeze
     ROLES = [TOP, JUNGLE, SUPPORT, ADC, MIDDLE]
 
+    QUEUES = {
+      RANKED_SOLO_5x5: 'Solo Queue',
+      RANKED_FLEX_SR: 'Flex Queue'
+    }.freeze
+
     STATS = {
       armor: 'armor',
       attackdamage: 'attack damage',
@@ -51,26 +56,28 @@ module RiotApi
       end
 
       def get_summoner_stats(args)
-        url = replace_url(@api[:summoner][:ranked], args)
+        url = replace_url(@api[:summoner][:description], args)
         id = args[:id].to_s
 
-        return unless stats = fetch_response(url)
+        return unless queue_stats = fetch_response(url)
 
-        stats[id].map do |division|
-          division[:entries].detect do |entry|
-            entry[:playerOrTeamId] == id
-          end.merge(
-            queue: RankedMode.new(mode: division[:queue].to_sym).mode,
-            tier: division[:tier].downcase.capitalize
-          )
+        queue_stats.inject({}) do |queues, queue_stat|
+          queues.tap do
+            queues[queue_stat['queueType']] = queue_stat.slice(
+              'leaguePoints', 'wins', 'losses', 'rank', 'hotStreak', 'inactive',
+              'tier'
+            )
+          end
         end
       end
 
       def get_summoner_id(args)
-        name = URI.encode(args[:name])
-        url = "#{replace_url(@api[:summoner][:id], args)}/#{name}"
-        return unless response = fetch_response(url)
-        response.values.first[:id].to_i
+        Rails.cache.fetch(name: args[:name], region: args[:region]) do
+          name = URI.encode(args[:name])
+          url = "#{replace_url(@api[:summoner][:id], args)}/#{name}"
+          return unless response = fetch_response(url)
+          response['id']
+        end
       end
     end
   end
