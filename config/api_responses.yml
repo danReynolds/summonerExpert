@@ -95,6 +95,15 @@ summoners:
   description:
     - "{name} is ranked {elo} {rank} in {queue}. The summoner currently has a {winrate}% win rate and is {hot_streak} a hot streak."
 errors:
+  matchups:
+    duo_roles_no_matchup:
+      - 'I do not have any information on matchups for {name1} {role1} and {name2} {role2} playing together in {elo} division.'
+    single_role_no_matchup:
+      - 'I cannot find any matchup information on {name1} and {name2} playing {role1} in {elo} division.'
+    multiple_shared_roles:
+      - '{name1} and {name2} have matchups for multiple roles in {elo} division. Please specify roles for one or both champions.'
+    no_shared_roles:
+      - 'I cannot find matchup information for {name1} and {name2} for any role combination in {elo} division.'
   stats:
     level:
       - 'A valid level is between 1 and 18.'

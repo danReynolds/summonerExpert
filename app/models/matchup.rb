@@ -1,16 +1,9 @@
-class Matchup
-  include CollectionHelper
-  include ActiveModel::Validations
-
-  CHAMPIONS = Rails.cache.read(:champions)
-
-  validates :elo, presence: true
-  validates :role1, presence: true
-  validates :name1, presence: true, inclusion: CHAMPIONS.values
-  validates :name2, presence: true, inclusion: CHAMPIONS.values
+class Matchup < MatchupRole
+  validates :name1, presence: true, inclusion:{ in: CHAMPIONS.values, allow_blank: true }
+  validates :name2, presence: true, inclusion: { in: CHAMPIONS.values, allow_blank: true }
   validate :matchup_validator
 
-  attr_accessor :elo, :role1, :role2, :name1, :name2, :matchup_role
+  attr_accessor :name1, :name2
 
   def initialize(**args)
     args[:name1] = CollectionHelper::match_collection(args[:name1], CHAMPIONS.values)
@@ -20,22 +13,15 @@ class Matchup
       instance_variable_set("@#{key}", value)
     end
 
-    synergy = ChampionGGApi::MATCHUP_ROLES[:SYNERGY]
-    adc = ChampionGGApi::MATCHUP_ROLES[:DUO_CARRY]
-    support = ChampionGGApi::MATCHUP_ROLES[:DUO_SUPPORT]
-    # Prioritize the synergy role if two are specified.
-    @matchup_role = if role1 == synergy || role2 == synergy
-      synergy
-    # The ADCSUPPORT matchup allow for dual role inquiries. The single
-    # role defining these cases must be assigned from these two roles
-    elsif role1 == adc && role2 == support || role1 == support && role2 == adc
-      ChampionGGApi::MATCHUP_ROLES[:ADCSUPPORT]
+    @matchup_role = determine_matchup_role
+    @matchup = if @matchup_role.present?
+      matchups = Rails.cache.read(
+        matchups: { name: @name1, role: @matchup_role, elo: @elo }
+      )
+      matchups[@name2] if matchups
     else
-      role1
-    end
-
-    if matchups = Rails.cache.read(matchups: { name: @name1, role: @matchup_role, elo: @elo })
-      @matchup = matchups[@name2]
+      @shared_matchups = find_shared_matchups
+      @shared_matchups.first if @shared_matchups.length == 1
     end
   end
 
@@ -44,16 +30,46 @@ class Matchup
   end
 
   def error_message
-    errors.messages.map do |key, value|
-      "#{key} #{value.first}"
-    end.en.conjunction(article: false)
+    errors.messages.values.map(&:first).en.conjunction(article: false)
   end
 
   private
 
+  # Find all shared roles between the champions and return the shared roles
+  def find_shared_matchups
+    ChampionGGApi::MATCHUP_ROLES.values.inject([]) do |shared_matchups, matchup_role|
+      matchups = Rails.cache.read(
+        matchups: { name: @name1, role: matchup_role, elo: @elo }
+      )
+      shared_matchups.tap do
+        if matchups && matchup = matchups[@name2]
+          shared_matchups << matchup
+        end
+      end
+    end
+  end
+
+  # Add manual validation errors if there is no matchup based on the roles specified
   def matchup_validator
-    if @matchup.nil?
-      errors.add(:Matchup, "could not be found for the given champions in the provided role and elo.")
+    if errors.messages.empty? && @matchup.nil?
+      args = {
+        name1: @name1,
+        name2: @name2,
+        elo: @elo.humanize,
+        role1: @role1.humanize,
+        role2: @role2.humanize,
+        matchup_role: @matchup_role
+      }
+
+      if @role1.present? && @role2.present?
+        errors[:base] << ApiResponse.get_response({ errors: { matchups: :duo_roles_no_matchup } }, args)
+      elsif @role1.present?
+        errors[:base] << ApiResponse.get_response({ errors: { matchups: :single_role_no_matchup } }, args)
+      elsif shared_matchups.length > 1
+        errors[:base] << ApiResponse.get_response({ errors: { matchups: :multiple_shared_roles } }, args)
+      elsif shared_matchups.length == 0
+        errors[:base] << ApiResponse.get_response({ errors: { matchups: :no_shared_roles } }, args)
+      end
     end
   end
 end
