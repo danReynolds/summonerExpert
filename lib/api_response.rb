@@ -13,7 +13,7 @@ class ApiResponse
     def get_response(namespace, args = {}, responses = API_RESPONSES)
       if namespace.class == Hash
         key = namespace.keys.first
-        get_response(namespace[key], args, responses[key])
+        get_response(namespace[key], args, responses[key] || responses)
       else
         replace_response(responses[namespace].sample, args)
       end

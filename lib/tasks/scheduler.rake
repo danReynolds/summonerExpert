@@ -43,7 +43,7 @@ namespace :champion_gg do
     end
   end
 
-  # Cache the ranking lists for champion performance on metrics like KDA in that role
+  # Cache the ranking lists for champion performance on metrics like kills, etc in that role
   def cache_champion_rankings(champion_rankings, elo, ids_to_names)
     champion_rankings.each do |role, position_names|
       position_names.each do |position_name, champion_positions|
@@ -113,8 +113,7 @@ namespace :champion_gg do
         cache_champion_matchups(name, id, elo, champion_role.delete('matchups'))
 
         # Cache how that champion does in that role overall
-        role_data = champion_role
-        Rails.cache.write({ name: name, role: ChampionGGApi::ROLES[role.to_sym], elo: elo }, role_data)
+        Rails.cache.write({ name: name, role: ChampionGGApi::ROLES[role.to_sym], elo: elo }, champion_role)
       end
       cache_champion_rankings(champion_rankings, elo, ids_to_names)
     end

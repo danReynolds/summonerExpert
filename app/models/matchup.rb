@@ -62,7 +62,7 @@ class Matchup < MatchupRole
       }
 
       if @role1.present? && @role2.present?
-        errors[:base] << ApiResponse.get_response({ errors: { matchups: :duo_roles_no_matchup } }, args)
+        errors[:base] << ApiResponse.get_response({ errors: { matchups: :duo_role_no_matchup } }, args)
       elsif @role1.present?
         errors[:base] << ApiResponse.get_response({ errors: { matchups: :single_role_no_matchup } }, args)
       elsif shared_matchups.length > 1

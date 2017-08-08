@@ -1,6 +1,5 @@
 class ChampionsController < ApplicationController
   include RiotApi
-  include Sortable
   include Utils
   before_action :load_champion, except: [:ranking, :matchup, :matchup_ranking]
   before_action :load_matchup, only: :matchup
@@ -9,15 +8,15 @@ class ChampionsController < ApplicationController
 
   def ranking
     rankings = Rails.cache.read(champion_params.slice(:position, :elo, :role).to_h)
-    sortable_rankings = Sortable.new({
+    rankings_filter = Filterable.new({
       collection: rankings
     }.merge(champion_params.slice(:list_position, :list_size, :list_order)))
-    filtered_rankings = sortable_rankings.sort
-    list_position = sortable_rankings.list_position.to_i
 
-    real_size = rankings.size # Number of champions available to return
-    requested_size = sortable_rankings.list_size.to_i # Number of champions requested to return
-    filtered_size = filtered_rankings.size # Number of champions returned given position and real size
+    filtered_rankings = rankings_filter.filter
+    list_position = rankings_filter.list_position
+    real_size = rankings_filter.real_size
+    filtered_size = rankings_filter.filtered_size
+    filter_types = rankings_filter.filter_types
 
     args = {
       position: ChampionGGApi::POSITIONS[champion_params[:position].to_sym],
@@ -25,25 +24,20 @@ class ChampionsController < ApplicationController
       elo: champion_params[:elo].humanize,
       names: filtered_rankings.en.conjunction(article: false),
       real_size: real_size.en.numwords,
-      requested_size: requested_size.en.numwords,
+      requested_size: rankings_filter.requested_size.en.numwords,
       filtered_size: filtered_size.en.numwords,
       list_position: list_position.en.ordinate, # starting position requested
-      filtered_position_offset: (list_position + filtered_size).en.ordinate, # end position given position and real size
-      list_order: sortable_rankings.list_order,
+      filtered_position_offset: (list_position + filtered_size).en.ordinate, # end position given position and filtered size
+      list_order: rankings_filter.list_order,
       real_size_champion_conjugation: 'champion'.en.pluralize(real_size)
     }
 
-    ranking_type = filtered_size == requested_size ? :complete : :incomplete
-    position_type = list_position == 1 ? :normal : :offset
-    size_type = case filtered_size
-    when 0
-      :empty
-    when 1
-      :single
-    else
-      :multiple
-    end
-    namespace = dig_set([:ranking, size_type, position_type, ranking_type])
+    namespace = dig_set([
+      :ranking,
+      filter_types[:size_type],
+      filter_types[:position_type],
+      filter_types[:fulfillment_type]
+    ])
 
     render json: {
       speech: ApiResponse.get_response({ champions: namespace }, args)
@@ -150,20 +144,24 @@ class ChampionsController < ApplicationController
     matchup_role = @matchup_ranking.matchup_role
     name = @matchup_ranking.name
 
-    sortable_rankings = Sortable.new({
+    rankings_filter = Filterable.new({
       collection: @matchup_ranking.matchups,
       # the default sort order is best = lowest
       sort_value: ->(name, matchup) { matchup[name][matchup_position] * -1 }
     }.merge(champion_params.slice(:list_position, :list_size, :list_order)))
-    ranked_names = sortable_rankings.sort.map { |ranking_name| ranking_name.first.dup }
 
+    filtered_rankings = rankings_filter.sort.map { |ranking| ranking.first.dup }
+    filter_types = rankings_filter.filter_types
+    real_size = rankings_filter.real_size
+    requested_size = rankings_filter.requested_size
+    filtered_size = filtered_rankings.filtered_size
 
     matchup_key = if matchup_role == ChampionGGApi::MATCHUP_ROLES[:SYNERGY]
       :synergy
     elsif matchup_role == ChampionGGApi::MATCHUP_ROLES[:ADCSUPPORT]
       :duo_role
     else
-      :single_role
+      :solo_role
     end
 
     if matchup_position == ChampionGGApi::MATCHUP_POSITIONS[:winrate]
@@ -177,15 +175,26 @@ class ChampionsController < ApplicationController
       unnamed_role: @matchup_ranking.unnamed_role.humanize,
       named_role: @matchup_ranking.named_role.humanize,
       name: @matchup_ranking.name,
-      ranked_names: ranked_names.en.conjunction(article: false),
-      list_size: sortable_rankings.list_size_message,
-      list_position: sortable_rankings.list_position_message,
-      list_order: sortable_rankings.list_order,
-      names_conjugation: 'is'.en.plural_verb(sortable_rankings.list_size.to_i),
-      champion_conjugation: 'champion'.en.pluralize(sortable_rankings.list_size.to_i)
+      real_size: real_size.en.numwords,
+      requested_size: requested_size.en.numwords,
+      filtered_size: filtered_size.en.numwords,
+      names: filtered_rankings.en.conjunction(article: false),
+      list_size: rankings_filter.list_size_message,
+      list_position: list_position.en.ordinate,
+      filtered_position_offset: (list_position + filtered_size).en.ordinate,
+      list_order: rankings_filter.list_order,
+      real_size_champion_conjugation: 'champion'.en.pluralize(real_size)
     }
+
+    namespace = dig_set([
+      :ranking,
+      filter_types[:size_type],
+      filter_types[:position_type],
+      filter_types[:fulfillment_type]
+    ])
+
     render json: {
-      speech: ApiResponse.get_response({ champions: { matchup_ranking: matchup_key } }, args)
+      speech: ApiResponse.get_response({ champions: namespace }, args)
     }
   end
 
