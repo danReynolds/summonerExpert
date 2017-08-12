@@ -104,22 +104,15 @@ class ChampionsController < ApplicationController
     champ2_result = @matchup.position(position, @matchup.name2)
     role1 = ChampionGGApi::MATCHUP_ROLES[@matchup.position('role', @matchup.name1).to_sym]
     role2 = ChampionGGApi::MATCHUP_ROLES[@matchup.position('role', @matchup.name2).to_sym]
-
-    matchup_key = if @matchup.matchup_role == ChampionGGApi::MATCHUP_ROLES[:SYNERGY]
-      :synergy
-    elsif role1 == role2
-      :single_role
-    else
-      :duo_role
-    end
+    role_type = @matchup.role_type
 
     response_query = {}
     if matchup_position == ChampionGGApi::MATCHUP_POSITIONS[:winrate]
       champ1_result *= 100
       champ2_result *= 100
-      response_query[matchup_key] = :winrate
+      response_query[role_type] = :winrate
     else
-      response_query[matchup_key] = :general
+      response_query[role_tpye] = :general
     end
 
     args = {
@@ -150,24 +143,12 @@ class ChampionsController < ApplicationController
       sort_value: ->(name, matchup) { matchup[name][matchup_position] * -1 }
     }.merge(champion_params.slice(:list_position, :list_size, :list_order)))
 
-    filtered_rankings = rankings_filter.sort.map { |ranking| ranking.first.dup }
+    filtered_rankings = rankings_filter.filter.map { |ranking| ranking.first.dup }
     filter_types = rankings_filter.filter_types
+    list_position = rankings_filter.list_position
     real_size = rankings_filter.real_size
     requested_size = rankings_filter.requested_size
-    filtered_size = filtered_rankings.filtered_size
-
-    matchup_key = if matchup_role == ChampionGGApi::MATCHUP_ROLES[:SYNERGY]
-      :synergy
-    elsif matchup_role == ChampionGGApi::MATCHUP_ROLES[:ADCSUPPORT]
-      :duo_role
-    else
-      :solo_role
-    end
-
-    if matchup_position == ChampionGGApi::MATCHUP_POSITIONS[:winrate]
-      champ1_result *= 100
-      champ2_result *= 100
-    end
+    filtered_size = rankings_filter.filtered_size
 
     args = {
       elo: @matchup_ranking.elo.humanize,
@@ -179,18 +160,17 @@ class ChampionsController < ApplicationController
       requested_size: requested_size.en.numwords,
       filtered_size: filtered_size.en.numwords,
       names: filtered_rankings.en.conjunction(article: false),
-      list_size: rankings_filter.list_size_message,
       list_position: list_position.en.ordinate,
       filtered_position_offset: (list_position + filtered_size).en.ordinate,
       list_order: rankings_filter.list_order,
       real_size_champion_conjugation: 'champion'.en.pluralize(real_size)
     }
-
     namespace = dig_set([
-      :ranking,
+      :matchup_ranking,
       filter_types[:size_type],
       filter_types[:position_type],
-      filter_types[:fulfillment_type]
+      filter_types[:fulfillment_type],
+      @matchup_ranking.role_type
     ])
 
     render json: {

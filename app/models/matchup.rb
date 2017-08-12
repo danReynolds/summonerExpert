@@ -14,7 +14,7 @@ class Matchup < MatchupRole
     end
 
     @matchup_role = determine_matchup_role
-    @matchup = if @matchup_role.present?
+    @matchup = if @matchup_role
       matchups = Rails.cache.read(
         matchups: { name: @name1, role: @matchup_role, elo: @elo }
       )

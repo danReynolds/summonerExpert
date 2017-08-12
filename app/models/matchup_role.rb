@@ -10,6 +10,16 @@ class MatchupRole
 
   validates :elo, presence: true
 
+  def role_type
+    if @matchup_role == ChampionGGApi::MATCHUP_ROLES[:SYNERGY]
+      :synergy
+    elsif role1 == role2
+      :solo_role
+    else
+      :duo_role
+    end
+  end
+
   protected
 
   def determine_matchup_role
@@ -21,7 +31,7 @@ class MatchupRole
       synergy
     elsif @role1 == adc && @role2 == support || @role1 == support && @role2 == adc
       ChampionGGApi::MATCHUP_ROLES[:ADCSUPPORT]
-    else
+    elsif @role1.present?
       @role1
     end
   end
