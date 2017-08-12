@@ -23,6 +23,8 @@ module RiotApi
       RANKED_FLEX_SR: 'Flex Queue'
     }.freeze
 
+    REGIONS = %w(br1 eun1 euw1 jp1 kr la1 la2 na1 oc1 ru tr1)
+
     STATS = {
       armor: 'armor',
       attackdamage: 'attack damage',
@@ -57,8 +59,6 @@ module RiotApi
 
       def get_summoner_stats(args)
         url = replace_url(@api[:summoner][:description], args)
-        id = args[:id].to_s
-
         return unless queue_stats = fetch_response(url)
 
         queue_stats.inject({}) do |queues, queue_stat|

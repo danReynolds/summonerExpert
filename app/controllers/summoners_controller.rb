@@ -7,7 +7,7 @@ class SummonersController < ApplicationController
     id = @summoner.id
     queue = summoner_params[:queue]
 
-    summoner_stats = RiotApi.get_summoner_stats(id: id, region: @region.region)
+    summoner_stats = RiotApi.get_summoner_stats(id: id, region: @summoner.region)
     queue_stats = summoner_stats[queue]
 
     return render json: {
@@ -39,17 +39,7 @@ class SummonersController < ApplicationController
   end
 
   def load_summoner
-    @region = Region.new(region: summoner_params[:region])
-    unless @region.valid?
-      render json: { speech: @region.error_message }
-      return false
-    end
-
-    @summoner = Summoner.new(name: summoner_params[:name])
-    @summoner.id = RiotApi.get_summoner_id(
-      name: @summoner.name,
-      region: @region.region
-    )
+    @summoner = Summoner.new(name: summoner_params[:name], region: summoner_params[:region])
 
     unless @summoner.valid?
       render json: { speech: @summoner.error_message }

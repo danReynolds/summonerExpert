@@ -4,7 +4,7 @@ class RolePerformance
   validates :elo, presence: true
   validates :role, presence: true
   validates :name, presence: true
-  validate :role_performance
+  validate :role_performance_validator
 
   attr_accessor :elo, :role, :name
 
@@ -19,9 +19,13 @@ class RolePerformance
   end
 
   def initialize(**args)
-    # If a role is not specified, determine if they only have one role and use
-    # that one
-    if args[:role].blank?
+    args.each do |key, value|
+      instance_variable_set("@#{key}", value)
+    end
+
+    if @role.present?
+      @role_performance = Rails.cache.read(args)
+    else
       role_performances = ChampionGGApi::ROLES.values.map do |role|
         { role: role, role_performance: Rails.cache.read(args.merge(role: role)) }
       end.reject { |role_entry| role_entry[:role_performance].nil? }
@@ -29,14 +33,8 @@ class RolePerformance
       if role_performances.length == 1
         role_entry = role_performances.first
         @role_performance = role_entry[:role_performance]
-        args[:role] = role_entry[:role]
+        @role = role_entry[:role]
       end
-    else
-      @role_performance = Rails.cache.read(args)
-    end
-
-    args.each do |key, value|
-      instance_variable_set("@#{key}", value)
     end
 
     if @role_performance
@@ -71,18 +69,16 @@ class RolePerformance
   end
 
   def error_message
-    errors.messages.map do |key, value|
-      "#{key} #{value.first}"
-    end.en.conjunction(article: false)
+    errors.messages.values.map(&:first).en.conjunction(article: false)
   end
 
   private
 
   private
 
-  def role_performance
+  def role_performance_validator
     if errors.empty? && @role_performance.nil?
-      errors.add(:Performance, "could not be found for the given champion in the provided role and elo.")
+      errors[:base] << "Information could not be found for the given champion in the provided role and elo."
     end
   end
 end

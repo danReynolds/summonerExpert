@@ -40,8 +40,12 @@ en:
               blank: 'of champion was not provided'
         summoner:
           attributes:
+            name:
+              presence: 'No summoner name was provided.'
+            region:
+              inclusion: 'The specified region is not valid.'
             id:
-              not_a_number: 'could not be found for the given summoner name'
+              not_a_number: 'A summoner id could not be found for the given name.'
         item:
           attributes:
             name:
@@ -57,6 +61,6 @@ en:
             name:
               blank: 'of champion was not provided'
             role:
-              blank: "was not provided Please specify the champion's role"
+              blank: "There was no role provided, please specify the champion's role."
             elo:
               blank: "was not specified Please provide the elo you are looking for"
