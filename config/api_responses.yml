@@ -80,8 +80,6 @@ champions:
       normal:
         complete:
           - 'No champions were requested.'
-        incomplete:
-          - 'There are no champions available playing {unnamed_role} in {elo} division in the current patch.'
       offset:
         complete:
           - 'No champions were requested.'

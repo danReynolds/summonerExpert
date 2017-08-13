@@ -13,7 +13,7 @@ class MatchupRanking < MatchupRole
 
     @matchups = if @matchup_role = determine_matchup_role
       Rails.cache.read(matchups: { name: @name, role: @matchup_role, elo: @elo })
-    elsif @role2
+    elsif @role2.present?
       determine_matchups_by_unnamed_role
     else
       determine_matchups_by_shared_roles
@@ -25,8 +25,8 @@ class MatchupRanking < MatchupRole
       matchup = @matchups.first
       other_name, matchup_data = matchup
 
-      @named_role = ChampionGGApi::ROLES[matchup_data[@name]['role'].to_sym]
-      @unnamed_role = ChampionGGApi::ROLES[matchup_data[other_name]['role'].to_sym]
+      @named_role = ChampionGGApi::MATCHUP_ROLES[matchup_data[@name]['role'].to_sym]
+      @unnamed_role = ChampionGGApi::MATCHUP_ROLES[matchup_data[other_name]['role'].to_sym]
     end
   end
 
@@ -45,14 +45,13 @@ class MatchupRanking < MatchupRole
       )
       shared_matchups.tap { shared_matchups << matchups if matchups }
     end
-
-    shared_matchup.first if shared_matchups.length == 1
+    shared_matchups.first if shared_matchups.length == 1
   end
 
   # Use the unnamed role to try to determine the matchups
   def determine_matchups_by_unnamed_role
-    adc = ChampionGGApi::ROLES[:DUO_CARRY]
-    support = ChampionGGApi::ROLES[:DUO_SUPPORT]
+    adc = ChampionGGApi::MATCHUP_ROLES[:DUO_CARRY]
+    support = ChampionGGApi::MATCHUP_ROLES[:DUO_SUPPORT]
 
     # ADCs and supports will have both their native role and ADCSUPPORT matchups
     # so use the unnamed role to determine which one of those is being asked for
@@ -67,9 +66,8 @@ class MatchupRanking < MatchupRole
       return unless adc_matchups || support_matchups
       return adc_matchups if adc_matchups && @role2 == adc
       return support_matchups if support_matchups && @role2 == support
-
       return Rails.cache.read(
-        matchups: { name: @name, role: ChampionGGApi::ROLES[:ADCSUPPORT], elo: @elo }
+        matchups: { name: @name, role: ChampionGGApi::MATCHUP_ROLES[:ADCSUPPORT], elo: @elo }
       )
     end
 
