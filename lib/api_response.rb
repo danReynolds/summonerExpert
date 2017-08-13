@@ -11,12 +11,22 @@ class ApiResponse
     end
 
     def get_response(namespace, args = {}, responses = API_RESPONSES)
-      if namespace.class == Hash
+      if namespace.class == Hash && responses.class == HashWithIndifferentAccess
         key = namespace.keys.first
-        get_response(namespace[key], args, responses[key] || responses)
+        get_response(namespace[key], args, responses[key])
       else
-        replace_response(responses[namespace].sample, args)
+        if responses.class == HashWithIndifferentAccess
+          replace_response(random_response(responses[namespace]), args)
+        else
+          replace_response(random_response(responses), args)
+        end
       end
+    end
+
+    private
+
+    def random_response(responses)
+      responses.sample
     end
   end
 end

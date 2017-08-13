@@ -27,7 +27,7 @@ class ChampionsController < ApplicationController
       requested_size: rankings_filter.requested_size.en.numwords,
       filtered_size: filtered_size.en.numwords,
       list_position: list_position.en.ordinate, # starting position requested
-      filtered_position_offset: (list_position + filtered_size).en.ordinate, # end position given position and filtered size
+      filtered_position_offset: (list_position + filtered_size - 1).en.ordinate, # end position given position and filtered size
       list_order: rankings_filter.list_order,
       real_size_champion_conjugation: 'champion'.en.pluralize(real_size)
     }
@@ -70,7 +70,7 @@ class ChampionsController < ApplicationController
       metric: ChampionGGApi::METRICS[champion_params[:metric].to_sym],
       ability_order: @role_performance.ability_order(champion_params[:metric]),
       elo: @role_performance.elo.humanize,
-      role: @role_performance.role.humanize
+      role: ChampionGGApi::ROLES[@role_performance.role.to_sym].humanize
     }
     render json: {
       speech: ApiResponse.get_response({ champions: :ability_order }, args)
@@ -86,7 +86,7 @@ class ChampionsController < ApplicationController
 
     args = {
       elo: @role_performance.elo.humanize,
-      role: @role_performance.role.humanize,
+      role: ChampionGGApi::ROLES[@role_performance.role.to_sym].humanize,
       item_names: item_names,
       name: @role_performance.name,
       metric: ChampionGGApi::METRICS[metric.to_sym]
@@ -112,7 +112,7 @@ class ChampionsController < ApplicationController
       champ2_result *= 100
       response_query[role_type] = :winrate
     else
-      response_query[role_tpye] = :general
+      response_query[role_type] = :general
     end
 
     args = {
@@ -161,7 +161,7 @@ class ChampionsController < ApplicationController
       filtered_size: filtered_size.en.numwords,
       names: filtered_rankings.en.conjunction(article: false),
       list_position: list_position.en.ordinate,
-      filtered_position_offset: (list_position + filtered_size).en.ordinate,
+      filtered_position_offset: (list_position + filtered_size - 1).en.ordinate,
       list_order: rankings_filter.list_order,
       real_size_champion_conjugation: 'champion'.en.pluralize(real_size)
     }

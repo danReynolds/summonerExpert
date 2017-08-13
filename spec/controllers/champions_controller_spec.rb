@@ -15,68 +15,17 @@ describe ChampionsController, type: :controller do
     JSON.parse(response.body).with_indifferent_access[:speech]
   end
 
-  shared_examples 'load champion' do
-    it 'should load the champion' do
-      expect(controller).to receive(:load_champion).and_call_original
-      post action, params
-    end
-  end
-
-  describe '#load_champion' do
-    context 'with exact champion name' do
-      it 'should load the champion' do
-        allow(controller).to receive(:champion_params).and_return({
-          name: 'Bard'
-        })
-
-        controller.send(:load_champion)
-
-        expect(assigns(:champion).valid?).to eq true
-        expect(assigns(:champion).name).to eq 'Bard'
-      end
-    end
-
-    context 'with similar champion name' do
-      it 'should load the champion' do
-        allow(controller).to receive(:champion_params).and_return({
-          name: 'Bardo'
-        })
-
-        controller.send(:load_champion)
-
-        expect(assigns(:champion).valid?).to eq true
-        expect(assigns(:champion).name).to eq 'Bard'
-      end
-    end
-
-    context 'with dissimilar champion name' do
-      it 'should respond with champion not found' do
-        allow(controller).to receive(:champion_params).and_return({
-          name: 'This is not a valid name'
-        })
-
-        expect(controller).to receive(:render).with(
-          json: { speech: 'name provided is not a valid champion name, to the best of my knowledge' }
-        )
-        expect(controller.send(:load_champion)).to eq false
-        expect(assigns(:champion).valid?).to eq false
-      end
-    end
-
-    context 'with no champion name' do
-      it 'should respond with champion not specified' do
-        allow(controller).to receive(:champion_params).and_return(name: '')
-
-        expect(controller).to receive(:render).with(
-          json: { speech: 'name of champion was not provided' }
-        )
-        expect(controller.send(:load_champion)).to eq false
-        expect(assigns(:champion).valid?).to eq false
+  # Override the indeterminate nature of the speech templates returned
+  shared_context 'determinate speech' do
+    before :each do
+      allow(ApiResponse).to receive(:random_response) do |responses|
+        responses.first
       end
     end
   end
 
   describe 'POST ranking' do
+    include_context 'determinate speech'
     let(:action) { :ranking }
     let(:champion_params) do
       {
@@ -94,6 +43,18 @@ describe ChampionsController, type: :controller do
 
     before :each do
       allow(controller).to receive(:champion_params).and_return(champion_params)
+    end
+
+    it 'should rank the champions by the specified position' do
+      champion_params[:position] = 'deaths'
+      post action, params
+      expect(speech).to eq 'The three champions with the highest deaths playing Top in Silver division are Rengar, Yasuo, and Quinn.'
+    end
+
+    it 'should sort the champions by the specified ordering' do
+      champion_params[:list_order] = 'lowest'
+      post action, params
+      expect(speech).to eq 'The three champions with the lowest kills playing Top in Silver division are Nautilus, Galio, and Maokai.'
     end
 
     context 'with no champions returned' do
@@ -158,260 +119,871 @@ describe ChampionsController, type: :controller do
 
     context 'with single champion returned' do
       context 'with normal list position' do
-        context 'with complete champions returned' do
-          before :each do
-            allow(Rails.cache).to receive(:read).with(query_params).and_return(
-              Rails.cache.read(query_params).first(1)
-            )
-            allow(Rails.cache).to receive(:read).with('champions').and_call_original
-            champion_params[:list_size] = '1'
-          end
+        before :each do
+          allow(Rails.cache).to receive(:read).with(query_params).and_return(
+            Rails.cache.read(query_params).first(1)
+          )
+          allow(Rails.cache).to receive(:read).with('champions').and_call_original
+          champion_params[:list_size] = '1'
+        end
 
+        context 'with complete champions returned' do
           it 'should return the champion' do
             post action, params
-            expect(speech).to eq 'The champion with the highest kills in Top from Silver division is Talon.'
+            expect(speech).to eq 'The champion with the highest kills playing Top in Silver division is Talon.'
+          end
+        end
+
+        context 'with incomplete champions returned' do
+          before :each do
+            allow(Rails.cache).to receive(:read).with(query_params).and_return([])
+            allow(Rails.cache).to receive(:read).with('champions').and_call_original
+          end
+
+          it 'should indicate that there are not enough champions' do
+            post action, params
+            expect(speech).to eq 'There are no champions available playing Top in Silver division in the current patch.'
+          end
+        end
+      end
+
+      context 'with offset list position' do
+        before :each do
+          allow(Rails.cache).to receive(:read).with(query_params).and_return(
+            Rails.cache.read(query_params).first(2)
+          )
+          allow(Rails.cache).to receive(:read).with('champions').and_call_original
+          champion_params[:list_size] = '1'
+          champion_params[:list_position] = '2'
+        end
+
+        context 'with complete champions returned' do
+          it 'should return the champion' do
+            post action, params
+            expect(speech).to eq 'The champion with the second highest kills playing Top in Silver division is Rengar.'
+          end
+        end
+
+        context 'with incomplete champions returned' do
+          before :each do
+            allow(Rails.cache).to receive(:read).with(query_params).and_return([])
+            allow(Rails.cache).to receive(:read).with('champions').and_call_original
+          end
+
+          it 'should indicate that there are not enough champions' do
+            post action, params
+            expect(speech).to eq 'The current patch only has data for zero champions playing Top in Silver division. There are no champions beginning at the second position.'
+          end
+        end
+      end
+    end
+
+    context 'with multiple champions returned' do
+      before :each do
+        champion_params[:list_size] = '5'
+      end
+
+      context 'with normal list position' do
+        context 'with complete champions returned' do
+          it 'should return the champions' do
+            post action, params
+            expect(speech).to eq 'The five champions with the highest kills playing Top in Silver division are Talon, Rengar, Quinn, Pantheon, and Akali.'
           end
         end
 
         context 'with incomplete champions returned' do
           before :each do
             allow(Rails.cache).to receive(:read).with(query_params).and_return(
-              Rails.cache.read(query_params).first(1)
+              Rails.cache.read(query_params).first(3)
             )
             allow(Rails.cache).to receive(:read).with('champions').and_call_original
           end
 
           it 'should indicate that there are not enough champions' do
             post action, params
-            expect(speech).to eq 'The current patch only has data for one champion playing Top in Silver division. The champion with the highest kills playing Top in Silver is Talon.'
+            expect(speech).to eq 'The current patch only has enough data for three champions. The three champions with the highest kills playing Top in Silver division are Talon, Rengar, and Quinn.'
           end
         end
       end
 
       context 'with offset list position' do
-        
-      end
-    end
+        before :each do
+          champion_params[:list_position] = '2'
+        end
 
-    context 'with list position' do
-      before :each do
-        champion_params[:list_position] = 2
-      end
+        context 'with complete champions returned' do
+          it 'should return the champions' do
+            post action, params
+            expect(speech).to eq 'The second through seventh champions with the highest kills playing Top in Silver division are Rengar, Quinn, Pantheon, Akali, and Wukong.'
+          end
+        end
 
-      it 'should determine the champions offset by list position' do
-        post action, params
-        expect(speech).to eq 'The second three champions with the highest kills in Top from Silver division are Rengar, Quinn, and Pantheon.'
-      end
-    end
+        context 'with incomplete champions returned' do
+          before :each do
+            allow(Rails.cache).to receive(:read).with(query_params).and_return(
+              Rails.cache.read(query_params).first(3)
+            )
+            allow(Rails.cache).to receive(:read).with('champions').and_call_original
+          end
 
-    context 'with worst order' do
-      before :each do
-        allow(controller).to receive(:champion_params).and_return(
-          list_size: '1',
-          lane: 'Support',
-          list_position: '1',
-          list_order: 'worst'
-        )
-      end
-
-      it 'should determine the worst champions' do
-        post action, params
-        expect(speech).to eq 'The worst champion in Support is Nunu.'
-      end
-    end
-
-    context 'with tag' do
-      before :each do
-        allow(controller).to receive(:champion_params).and_return(
-          list_size: '3',
-          lane: 'Top',
-          list_position: '1',
-          list_order: 'best',
-          tag: 'Assassin'
-        )
-      end
-
-      it 'should filter the ranking of the champions by the provided tag' do
-        post action, params
-        expect(speech).to eq 'The best three assassins in Top are Irelia, Yasuo, and Fiora.'
-      end
-    end
-
-    context 'with list position specified' do
-      before :each do
-        allow(controller).to receive(:champion_params).and_return(
-          list_size: '1',
-          list_order: 'best',
-          lane: 'Top',
-          list_position: '2'
-        )
-      end
-
-      it 'should determine the best champion at that list position' do
-        post action, params
-        expect(speech).to eq 'The second best champion in Top is Nasus.'
-      end
-    end
-
-    context 'with multiple list size specified' do
-      it 'determine the best champions for the specified list size and role' do
-        post action, params
-        expect(speech).to eq "The best three champions in Top are Darius, Nasus, and Jayce."
-      end
-    end
-
-    context 'with single list size specified' do
-      before :each do
-        allow(controller).to receive(:champion_params).and_return(
-          list_size: '1',
-          list_position: '1',
-          list_order: 'best',
-          lane: 'Top'
-        )
-      end
-
-      it 'determine the best champion for the specified role' do
-        post action, params
-        expect(speech).to eq "The best champion in Top is Darius."
+          it 'should indicate that there are not enough champions' do
+            post action, params
+            expect(speech).to eq 'The current patch only has enough data for three champions. The second through fourth champions with the highest kills playing Top in Silver division are Rengar and Quinn.'
+          end
+        end
       end
     end
   end
 
-  describe 'POST matchup' do
-    let(:action) { :matchup }
-    let(:champion_name) { 'Azir' }
-    let(:other_champion_name) { 'Heimerdinger' }
+  describe 'POST stats' do
+    include_context 'determinate speech'
+    let(:action) { :stats }
+    let(:champion_params) do
+      {
+        stat: 'armor',
+        name: 'Nocturne',
+        level: '5'
+      }
+    end
 
     before :each do
-      allow(controller).to receive(:champion_params).and_return(
-        champion: champion_name,
-        champion1: other_champion_name,
-        lane: role
-      )
+      allow(controller).to receive(:champion_params).and_return(champion_params)
     end
 
-    context 'without a role specified' do
-      let(:role) { '' }
-
-      context 'with no shared roles' do
-        let(:response_text) {
-          "Azir and Heimerdinger do not typically play against eachother in any role."
-        }
-        before :each do
-          @champion = Champion.new(name: champion_name)
-          @champion.roles = @champion.roles.first(1)
-          @other_champion = Champion.new(name: other_champion_name)
-          @other_champion.roles = @other_champion.roles.first(1)
-
-          @champion.roles.first[:role] = 'Top'
-          @other_champion.roles.first[:role] = 'Middle'
-
-          allow(Champion).to receive(:new)
-            .and_return(@champion, @other_champion)
-        end
-
-        it_should_behave_like 'load champion'
-
-        it 'should indicate that the two champions do not play against eachother' do
-          post action, params
-          expect(speech).to eq response_text
-        end
-      end
-
-      context 'with a single shared role' do
-        let(:response_text) {
-          'Azir got worse against Heimerdinger in the latest patch and has a win rate of 37.93% against the Revered Inventor in Middle.'
-        }
-        before :each do
-          @champion = Champion.new(name: champion_name)
-          @champion.roles = @champion.roles.first(1)
-          @other_champion = Champion.new(name: other_champion_name)
-          @other_champion.roles = @other_champion.roles.first(1)
-
-          role = 'Middle'
-          @champion.roles.first[:role] = role
-          @other_champion.roles.first[:role] = role
-
-          allow(Champion).to receive(:new)
-            .and_return(@champion, @other_champion)
-        end
-
-        it 'should decide that the higher win rate champion should win' do
-          post action, params
-          expect(speech).to eq response_text
-        end
-      end
-
-      context 'with multiple shared roles' do
-        before :each do
-          champion = Champion.new(name: champion_name)
-          first_role_data = champion.roles.first
-          first_role_data[:role] = 'Middle'
-          second_role_data = first_role_data.dup
-          second_role_data[:role] = 'Top'
-          champion.roles = [first_role_data, second_role_data]
-
-          other_champion = Champion.new(name: other_champion_name)
-          first_role_data = other_champion.roles.first
-          first_role_data[:role] = 'Middle'
-          second_role_data = first_role_data.dup
-          second_role_data[:role] = 'Top'
-          other_champion.roles = [first_role_data, second_role_data]
-
-          allow(Champion).to receive(:new)
-            .and_return(champion, other_champion)
-        end
-
-        it_should_behave_like 'load champion'
-
-        it 'shoud ask for a role to be specified' do
-          post action, params
-          expect(speech).to eq controller.send(:ask_for_role_response)[:speech]
-        end
+    context 'with a valid level' do
+      it "should specify the champion's stat value at the given level" do
+        post action, params
+        expect(speech).to eq 'Nocturne has 40.88 armor at level 5.'
       end
     end
 
-    context 'with a role specified' do
-      let(:role) { 'Middle' }
+    context 'with an invalid level' do
+      before :each do
+        champion_params[:level] = '25'
+      end
 
-      context 'with both champions sharing the role' do
-        let(:response_text) {
-          "Azir got worse against Heimerdinger in the latest patch and has a win rate of 37.93% against the Revered Inventor in Middle."
-        }
+      it 'should respond indicating that the level is invalid' do
+        post action, params
+        expect(speech).to eq 'A valid champion level is between 1 and 18.'
+      end
+    end
+  end
 
-        before :each do
-          champion = Champion.new(name: champion_name)
-          champion.roles.first[:role] = role
-          other_champion = Champion.new(name: other_champion_name)
-          other_champion.roles.first[:role] = role
+  describe 'POST ability_order' do
+    include_context 'determinate speech'
+    let(:action) { :ability_order }
+    let(:champion_params) do
+      {
+        name: 'Azir',
+        role: 'MIDDLE',
+        elo: 'GOLD',
+        metric: 'highestCount'
+      }
+    end
 
-          allow(Champion).to receive(:new)
-            .and_return(champion, other_champion)
+    before :each do
+      allow(controller).to receive(:champion_params).and_return(champion_params)
+    end
+
+    it 'should indicate the ability ordering for the champion' do
+      post action, params
+      expect(speech).to eq 'The most frequent ability order for Azir Middle in Gold is W, Q, E, Q, Q, R, Q, W, Q, W, R, W, W, E, E, R, E, E.'
+    end
+
+    it 'should vary the ability ordering by metric' do
+      champion_params[:metric] = 'highestWinrate'
+      post action, params
+
+      expect(speech).to eq 'The highest win rate ability order for Azir Middle in Gold is W, Q, E, W, Q, R, W, E, Q, Q, R, Q, W, W, E, R, E, E.'
+    end
+  end
+
+  describe 'POST build' do
+    include_context 'determinate speech'
+    let(:action) { :build }
+    let(:champion_params) do
+      {
+        name: 'Bard',
+        role: 'SUPPORT',
+        elo: 'GOLD',
+        metric: 'highestCount'
+      }
+    end
+
+    before :each do
+      allow(controller).to receive(:champion_params).and_return(champion_params)
+    end
+
+    it 'should determine the best build for the champion' do
+      post action, params
+      expect(speech).to eq "The most frequent build for Bard Support in Gold division is Boots of Mobility, Eye of the Watchers, Redemption, Locket of the Iron Solari, Knight's Vow, and Mikael's Crucible."
+    end
+
+    it 'should vary the build based on the specified metric' do
+      champion_params[:metric] = 'highestWinrate'
+      post action, params
+      expect(speech).to eq "The highest win rate build for Bard Support in Gold division is Boots of Swiftness, Eye of the Watchers, Locket of the Iron Solari, Redemption, Iceborn Gauntlet, and Rylai's Crystal Scepter."
+    end
+  end
+
+  describe 'POST matchup' do
+    include_context 'determinate speech'
+    let(:action) { :matchup }
+    let(:champion_params) do
+      {
+        name1: 'Shyvana',
+        name2: 'Nocturne',
+        role1: 'JUNGLE',
+        role2: 'JUNGLE',
+        elo: 'GOLD',
+        matchup_position: 'kills'
+      }
+    end
+
+    before :each do
+      allow(controller).to receive(:champion_params).and_return(champion_params)
+    end
+
+    context 'error messages' do
+      context 'duo role no matchup' do
+        let(:champion_params) do
+          {
+            name1: 'Jinx',
+            name2: 'Nocturne',
+            role1: 'JUNGLE',
+            role2: 'JUNGLE',
+            elo: 'GOLD',
+            matchup_position: 'kills'
+          }
         end
 
-        it 'should decide that the higher win rate champion should win' do
+        it 'should indicate that the champions do not play together' do
           post action, params
-          expect(speech).to eq response_text
+          expect(speech).to eq 'I do not have any information on matchups for Jinx Jungle and Nocturne Jungle playing together in Gold division.'
         end
       end
 
-      context 'without both champions sharing the role' do
-        let(:response_text) {
-          "Azir and Heimerdinger do not typically play against eachother in Middle."
-        }
-        before :each do
-          champion = Champion.new(name: champion_name)
-          champion.roles = []
-          other_champion = Champion.new(name: other_champion_name)
-          other_champion.roles = []
-
-          allow(Champion).to receive(:new)
-            .and_return(champion, other_champion)
+      context 'single role no matchup' do
+        let(:champion_params) do
+          {
+            name1: 'Jinx',
+            name2: 'Nocturne',
+            role1: 'JUNGLE',
+            role2: '',
+            elo: 'GOLD',
+            matchup_position: 'kills'
+          }
         end
 
-        it 'should indicate that the two champions do not play together' do
+        it 'should indicate that the champions do not play together' do
           post action, params
-          expect(speech).to eq response_text
+          expect(speech).to eq 'I cannot find any matchup information on Jinx and Nocturne playing Jungle in Gold division.'
+        end
+      end
+
+      context 'multiple shared roles' do
+        let(:champion_params) do
+          {
+            name1: 'Jinx',
+            name2: 'Bard',
+            role1: '',
+            role2: '',
+            elo: 'GOLD',
+            matchup_position: 'kills'
+          }
+        end
+
+        it 'should indicate that the champions play together in multiple roles' do
+          post action, params
+          expect(speech).to eq 'Jinx and Bard have matchups for multiple roles in Gold division. Please specify roles for one or both champions.'
+        end
+      end
+    end
+
+    context 'no shared roles' do
+      let(:champion_params) do
+        {
+          name1: 'Jinx',
+          name2: 'Darius',
+          role1: '',
+          role2: '',
+          elo: 'GOLD',
+          matchup_position: 'kills'
+        }
+      end
+
+      it 'should indicate that the champions do not have any shared roles' do
+        post action, params
+        expect(speech).to eq 'I cannot find matchup information for Jinx and Darius for any role combination in Gold division.'
+      end
+    end
+
+    context 'with solo role' do
+      before :each do
+        champion_params[:role1] = ''
+      end
+
+      context 'with general matchup position' do
+        it 'should return the matchup for the champions' do
+          post action, params
+          expect(speech).to eq 'Shyvana averages 6.05 kills in Jungle, lower than Nocturne who averages 7.48 kills when playing Jungle in Gold division.'
+        end
+      end
+
+      context 'with winrate matchup position' do
+        before :each do
+          champion_params[:matchup_position] = 'winrate'
+        end
+
+        it 'should return the matchup for the champions' do
+          post action, params
+          expect(speech).to eq 'Shyvana averages a 50.21% win rate in Jungle, higher than Nocturne playing Jungle in Gold division.'
+        end
+      end
+    end
+
+    context 'with duo role' do
+      context 'with general matchup position' do
+        it 'should return the matchup for the champions' do
+          post action, params
+          expect(speech).to eq 'Shyvana and Nocturne have 6.05 and 7.48 kills respectively playing Jungle in Gold division.'
+        end
+      end
+
+      context 'with winrate matchup position' do
+        before :each do
+          champion_params[:matchup_position] = 'winrate'
+        end
+
+        it 'should return the matchup for the champions' do
+          post action, params
+          expect(speech).to eq 'Shyvana has a 50.21% win rate against Nocturne playing Jungle in Gold division.'
+        end
+      end
+    end
+
+    context 'with synergy role' do
+      before :each do
+        champion_params[:name1] = 'Bard'
+        champion_params[:name2] = 'Jinx'
+        champion_params[:role1] = 'SYNERGY'
+      end
+
+      context 'with general matchup position' do
+        it 'should return the matchup for the champions' do
+          post action, params
+          expect(speech).to eq 'Bard averages 3.29 kills in Support when playing with Jinx Adc in Gold.'
+        end
+      end
+
+      context 'with winrate matchup position' do
+        before :each do
+          champion_params[:matchup_position] = 'winrate'
+        end
+
+        it 'should return the matchup for the champions' do
+          post action, params
+          expect(speech).to eq 'Bard averages a 50.83% win rate in Support when playing alongside Jinx Adc in Gold.'
+        end
+      end
+    end
+  end
+
+  describe 'POST matchup_ranking' do
+    include_context 'determinate speech'
+    let(:action) { :matchup_ranking }
+    let(:champion_params) do
+      {
+        name: 'Shyvana',
+        role1: 'JUNGLE',
+        role2: 'JUNGLE',
+        elo: 'GOLD',
+        list_order: 'highest',
+        list_position: '1',
+        list_size: '1',
+        matchup_position: 'winrate'
+      }
+    end
+    let(:query_params) do
+      { matchups: { name: 'Shyvana', role: 'JUNGLE', elo: 'GOLD' } }
+    end
+
+    before :each do
+      allow(controller).to receive(:champion_params).and_return(champion_params)
+    end
+
+    context 'with no role specified' do
+      before :each do
+        champion_params[:role1] = ''
+        champion_params[:role2] = ''
+      end
+
+      context 'with only one role played by the champion' do
+        it 'should return the complete list of champions' do
+          post action, params
+          expect(speech).to eq "The champion with the highest win rate playing Jungle against Shyvana from Gold division is Cho'Gath."
+        end
+      end
+    end
+
+    context 'with only unnamed role specified' do
+      before :each do
+        champion_params[:role1] = ''
+      end
+
+      context 'as a non-adc/support role' do
+        it 'should use the unnamed role and return the complete list of champions' do
+          post action, params
+          expect(speech).to eq "The champion with the highest win rate playing Jungle against Shyvana from Gold division is Cho'Gath."
+        end
+      end
+
+      context 'as a support role' do
+        before :each do
+          champion_params[:role1] = ''
+          champion_params[:role2] = 'SUPPORT'
+        end
+
+        it 'should use the unnamed role to determine if the named champion is an ADC' do
+          champion_params[:name] = 'Jinx'
+          post action, params
+          expect(speech).to eq 'The champion with the highest win rate playing Support against Jinx from Gold division is Janna.'
+        end
+
+        it 'should use the unnamed role to determine if the named champion is an ADC' do
+          champion_params[:name] = 'Janna'
+          post action, params
+          expect(speech).to eq 'The champion with the highest win rate playing Support against Janna from Gold division is Sona.'
+        end
+      end
+
+    end
+
+    context 'error messages' do
+      context 'duo roles empty matchup rankings' do
+        before :each do
+          champion_params[:role1] = 'TOP'
+          champion_params[:role2] = 'MIDDLE'
+        end
+
+        it 'should indicate that the champion has no matchup rankings for the given two roles' do
+          post action, params
+          expect(speech).to eq 'There are no matchup rankings for champions playing Middle with Shyvana Top in Gold division.'
+        end
+      end
+
+      context 'named role' do
+        before :each do
+          champion_params[:role2] = ''
+        end
+
+        context 'empty matchup rankings' do
+          before :each do
+            allow(Rails.cache).to receive(:read).and_return(nil)
+          end
+
+          it 'should indicate that the champion has no matchup rankings for the given role' do
+            post action, params
+            expect(speech).to eq 'There are no matchup rankings for Shyvana Jungle.'
+          end
+        end
+      end
+
+      context 'unnamed role' do
+        before :each do
+          champion_params[:role1] = ''
+        end
+
+        context 'empty matchup rankings' do
+          before :each do
+            allow(Rails.cache).to receive(:read).and_return(nil)
+          end
+
+          it 'should indicate that there are no matchup rankings for the unnamed role' do
+            post action, params
+            expect(speech).to eq 'There are no matchup rankings for champions playing Jungle with Shyvana.'
+          end
+        end
+      end
+
+      context 'empty roles' do
+        before :each do
+          champion_params[:role1] = ''
+          champion_params[:role2] = ''
+        end
+
+        context 'with multiple matchup rankings' do
+          before :each do
+            champion_params[:name] = 'Jinx'
+          end
+
+          it 'should ask for role specification' do
+            post action, params
+            expect(speech).to eq "There are multiple matchup rankings for Jinx, please specify Jinx's role."
+          end
+        end
+
+        context 'with empty matchup rankings' do
+          before :each do
+            allow(Rails.cache).to receive(:read).and_return(nil)
+          end
+
+          it 'should indicate the champion has no rankings' do
+            post action, params
+            expect(speech).to eq 'There are no matchup rankings for Shyvana.'
+          end
+        end
+      end
+    end
+
+    context 'no champions returned' do
+      context 'with normal position' do
+        context 'with complete matchup rankings' do
+          before :each do
+            champion_params[:list_size] = '0'
+          end
+
+          it 'should indicate that no champions were requested' do
+            post action, params
+            expect(speech).to eq 'No champions were requested.'
+          end
+        end
+
+        context 'with incomplete matchup rankings' do
+          before :each do
+            allow(Rails.cache).to receive(:read).with(query_params).and_return(nil)
+            allow(Rails.cache).to receive(:read).with('champions').and_call_original
+            allow(Rails.cache).to receive(:read).with(:champions).and_call_original
+          end
+
+          it 'should indicate that there are not enough champions' do
+            post action, params
+            expect(speech).to eq 'There are no matchup rankings for champions playing Jungle with Shyvana Jungle in Gold division.'
+          end
+        end
+      end
+
+      context 'with offset position' do
+        before :each do
+          champion_params[:list_position] = '2'
+        end
+
+        context 'with complete matchup rankings' do
+          before :each do
+            champion_params[:list_size] = '0'
+          end
+
+          it 'should indicate that there were no champions requested' do
+            post action, params
+            expect(speech).to eq 'No champions were requested.'
+          end
+        end
+
+        context 'with incomplete matchup rankings' do
+          before :each do
+            allow(Rails.cache).to receive(:read).with(query_params).and_return(
+              Rails.cache.read(query_params).first(1)
+            )
+          end
+
+          it 'should indicate that there are not enough champions when begun at that offset' do
+            post action, params
+            expect(speech).to eq 'The current patch only has data for one champion playing Jungle in Gold division. There are no champions beginning at the second position.'
+          end
+        end
+      end
+    end
+
+    context 'with a single champion returned' do
+      context 'with normal list position' do
+        context 'with complete matchup rankings' do
+          context 'with a shared role' do
+            it 'should return the complete list of champions, specifying one role' do
+              post action, params
+              expect(speech).to eq "The champion with the highest win rate playing Jungle against Shyvana from Gold division is Cho'Gath."
+            end
+          end
+
+          context 'with duo roles' do
+            before :each do
+              champion_params[:name] = 'Janna'
+              champion_params[:role1] = 'SUPPORT'
+              champion_params[:role2] = 'ADC'
+            end
+
+            it 'should return the complete list of champions, specifying both roles' do
+              post action, params
+              expect(speech).to eq 'The champion with the highest win rate playing Adc against Janna Support from Gold division is Miss Fortune.'
+            end
+          end
+
+          context 'with synergy' do
+            before :each do
+              champion_params[:name] = 'Janna'
+              champion_params[:role1] = 'SYNERGY'
+              champion_params[:role2] = 'ADC'
+            end
+
+            it 'should return the complete list of champions, specifying that it is a synergy ranking' do
+              post action, params
+              expect(speech).to eq 'The champion with the highest win rate playing Adc with Janna Support from Gold division is Twitch.'
+            end
+          end
+        end
+
+        context 'with incomplete matchup rankings' do
+          before :each do
+            allow(Rails.cache).to receive(:read).with(query_params).and_return(
+              Rails.cache.read(query_params).first(1)
+            )
+            champion_params[:list_size] = 2
+          end
+
+          it 'should return the partial list of champions, indicating that there are not enough' do
+            post action, params
+            expect(speech).to eq 'The current patch only has enough data for a single champion. The single champion with the highest win rate playing Jungle against Shyvana from Gold division is Lee Sin.'
+          end
+        end
+      end
+
+      context 'with offset list position' do
+        before :each do
+          champion_params[:list_position] = '2'
+        end
+
+        context 'with complete matchup rankings' do
+          context 'with a shared role' do
+            it 'should return the complete list of champions, indicating the offset and one role' do
+              post action, params
+              expect(speech).to eq 'The champion with the second highest win rate playing Jungle against Shyvana from Gold division is Kindred.'
+            end
+          end
+
+          context 'with duo roles' do
+            before :each do
+              champion_params[:name] = 'Jinx'
+              champion_params[:role1] = 'ADC'
+              champion_params[:role2] = 'SUPPORT'
+            end
+
+            it 'should return the complete list of champions, indicating the offset and both roles' do
+              post action, params
+              expect(speech).to eq 'The champion with the second highest win rate playing Support against Jinx Adc from Gold division is Sion.'
+            end
+          end
+
+          context 'with synergy role' do
+            before :each do
+              champion_params[:name] = 'Jinx'
+              champion_params[:role1] = 'SYNERGY'
+              champion_params[:role2] = 'SUPPORT'
+            end
+
+            it 'should return the complete list of champions, indicating the offset and specifying that it is a synergy role' do
+              post action, params
+              expect(speech).to eq 'The champion with the second highest win rate playing Support with Jinx Adc from Gold division is Sion.'
+            end
+          end
+        end
+
+        context 'with incomplete matchup rankings' do
+          before :each do
+            champion_params[:list_size] = '2'
+          end
+
+          before :each do
+            allow(Rails.cache).to receive(:read).with(query_params).and_return(
+              Rails.cache.read(query_params).first(2)
+            )
+          end
+
+          it 'should return the incomplete list of champions, indicating the offset position' do
+            post action, params
+            expect(speech).to eq 'The current patch only has enough data for a single champion beginning at the second position. The single champion with the highest win rate playing Jungle against Shyvana from Gold division is Kayn.'
+          end
+        end
+      end
+    end
+
+    context 'with multiple champions returned' do
+      before :each do
+        champion_params[:list_size] = '3'
+      end
+
+      context 'with normal list position' do
+        context 'with complete matchup rankings' do
+          context 'with a shared role' do
+            it 'should return the complete list of champions, indicating the one shared role' do
+              post action, params
+              expect(speech).to eq "The champions with the highest win rate playing Jungle against Shyvana from Gold division are Cho'Gath, Kindred, and Nunu."
+            end
+          end
+
+          context 'with duo roles' do
+            before :each do
+              champion_params[:role1] = 'ADC'
+              champion_params[:role2] = 'SUPPORT'
+              champion_params[:name] = 'Jinx'
+            end
+
+            it 'should return the complete list of champions, indicating the two roles' do
+              post action, params
+              expect(speech).to eq 'The champions with the highest win rate playing Support against Jinx Adc from Gold division are Janna, Sion, and Trundle.'
+            end
+          end
+
+          context 'with synergy role' do
+            before :each do
+              champion_params[:role1] = 'ADC'
+              champion_params[:role2] = 'SYNERGY'
+              champion_params[:name] = 'Jinx'
+            end
+
+            it 'should return the complete list of champions, indicating they synergize' do
+              post action, params
+              expect(speech).to eq 'The champions with the highest win rate playing Support with Jinx Adc from Gold division are Poppy, Sion, and Janna.'
+            end
+          end
+        end
+
+        context 'with incomplete matchup rankings' do
+          before :each do
+            allow(Rails.cache).to receive(:read).with(query_params).and_return(
+              Rails.cache.read(query_params).first(2)
+            )
+            allow(Rails.cache).to receive(:read).with(:champions).and_call_original
+            allow(Rails.cache).to receive(:read).with('champions').and_call_original
+            champion_params[:list_size] = 3
+          end
+
+          context 'with a shared role' do
+            it 'should return the partial list of champions, indicating the one shared role' do
+              post action, params
+              expect(speech).to eq 'The current patch only has enough data for two champions. The two champions with the highest win rate playing Jungle against Shyvana from Gold division are Lee Sin and Kayn.'
+            end
+          end
+
+          context 'with duo roles' do
+            let(:query_params) do
+              { matchups: { name: 'Jinx', role: 'ADCSUPPORT', elo: 'GOLD' } }
+            end
+            before :each do
+              champion_params[:role1] = 'ADC'
+              champion_params[:role2] = 'SUPPORT'
+              champion_params[:name] = 'Jinx'
+            end
+
+            it 'should return the partial list of champions, indicating the multiple roles' do
+              post action, params
+              expect(speech).to eq 'The current patch only has enough data for two champions. The two champions with the highest win rate playing Support against Jinx Adc from Gold division are Blitzcrank and Thresh.'
+            end
+          end
+
+          context 'with synergy role' do
+            let(:query_params) do
+              { matchups: { name: 'Jinx', role: 'SYNERGY', elo: 'GOLD' } }
+            end
+            before :each do
+              champion_params[:role1] = 'ADC'
+              champion_params[:role2] = 'SYNERGY'
+              champion_params[:name] = 'Jinx'
+            end
+
+            it 'should return the partial list of champions, indicating the synergy role' do
+              post action, params
+              expect(speech).to eq 'The current patch only has enough data for two champions. The two champions with the highest win rate playing Support with Jinx Adc from Gold division are Blitzcrank and Thresh.'
+            end
+          end
+        end
+
+        context 'with offset list position' do
+          before :each do
+            champion_params[:list_position] = '2'
+            champion_params[:list_size] = '4'
+          end
+
+          context 'with complete matchup rankings' do
+            context 'with a shared role' do
+              it 'should return the complete list of champions, specifying the offset and shared role' do
+                post action, params
+                expect(speech).to eq 'The second through fifth champions with the highest win rate playing Jungle against Shyvana from Gold division are Kindred, Nunu, Rammus, and Jax.'
+              end
+            end
+
+            context 'with duo roles' do
+              before :each do
+                champion_params[:name] = 'Janna'
+                champion_params[:role1] = 'SUPPORT'
+                champion_params[:role2] = 'ADC'
+              end
+
+              it 'should return the complete list of champions, specifying the offset and duo roles' do
+                post action, params
+                expect(speech).to eq 'The second through fifth champions with the highest win rate playing Adc against Janna Support from Gold division are Twitch, Tristana, Draven, and Jhin.'
+              end
+            end
+
+            context 'with synergy role' do
+              before :each do
+                champion_params[:name] = 'Janna'
+                champion_params[:role1] = 'SYNERGY'
+                champion_params[:role2] = 'ADC'
+              end
+
+              it 'should return the complete list of champions, specifying the offset and synergy role' do
+                post action, params
+                expect(speech).to eq 'The second through fifth champions with the highest win rate playing Adc with Janna Support from Gold division are Miss Fortune, Jinx, Tristana, and Draven.'
+              end
+            end
+          end
+
+          context 'with incomplete matchup rankings' do
+            before :each do
+              allow(Rails.cache).to receive(:read).with(query_params).and_return(
+                Rails.cache.read(query_params).first(3)
+              )
+              allow(Rails.cache).to receive(:read).with(:champions).and_call_original
+              allow(Rails.cache).to receive(:read).with('champions').and_call_original
+            end
+            context 'with a shared role' do
+              it 'should return the partial list of champions, specifying the offset and shared role' do
+                post action, params
+                expect(speech).to eq 'The current patch only has enough data for three champions. The second through third champions with the highest win rate playing Jungle against Shyvana from Gold division are Lee Sin and Kayn.'
+              end
+            end
+
+            context 'with duo roles' do
+              let(:query_params) do
+                { matchups: { name: 'Jinx', role: 'ADCSUPPORT', elo: 'GOLD' } }
+              end
+              before :each do
+                champion_params[:role1] = 'ADC'
+                champion_params[:role2] = 'SUPPORT'
+                champion_params[:name] = 'Jinx'
+              end
+
+              it 'should return the partial list of champions, specifying the offset and duo roles' do
+                post action, params
+                expect(speech).to eq 'The current patch only has enough data for three champions. The second through third champions with the highest win rate playing Support against Jinx Adc from Gold division are Blitzcrank and Thresh.'
+              end
+            end
+
+            context 'with synergy role' do
+              let(:query_params) do
+                { matchups: { name: 'Jinx', role: 'SYNERGY', elo: 'GOLD' } }
+              end
+              before :each do
+                champion_params[:role1] = 'ADC'
+                champion_params[:role2] = 'SYNERGY'
+                champion_params[:name] = 'Jinx'
+              end
+
+              it 'should return the partial list of champions, specifying the offset and synergy role' do
+                post action, params
+                expect(speech).to eq 'The current patch only has enough data for three champions. The second through third champions with the highest win rate playing Support with Jinx Adc from Gold division are Thresh and Lulu.'
+              end
+            end
+          end
         end
       end
     end
@@ -420,8 +992,6 @@ describe ChampionsController, type: :controller do
   describe 'POST title' do
     let(:action) { :title }
     let(:response_text) { "Sona's title is Maven of the Strings." }
-
-    it_should_behave_like 'load champion'
 
     it 'should return the champions title' do
       post action, params
@@ -432,8 +1002,6 @@ describe ChampionsController, type: :controller do
   describe 'POST stats' do
     let(:action) { :stats }
     let(:response_text) { 'Zed has 68 attack damage at level 5.' }
-
-    it_should_behave_like 'load champion'
 
     context 'with stat modifier' do
       context 'with level specified' do
@@ -480,8 +1048,6 @@ describe ChampionsController, type: :controller do
       "The highest win rate build for Bard Support is Boots of Mobility, Sightstone, Frost Queen's Claim, Redemption, Knight's Vow, and Locket of the Iron Solari."
     }
 
-    it_should_behave_like 'load champion'
-
     it 'should provide a build for a champion' do
       post action, params
       expect(speech).to eq response_text
@@ -493,8 +1059,6 @@ describe ChampionsController, type: :controller do
     let(:response_text) {
       "The highest win rate on Azir Middle has you start W, Q, Q, E and then max Q, W, E."
     }
-
-    it_should_behave_like 'load champion'
 
     context 'with repeated 3 starting abililties' do
       it 'should return the 4 first order and max order for abilities' do
@@ -525,8 +1089,6 @@ describe ChampionsController, type: :controller do
     let(:response_text) {
       "The best counter for Jayce Top is Jarvan IV at a 58.19% win rate."
     }
-
-    it_should_behave_like 'load champion'
 
     context 'without enough matchups' do
       let(:champion) { Champion.new(name: 'Bard') }
@@ -627,8 +1189,6 @@ describe ChampionsController, type: :controller do
       "Jax got better in the last patch and is currently ranked forty-first out of fifty-seven with a 49.69% win rate and a 3.76% play rate as Top."
     }
 
-    it_should_behave_like 'load champion'
-
     it 'should indicate the strength of champions in the given lane' do
       post action, params
       expect(speech).to eq(response_text)
@@ -640,8 +1200,6 @@ describe ChampionsController, type: :controller do
     let(:response_text) {
       "Ivern's second ability is called Brushmaker. In brush, Ivern's attacks are ranged and deal bonus magic damage. Ivern can activate this ability to create a patch of brush."
     }
-
-    it_should_behave_like 'load champion'
 
     it "should describe the champion's ability" do
       post action, params
@@ -655,8 +1213,6 @@ describe ChampionsController, type: :controller do
     let(:response_text) {
       "Yasuo's fourth ability, Last Breath, has a cooldown of 0 seconds at rank 3."
     }
-
-    it_should_behave_like 'load champion'
 
     it "should provide the champion's cooldown" do
       post action, params
@@ -682,8 +1238,6 @@ describe ChampionsController, type: :controller do
       "Here's a tip for playing as Fiora: Grand Challenge allows Fiora to take down even the most durable opponents and then recover if successful, so do not hesitate to attack the enemy's front line."
     }
 
-    it_should_behave_like 'load champion'
-
     it 'should provide tips for playing the champion' do
       champion = Champion.new(name: 'Fiora')
       allow(Champion).to receive(:new).and_return(champion)
@@ -701,8 +1255,6 @@ describe ChampionsController, type: :controller do
     let(:response_text) {
       "Here's a tip for playing against LeBlanc: Stunning or silencing LeBlanc will prevent her from activating the return part of Distortion."
     }
-
-    it_should_behave_like 'load champion'
 
     it 'should provide tips for beating the enemy champion' do
       champion = Champion.new(name: 'Leblanc')

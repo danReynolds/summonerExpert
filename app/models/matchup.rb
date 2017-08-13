@@ -1,5 +1,5 @@
 class Matchup < MatchupRole
-  validates :name1, presence: true, inclusion:{ in: CHAMPIONS.values, allow_blank: true }
+  validates :name1, presence: true, inclusion: { in: CHAMPIONS.values, allow_blank: true }
   validates :name2, presence: true, inclusion: { in: CHAMPIONS.values, allow_blank: true }
   validate :matchup_validator
 
@@ -61,10 +61,12 @@ class Matchup < MatchupRole
         matchup_role: @matchup_role
       }
 
+      shared_matchups = find_shared_matchups
+
       if @role1.present? && @role2.present?
         errors[:base] << ApiResponse.get_response({ errors: { matchups: :duo_role_no_matchup } }, args)
       elsif @role1.present?
-        errors[:base] << ApiResponse.get_response({ errors: { matchups: :single_role_no_matchup } }, args)
+        errors[:base] << ApiResponse.get_response({ errors: { matchups: :solo_role_no_matchup } }, args)
       elsif shared_matchups.length > 1
         errors[:base] << ApiResponse.get_response({ errors: { matchups: :multiple_shared_roles } }, args)
       elsif shared_matchups.length == 0

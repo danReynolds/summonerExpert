@@ -60,7 +60,7 @@ champions:
     - "The cooldown of {name}'s {ability_position} ability, {ability_name}, is {ability_cooldown} seconds at rank {rank}."
     - "{name}'s {ability_position} ability, {ability_name}, has a cooldown of {ability_cooldown} seconds at rank {rank}."
   matchup:
-    single_role:
+    solo_role:
       general:
         - '{name1} and {name2} have {champ1_result} and {champ2_result} {position} respectively playing {role1} in {elo} division.'
       winrate:
@@ -97,7 +97,7 @@ champions:
           synergy:
             - 'The champion with the {list_order} {position} playing {unnamed_role} with {name} {named_role} from {elo} division is {names}.'
         incomplete:
-          - 'There is currently no data for champions playing {unnamed_role} against {name} {named_role} in {elo} division.'
+          - 'The current patch only has enough data for a single champion. The single champion with the {list_order} {position} playing {unnamed_role} against {name} from {elo} division is {names}.'
       offset:
         complete:
           solo_role:
@@ -107,7 +107,7 @@ champions:
           synergy:
             - 'The champion with the {list_position} {list_order} {position} playing {unnamed_role} with {name} {named_role} from {elo} division is {names}.'
         incomplete:
-          - 'There is currently no data for champions playing {unnamed_role} against {name} {named_role} in {elo} division.'
+          - 'The current patch only has enough data for a single champion beginning at the {list_position} position. The single champion with the {list_order} {position} playing {unnamed_role} against {name} from {elo} division is {names}.'
     multiple:
       normal:
         complete:
@@ -156,7 +156,7 @@ errors:
   matchups:
     duo_role_no_matchup:
       - 'I do not have any information on matchups for {name1} {role1} and {name2} {role2} playing together in {elo} division.'
-    single_role_no_matchup:
+    solo_role_no_matchup:
       - 'I cannot find any matchup information on {name1} and {name2} playing {role1} in {elo} division.'
     multiple_shared_roles:
       - '{name1} and {name2} have matchups for multiple roles in {elo} division. Please specify roles for one or both champions.'
@@ -165,15 +165,15 @@ errors:
   matchup_ranking:
     duo_roles:
       empty_matchup_rankings:
-        - 'There are no matchup rankings for champions playing {unnamed_role} with or against {name} {named_role} in {elo} division.'
+        - 'There are no matchup rankings for champions playing {unnamed_role} with {name} {named_role} in {elo} division.'
     named_role:
       empty_matchup_rankings:
         - 'There are no matchup rankings for {name} {named_role}.'
       multiple_matchup_rankings:
-        - 'What role are the champions playing with or against {name} {named_role}?'
+        - 'What role are the champions playing with {name}?'
     unnamed_role:
       empty_matchup_rankings:
-        - 'There are no matchup rankings for champions playing {unnamed_role} with or against {name}.'
+        - 'There are no matchup rankings for champions playing {unnamed_role} with {name}.'
       multiple_matchup_rankings:
         - 'What role is {name} playing?'
     empty_roles:
@@ -183,7 +183,7 @@ errors:
         - 'There are no matchup rankings for {name}.'
   stats:
     level:
-      - 'A valid level is between 1 and 18.'
+      - 'A valid champion level is between 1 and 18.'
       - 'Only levels between 1 and 18 can be specified.'
 application:
   patch:

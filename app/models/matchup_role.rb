@@ -13,7 +13,7 @@ class MatchupRole
   def role_type
     if @matchup_role == ChampionGGApi::MATCHUP_ROLES[:SYNERGY]
       :synergy
-    elsif role1 == role2
+    elsif @role1 == @role2 || @role1.blank? || @role2.blank?
       :solo_role
     else
       :duo_role
