@@ -4,7 +4,7 @@ champions:
     - 'That champ and I go way back, if I had to call him anything it would be {name}, {title}.'
     - '{name} has the title of {title}.'
   lore:
-    - 'I will tell you about the history of {name}. Stop me if you have heard it: {lore}'
+    - 'I will tell you about the history of {name}. This is all I know: {lore}'
     - '{name} has such an interesting past. Here it is, stop me if you have heard it: {lore}'
   ability:
     - "{champion_name}'s {position} ability is called {ability_name}. {description}"
@@ -137,7 +137,6 @@ champions:
             - 'The current patch only has enough data for {real_size} champions. The {list_position} through {filtered_position_offset} champions with the {list_order} {position} playing {unnamed_role} against {name} {named_role} from {elo} division are {names}.'
           synergy:
             - 'The current patch only has enough data for {real_size} champions. The {list_position} through {filtered_position_offset} champions with the {list_order} {position} playing {unnamed_role} with {name} {named_role} from {elo} division are {names}.'
-  cooldown:
   build:
     - 'The {metric} build for {name} {role} in {elo} division is {item_names}.'
   stats:
@@ -170,6 +169,15 @@ errors:
         - 'There are no matchup rankings for champions playing {unnamed_role} with {name}.'
       no_roles:
         - "There are multiple matchup rankings for {name}, please specify {name}'s role."
+  role_performance:
+    does_not_play:
+      - 'I do not have any information on {name} playing {role}.'
+    plays_multiple_roles:
+      - '{name} plays multiple roles, please specify a role.'
+  cooldown:
+    rank:
+      - 'A valid ability rank is between 1 and 5.'
+      - 'Only ranks between 1 and 5 can be specified.'
   stats:
     level:
       - 'A valid champion level is between 1 and 18.'

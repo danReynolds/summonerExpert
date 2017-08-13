@@ -86,7 +86,7 @@ class ChampionsController < ApplicationController
 
     args = {
       elo: @role_performance.elo.humanize,
-      role: ChampionGGApi::ROLES[@role_performance.role.to_sym].humanize,
+      role: @role_performance.role.humanize,
       item_names: item_names,
       name: @role_performance.name,
       metric: ChampionGGApi::METRICS[metric.to_sym]
@@ -220,8 +220,12 @@ class ChampionsController < ApplicationController
 
   def cooldown
     ability_position = champion_params[:ability_position].to_sym
-    rank = champion_params[:rank].split(' ').last.to_i
+    rank = champion_params[:rank].to_i
     ability = @champion.ability(ability_position)
+
+    return render json: {
+      speech: ApiResponse.get_response({ errors: { cooldown: :rank }})
+    } if rank < 1 || rank > 5
 
     args = {
       name: @champion.name,
@@ -237,7 +241,8 @@ class ChampionsController < ApplicationController
   end
 
   def lore
-    args = { name: @champion.name, lore: @champion.lore }
+    args = { name: @champion.name, lore: @champion.blurb }
+
     render json: {
       speech: ApiResponse.get_response({ champions: :lore }, args)
     }

@@ -4,7 +4,7 @@ class Champion < Collection
   COLLECTION = Rails.cache.read(collection_key.pluralize)
   STAT_PER_LEVEL = :perlevel
   ACCESSORS = [
-    :name, :title, :lore, :passive, :allytips, :enemytips, :id
+    :name, :title, :lore, :passive, :allytips, :enemytips, :id, :blurb
   ].freeze
   ACCESSORS.each do |accessor|
     attr_accessor accessor

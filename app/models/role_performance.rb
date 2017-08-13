@@ -2,7 +2,6 @@ class RolePerformance
   include ActiveModel::Validations
 
   validates :elo, presence: true
-  validates :role, presence: true
   validates :name, presence: true
   validate :role_performance_validator
 
@@ -74,11 +73,15 @@ class RolePerformance
 
   private
 
-  private
-
   def role_performance_validator
+    args = { name: @name, elo: @elo.humanize, role: @role.humanize }
+
     if errors.empty? && @role_performance.nil?
-      errors[:base] << "Information could not be found for the given champion in the provided role and elo."
+      if @role.present?
+        errors[:base] << ApiResponse.get_response({ errors: { role_performance: :does_not_play } }, args)
+      else
+        errors[:base] << ApiResponse.get_response({ errors: { role_performance: :plays_multiple_roles } }, args)
+      end
     end
   end
 end

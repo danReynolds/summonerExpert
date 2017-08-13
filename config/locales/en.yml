@@ -60,7 +60,5 @@ en:
           attributes:
             name:
               blank: 'of champion was not provided'
-            role:
-              blank: "There was no role provided, please specify the champion's role."
             elo:
               blank: "was not specified Please provide the elo you are looking for"

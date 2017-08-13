@@ -214,7 +214,7 @@ describe ChampionsController, type: :controller do
         context 'with complete champions returned' do
           it 'should return the champions' do
             post action, params
-            expect(speech).to eq 'The second through seventh champions with the highest kills playing Top in Silver division are Rengar, Quinn, Pantheon, Akali, and Wukong.'
+            expect(speech).to eq 'The second through sixth champions with the highest kills playing Top in Silver division are Rengar, Quinn, Pantheon, Akali, and Wukong.'
           end
         end
 
@@ -228,7 +228,7 @@ describe ChampionsController, type: :controller do
 
           it 'should indicate that there are not enough champions' do
             post action, params
-            expect(speech).to eq 'The current patch only has enough data for three champions. The second through fourth champions with the highest kills playing Top in Silver division are Rengar and Quinn.'
+            expect(speech).to eq 'The current patch only has enough data for three champions. The second through third champions with the highest kills playing Top in Silver division are Rengar and Quinn.'
           end
         end
       end
@@ -322,7 +322,7 @@ describe ChampionsController, type: :controller do
     it 'should vary the build based on the specified metric' do
       champion_params[:metric] = 'highestWinrate'
       post action, params
-      expect(speech).to eq "The highest win rate build for Bard Support in Gold division is Boots of Swiftness, Eye of the Watchers, Locket of the Iron Solari, Redemption, Iceborn Gauntlet, and Rylai's Crystal Scepter."
+      expect(speech).to eq "The highest win rate build for Bard Support in Gold division is Boots of Swiftness, Eye of the Watchers, Redemption, Locket of the Iron Solari, Knight's Vow, and Zz'Rot Portal."
     end
   end
 
@@ -426,7 +426,7 @@ describe ChampionsController, type: :controller do
       context 'with general matchup position' do
         it 'should return the matchup for the champions' do
           post action, params
-          expect(speech).to eq 'Shyvana averages 6.05 kills in Jungle, lower than Nocturne who averages 7.48 kills when playing Jungle in Gold division.'
+          expect(speech).to eq 'Shyvana and Nocturne have 6.05 and 7.48 kills respectively playing Jungle in Gold division.'
         end
       end
 
@@ -437,7 +437,7 @@ describe ChampionsController, type: :controller do
 
         it 'should return the matchup for the champions' do
           post action, params
-          expect(speech).to eq 'Shyvana averages a 50.21% win rate in Jungle, higher than Nocturne playing Jungle in Gold division.'
+          expect(speech).to eq 'Shyvana has a 50.21% win rate against Nocturne playing Jungle in Gold division.'
         end
       end
     end
@@ -1026,282 +1026,195 @@ describe ChampionsController, type: :controller do
     end
   end
 
-  describe 'POST title' do
-    let(:action) { :title }
-    let(:response_text) { "Sona's title is Maven of the Strings." }
-
-    it 'should return the champions title' do
-      post action, params
-      expect(speech).to eq response_text
+  describe 'POST role_performance_summary' do
+    include_context 'determinate speech'
+    let(:action) { :role_performance_summary }
+    let(:champion_params) do
+      {
+        name: 'Shyvana',
+        role: 'JUNGLE',
+        elo: 'GOLD',
+      }
     end
-  end
 
-  describe 'POST stats' do
-    let(:action) { :stats }
-    let(:response_text) { 'Zed has 68 attack damage at level 5.' }
+    before :each do
+      allow(controller).to receive(:champion_params).and_return(champion_params)
+    end
 
-    context 'with stat modifier' do
-      context 'with level specified' do
-        it 'should calculate the stat for the champion' do
-          post action, params
-          expect(speech).to eq response_text
-        end
+    context 'with a role specified' do
+      it 'should return the role performance for the given role' do
+        post action, params
+        expect(speech). to eq 'Shyvana is doing better this patch in Jungle and is ranked 8th out of 45 with a 6.1/5.28/6.86 KDA, 51.87% win rate and a 0.02% ban rate in Gold division.'
+      end
+    end
+
+    context 'with no role specified' do
+      before :each do
+        champion_params[:role] = ''
       end
 
-      context 'without level specified' do
+      it 'should determine the role based on the roles the champion plays' do
+        post action, params
+        expect(speech).to eq 'Shyvana is doing better this patch in Jungle and is ranked 8th out of 45 with a 6.1/5.28/6.86 KDA, 51.87% win rate and a 0.02% ban rate in Gold division.'
+      end
+    end
+
+    context 'error messages' do
+      context 'does not play role' do
         before :each do
-          allow(controller).to receive(:champion_params).and_return(
-            champion: 'Zed',
-            stat: 'attackdamage'
-          )
+          champion_params[:name] = 'Jayce'
+          champion_params[:role] = 'SUPPORT'
         end
 
-        it 'should ask for the level' do
+        it 'should indicate that the champion does not play that role' do
           post action, params
-          expect(speech).to eq controller.send(:ask_for_level_response)[:speech]
-        end
-      end
-    end
-
-    context 'without stat modifier' do
-      let(:response_text) { 'Zed has 345 movement speed.' }
-      before :each do
-        allow(controller).to receive(:champion_params).and_return(
-          champion: 'Zed',
-          stat: 'movespeed'
-        )
-      end
-
-      it 'should calculate the stat for the champion' do
-        post action, params
-        expect(speech).to eq response_text
-      end
-    end
-  end
-
-  describe 'POST build' do
-    let(:action) { :build }
-    let(:response_text) {
-      "The highest win rate build for Bard Support is Boots of Mobility, Sightstone, Frost Queen's Claim, Redemption, Knight's Vow, and Locket of the Iron Solari."
-    }
-
-    it 'should provide a build for a champion' do
-      post action, params
-      expect(speech).to eq response_text
-    end
-  end
-
-  describe 'POST ability_order' do
-    let(:action) { :ability_order }
-    let(:response_text) {
-      "The highest win rate on Azir Middle has you start W, Q, Q, E and then max Q, W, E."
-    }
-
-    context 'with repeated 3 starting abililties' do
-      it 'should return the 4 first order and max order for abilities' do
-        post action, params
-        expect(speech).to eq response_text
-      end
-    end
-
-    context 'with uniq starting 3 abilities' do
-      let(:response_text) {
-        "The highest win rate on Azir Middle has you start W, Q, E and then max Q, W, E."
-      }
-
-      it 'should return the 3 first order and max order for abilities' do
-        champion = Champion.new(name: 'Azir')
-        order = champion.roles.first[:skills][:highestWinPercent][:order]
-        order[2] = 'E'
-        order[3] = 'Q'
-        allow(Champion).to receive(:new).and_return(champion)
-        post action, params
-        expect(speech).to eq response_text
-      end
-    end
-  end
-
-  describe 'POST counters' do
-    let(:action) { :counters }
-    let(:response_text) {
-      "The best counter for Jayce Top is Jarvan IV at a 58.19% win rate."
-    }
-
-    context 'without enough matchups' do
-      let(:champion) { Champion.new(name: 'Bard') }
-      let(:role_data) do
-        champion.roles.first.tap do |role|
-          role[:matchups] = role[:matchups].select do |matchup|
-            matchup[:games] >= 100
-          end.first(2)
+          expect(speech).to eq 'I do not have any information on Jayce playing Support.'
         end
       end
 
-      before :each do
-        allow(controller).to receive(:champion_params).and_return(
-          champion: champion.name,
-          list_size: 10
-        )
-        allow(Champion).to receive(:new).and_return(champion)
-        allow(champion).to receive(:find_by_role).and_return(role_data)
-      end
+      context 'plays multiple roles' do
+        before :each do
+          champion_params[:name] = 'Jayce'
+          champion_params[:role] = ''
+        end
 
-      it 'should indicate that there was not the correct number of results' do
-        post action, params
-        expect(speech).to eq 'The current patch only has enough data for two counters. The best two counters for Bard Support are Zilean at a 57.75% win rate and Taric at a 57.9% win rate.'
-      end
-    end
-
-    context 'without any matchups' do
-      let(:champion) { Champion.new(name: 'Bard') }
-      let(:role_data) do
-        champion.roles.first.tap do |role|
-          role[:matchups].map! { |_| { games: 10 } }
+        it 'should indicate that a role must be specified' do
+          post action, params
+          expect(speech).to eq 'Jayce plays multiple roles, please specify a role.'
         end
       end
-
-      before :each do
-        allow(controller).to receive(:champion_params).and_return({
-          champion: champion.name
-        })
-        allow(Champion).to receive(:new).and_return(champion)
-        allow(champion).to receive(:find_by_role).and_return(role_data)
-      end
-
-      it 'should specify that there is not enough data in the current patch' do
-        post action, params
-        expect(speech).to eq 'There is not enough data for Bard in the current patch.'
-      end
-    end
-
-    context 'with worst order' do
-      let(:response_text) {
-        "The worst four counters for Jayce Top are Singed at a 43.12% win rate, Dr. Mundo at a 44.37% win rate, Teemo at a 47.78% win rate, and Garen at a 47.8% win rate."
-      }
-      before :each do
-        allow(controller).to receive(:champion_params).and_return(
-          list_size: '4',
-          lane: 'Top',
-          list_position: '1',
-          list_order: 'worst',
-          champion: 'Jayce'
-        )
-      end
-
-      it 'should return the worst counters for the champion' do
-        post action, params
-        expect(speech).to eq response_text
-      end
-    end
-
-    context 'with list position' do
-      let(:response_text) {
-        "The second best counter for Jayce Top is Sion at a 56.3% win rate."
-      }
-      before :each do
-        allow(controller).to receive(:champion_params).and_return(
-          list_size: '1',
-          lane: 'Top',
-          list_position: '2',
-          list_order: 'best',
-          champion: 'Jayce'
-        )
-      end
-
-      it 'should return the champion at that list position for the champion' do
-        post action, params
-        expect(speech).to eq response_text
-      end
-    end
-
-    it 'should return the best counters for the champion' do
-      post action, params
-      expect(speech).to eq response_text
-    end
-  end
-
-  describe 'POST lane' do
-    let(:action) { :lane }
-    let(:response_text) {
-      "Jax got better in the last patch and is currently ranked forty-first out of fifty-seven with a 49.69% win rate and a 3.76% play rate as Top."
-    }
-
-    it 'should indicate the strength of champions in the given lane' do
-      post action, params
-      expect(speech).to eq(response_text)
     end
   end
 
   describe 'POST ability' do
+    include_context 'determinate speech'
     let(:action) { :ability }
-    let(:response_text) {
-      "Ivern's second ability is called Brushmaker. In brush, Ivern's attacks are ranged and deal bonus magic damage. Ivern can activate this ability to create a patch of brush."
-    }
+    let(:champion_params) do
+      {
+        name: 'Shyvana',
+        ability_position: 'first'
+      }
+    end
 
-    it "should describe the champion's ability" do
+    before :each do
+      allow(controller).to receive(:champion_params).and_return(champion_params)
+    end
+
+    it 'should return the ability information for the specified champion' do
       post action, params
-
-      expect(speech).to eq response_text
+      expect(speech).to eq "Shyvana's first ability is called Twin Bite. Shyvana strikes twice on her next attack. Basic attacks reduce the cooldown of Twin Bite by 0.5 seconds. Dragon Form: Twin Bite cleaves all units in front Shyvana."
     end
   end
 
   describe 'POST cooldown' do
+    include_context 'determinate speech'
     let(:action) { :cooldown }
-    let(:response_text) {
-      "Yasuo's fourth ability, Last Breath, has a cooldown of 0 seconds at rank 3."
-    }
+    let(:champion_params) do
+      {
+        name: 'Shyvana',
+        ability_position: 'first',
+        rank: '1'
+      }
+    end
 
-    it "should provide the champion's cooldown" do
-      post action, params
-      expect(speech).to eq response_text
+    before :each do
+      allow(controller).to receive(:champion_params).and_return(champion_params)
+    end
+
+    context 'with valid rank' do
+      it 'should indicate the cooldown for the specified ability' do
+        post action, params
+        expect(speech).to eq "The cooldown of Shyvana's first ability, Twin Bite, is 8 seconds at rank 1."
+      end
+    end
+
+    context 'with an invalid rank' do
+      before :each do
+        champion_params[:rank] = '6'
+      end
+
+      it 'should indicate the valid rank range' do
+        post action, params
+        expect(speech).to eq 'A valid ability rank is between 1 and 5.'
+      end
     end
   end
 
-  describe 'POST description' do
-    let(:action) { :description }
-    let(:response_text) {
-      "Katarina, the the Sinister Blade, is an Assassin and a Mage and is played as Middle."
-    }
+  describe 'POST lore' do
+    include_context 'determinate speech'
+    let(:action) { :lore }
+    let(:champion_params) do
+      { name: 'Shyvana' }
+    end
 
-    it 'should provide a description for the champion' do
+    before :each do
+      allow(controller).to receive(:champion_params).and_return(champion_params)
+    end
+
+    it 'should return the lore of the champion' do
       post action, params
-      expect(speech).to eq response_text
+      expect(speech).to eq "I will tell you about the history of Shyvana. This is all I know: A half-breed born from the union between dragon and human, Shyvana searched all her life for belonging. Persecution forged her into a brutal warrior, and those who dare stand against Shyvana face the fiery beast lurking just beneath her skin..."
+    end
+  end
+
+  describe 'POST title' do
+    include_context 'determinate speech'
+    let(:action) { :title }
+    let(:champion_params) do
+      { name: 'Shyvana' }
+    end
+
+    before :each do
+      allow(controller).to receive(:champion_params).and_return(champion_params)
+    end
+
+    it 'should return the champions title' do
+      post action, params
+      expect(speech).to eq 'Shyvana has the illustrious title of the Half-Dragon.'
     end
   end
 
   describe 'POST ally_tips' do
+    include_context 'determinate speech'
     let(:action) { :ally_tips }
-    let(:response_text) {
-      "Here's a tip for playing as Fiora: Grand Challenge allows Fiora to take down even the most durable opponents and then recover if successful, so do not hesitate to attack the enemy's front line."
-    }
+    let(:champion_params) do
+      { name: 'Shyvana' }
+    end
 
-    it 'should provide tips for playing the champion' do
-      champion = Champion.new(name: 'Fiora')
+    before :each do
+      allow(controller).to receive(:champion_params).and_return(champion_params)
+      champion = Champion.new(name: champion_params[:name])
       allow(Champion).to receive(:new).and_return(champion)
       allow(champion.allytips).to receive(:sample).and_return(
         champion.allytips.last
       )
+    end
 
+    it 'should provide tips for playing with the champion' do
       post action, params
-      expect(speech).to eq response_text
+      expect(speech).to eq "Here's something you should know about Shyvana: It can be valuable to purchase one of the items that can slow enemies: Frozen Mallet, Dead Man's Plate, or Entropy."
     end
   end
 
   describe 'POST enemy_tips' do
+    include_context 'determinate speech'
     let(:action) { :enemy_tips }
-    let(:response_text) {
-      "Here's a tip for playing against LeBlanc: Stunning or silencing LeBlanc will prevent her from activating the return part of Distortion."
-    }
+    let(:champion_params) do
+      { name: 'Shyvana' }
+    end
 
-    it 'should provide tips for beating the enemy champion' do
-      champion = Champion.new(name: 'Leblanc')
+    before :each do
+      allow(controller).to receive(:champion_params).and_return(champion_params)
+      champion = Champion.new(name: champion_params[:name])
       allow(Champion).to receive(:new).and_return(champion)
       allow(champion.enemytips).to receive(:sample).and_return(
         champion.enemytips.last
       )
+    end
 
+    it 'should provide tips for playing against the champion' do
       post action, params
-      expect(speech).to eq response_text
+      expect(speech).to eq "I have seen Shyvana fall in battle before and this is what I would recommend: Shyvana's Fury Bar indicate her ultimate can be activated. Harassing her when she's low on Fury can be very effective."
     end
   end
 end
