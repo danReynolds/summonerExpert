@@ -161,24 +161,15 @@ errors:
     no_shared_roles:
       - 'I cannot find matchup information for {name1} and {name2} for any role combination in {elo} division.'
   matchup_ranking:
-    duo_roles:
-      empty_matchup_rankings:
+    empty:
+      duo_roles:
         - 'There are no matchup rankings for champions playing {unnamed_role} with {name} {named_role} in {elo} division.'
-    named_role:
-      empty_matchup_rankings:
+      named_role:
         - 'There are no matchup rankings for {name} {named_role}.'
-      multiple_matchup_rankings:
-        - 'What role are the champions playing with {name}?'
-    unnamed_role:
-      empty_matchup_rankings:
+      unnamed_role:
         - 'There are no matchup rankings for champions playing {unnamed_role} with {name}.'
-      multiple_matchup_rankings:
-        - 'What role is {name} playing?'
-    empty_roles:
-      multiple_matchup_rankings:
+      no_roles:
         - "There are multiple matchup rankings for {name}, please specify {name}'s role."
-      empty_matchup_rankings:
-        - 'There are no matchup rankings for {name}.'
   stats:
     level:
       - 'A valid champion level is between 1 and 18.'

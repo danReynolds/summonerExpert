@@ -84,26 +84,14 @@ class MatchupRanking < MatchupRole
         matchup_role: @matchup_role
       }
 
-      matchups = determine_matchups_by_roles
-
       if @role1.present? && @role2.present?
-        errors[:base] << ApiResponse.get_response({ errors: { matchup_ranking: { duo_roles: :empty_matchup_rankings } } }, args)
+        errors[:base] << ApiResponse.get_response({ errors: { matchup_ranking: { empty: :duo_roles } } }, args)
       elsif @role1.present?
-        if matchups.length > 1
-          errors[:base] << ApiResponse.get_response({ errors: { matchup_ranking: { named_role: :multiple_matchup_rankings } } }, args)
-        else
-          errors[:base] << ApiResponse.get_response({ errors: { matchup_ranking: { named_role: :empty_matchup_rankings } } }, args)
-        end
+        errors[:base] << ApiResponse.get_response({ errors: { matchup_ranking: { empty: :named_role } } }, args)
       elsif @role2.present?
-        if matchups.length > 1
-          errors[:base] << ApiResponse.get_response({ errors: { matchup_ranking: { unnamed_role: :multiple_matchup_rankings } } }, args)
-        else
-          errors[:base] << ApiResponse.get_response({ errors: { matchup_ranking: { unnamed_role: :empty_matchup_rankings } } }, args)
-        end
-      elsif matchups.length > 1
-        errors[:base] << ApiResponse.get_response({ errors: { matchup_ranking: { empty_roles: :multiple_matchup_rankings } } }, args)
+        errors[:base] << ApiResponse.get_response({ errors: { matchup_ranking: { empty: :unnamed_role } } }, args)
       else
-        errors[:base] << ApiResponse.get_response({ errors: { matchup_ranking: { empty_roles: :empty_matchup_rankings } } }, args)
+        errors[:base] << ApiResponse.get_response({ errors: { matchup_ranking: { empty: :no_roles } } }, args)
       end
     end
   end

@@ -622,77 +622,63 @@ describe ChampionsController, type: :controller do
     end
 
     context 'error messages' do
-      context 'duo roles empty matchup rankings' do
-        before :each do
-          champion_params[:role1] = 'TOP'
-          champion_params[:role2] = 'MIDDLE'
-        end
-
-        it 'should indicate that the champion has no matchup rankings for the given two roles' do
-          post action, params
-          expect(speech).to eq 'There are no matchup rankings for champions playing Middle with Shyvana Top in Gold division.'
-        end
-      end
-
-      context 'named role' do
-        before :each do
-          champion_params[:role2] = ''
-        end
-
-        context 'empty matchup rankings' do
+      context 'empty matchup rankings' do
+        context 'duo roles specified' do
           before :each do
-            allow(Rails.cache).to receive(:read).and_return(nil)
+            champion_params[:role1] = 'TOP'
+            champion_params[:role2] = 'MIDDLE'
           end
 
-          it 'should indicate that the champion has no matchup rankings for the given role' do
+          it 'should indicate that the champion has no matchup rankings for the given two roles' do
             post action, params
-            expect(speech).to eq 'There are no matchup rankings for Shyvana Jungle.'
+            expect(speech).to eq 'There are no matchup rankings for champions playing Middle with Shyvana Top in Gold division.'
           end
         end
-      end
 
-      context 'unnamed role' do
-        before :each do
-          champion_params[:role1] = ''
-        end
-
-        context 'empty matchup rankings' do
+        context 'only named role specified' do
           before :each do
-            allow(Rails.cache).to receive(:read).and_return(nil)
+            champion_params[:role2] = ''
           end
 
-          it 'should indicate that there are no matchup rankings for the unnamed role' do
-            post action, params
-            expect(speech).to eq 'There are no matchup rankings for champions playing Jungle with Shyvana.'
+          context 'empty matchup rankings' do
+            before :each do
+              allow(Rails.cache).to receive(:read).and_return(nil)
+            end
+
+            it 'should indicate that the champion has no matchup rankings for the given role' do
+              post action, params
+              expect(speech).to eq 'There are no matchup rankings for Shyvana Jungle.'
+            end
           end
         end
-      end
 
-      context 'empty roles' do
-        before :each do
-          champion_params[:role1] = ''
-          champion_params[:role2] = ''
+        context 'only unnamed role specified' do
+          before :each do
+            champion_params[:role1] = ''
+          end
+
+          context 'empty matchup rankings' do
+            before :each do
+              allow(Rails.cache).to receive(:read).and_return(nil)
+            end
+
+            it 'should indicate that there are no matchup rankings for the unnamed role' do
+              post action, params
+              expect(speech).to eq 'There are no matchup rankings for champions playing Jungle with Shyvana.'
+            end
+          end
         end
 
-        context 'with multiple matchup rankings' do
+        context 'no roles specified' do
           before :each do
             champion_params[:name] = 'Jinx'
+            champion_params[:role1] = ''
+            champion_params[:role2] = ''
           end
 
           it 'should ask for role specification' do
             post action, params
             expect(speech).to eq "There are multiple matchup rankings for Jinx, please specify Jinx's role."
-          end
-        end
-
-        context 'with empty matchup rankings' do
-          before :each do
-            allow(Rails.cache).to receive(:read).and_return(nil)
-          end
-
-          it 'should indicate the champion has no rankings' do
-            post action, params
-            expect(speech).to eq 'There are no matchup rankings for Shyvana.'
           end
         end
       end
@@ -712,7 +698,7 @@ describe ChampionsController, type: :controller do
             end
           end
         end
-        
+
         context 'with offset position' do
           before :each do
             champion_params[:list_position] = '2'
