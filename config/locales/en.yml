@@ -26,7 +26,7 @@ en:
         matchup:
           attributes:
             name1:
-              inclusion: 'The first name provided is not the name of a champion, to the best of my knowledge'
+              inclusion: 'The first name provided is not the name of a champion, to the best of my knowledge.'
               blank: 'The first champion name was not provided.'
             name2:
               inclusion: 'The second name provided is not the name of a champion, to the best of my knowledge.'
@@ -34,10 +34,10 @@ en:
         matchup_ranking:
           attributes:
             name:
-              blank: 'of champion was not provided'
-              inclusion: 'is not a valid champion name, to the best of my knowledge'
+              blank: 'of champion was not provided.'
+              inclusion: 'is not a valid champion name, to the best of my knowledge.'
             role1:
-              blank: 'of champion was not provided'
+              blank: 'of champion was not provided.'
         summoner:
           attributes:
             name:
@@ -49,16 +49,16 @@ en:
         item:
           attributes:
             name:
-              blank: 'was not provided'
-              inclusion: 'provided is not a valid item name, to the best of my knowledge'
+              blank: 'was not provided.'
+              inclusion: 'provided is not a valid item name, to the best of my knowledge.'
         champion:
           attributes:
             name:
-              blank: 'of champion was not provided'
-              inclusion: 'provided is not a valid champion name, to the best of my knowledge'
+              blank: 'of champion was not provided.'
+              inclusion: 'provided is not a valid champion name, to the best of my knowledge.'
         role_performance:
           attributes:
             name:
-              blank: 'of champion was not provided'
+              blank: 'of champion was not provided.'
             elo:
-              blank: "was not specified Please provide the elo you are looking for"
+              blank: "was not specified Please provide the elo you are looking for."
