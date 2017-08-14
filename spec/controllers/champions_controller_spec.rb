@@ -1,31 +1,15 @@
 require 'rails_helper'
+require 'spec_contexts.rb'
 
 describe ChampionsController, type: :controller do
-  let(:resources) do
-    JSON.parse(File.read('api.json')).with_indifferent_access[:resources]
-  end
-  let(:params) do
-    res = resources.detect do |res|
-      res[:name] == "champions/#{action}"
-    end
-    JSON.parse(res[:body][:text])
-  end
+  include_context 'spec setup'
+  include_context 'determinate speech'
 
-  def speech
-    JSON.parse(response.body).with_indifferent_access[:speech]
-  end
-
-  # Override the indeterminate nature of the speech templates returned
-  shared_context 'determinate speech' do
-    before :each do
-      allow(ApiResponse).to receive(:random_response) do |responses|
-        responses.first
-      end
-    end
+  before :each do
+    allow(controller).to receive(:champion_params).and_return(champion_params)
   end
 
   describe 'POST ranking' do
-    include_context 'determinate speech'
     let(:action) { :ranking }
     let(:champion_params) do
       {
@@ -39,10 +23,6 @@ describe ChampionsController, type: :controller do
     end
     let(:query_params) do
       { position: 'kills', elo: 'SILVER', role: 'TOP' }
-    end
-
-    before :each do
-      allow(controller).to receive(:champion_params).and_return(champion_params)
     end
 
     it 'should rank the champions by the specified position' do
@@ -236,7 +216,6 @@ describe ChampionsController, type: :controller do
   end
 
   describe 'POST stats' do
-    include_context 'determinate speech'
     let(:action) { :stats }
     let(:champion_params) do
       {
@@ -244,10 +223,6 @@ describe ChampionsController, type: :controller do
         name: 'Nocturne',
         level: '5'
       }
-    end
-
-    before :each do
-      allow(controller).to receive(:champion_params).and_return(champion_params)
     end
 
     context 'with a valid level' do
@@ -270,7 +245,6 @@ describe ChampionsController, type: :controller do
   end
 
   describe 'POST ability_order' do
-    include_context 'determinate speech'
     let(:action) { :ability_order }
     let(:champion_params) do
       {
@@ -279,10 +253,6 @@ describe ChampionsController, type: :controller do
         elo: 'GOLD',
         metric: 'highestCount'
       }
-    end
-
-    before :each do
-      allow(controller).to receive(:champion_params).and_return(champion_params)
     end
 
     it 'should indicate the ability ordering for the champion' do
@@ -299,7 +269,6 @@ describe ChampionsController, type: :controller do
   end
 
   describe 'POST build' do
-    include_context 'determinate speech'
     let(:action) { :build }
     let(:champion_params) do
       {
@@ -308,10 +277,6 @@ describe ChampionsController, type: :controller do
         elo: 'GOLD',
         metric: 'highestCount'
       }
-    end
-
-    before :each do
-      allow(controller).to receive(:champion_params).and_return(champion_params)
     end
 
     it 'should determine the best build for the champion' do
@@ -327,7 +292,6 @@ describe ChampionsController, type: :controller do
   end
 
   describe 'POST matchup' do
-    include_context 'determinate speech'
     let(:action) { :matchup }
     let(:champion_params) do
       {
@@ -338,10 +302,6 @@ describe ChampionsController, type: :controller do
         elo: 'GOLD',
         matchup_position: 'kills'
       }
-    end
-
-    before :each do
-      allow(controller).to receive(:champion_params).and_return(champion_params)
     end
 
     context 'error messages' do
@@ -490,7 +450,6 @@ describe ChampionsController, type: :controller do
   end
 
   describe 'POST matchup_ranking' do
-    include_context 'determinate speech'
     let(:action) { :matchup_ranking }
     let(:champion_params) do
       {
@@ -506,10 +465,6 @@ describe ChampionsController, type: :controller do
     end
     let(:query_params) do
       { matchups: { name: 'Shyvana', role: 'JUNGLE', elo: 'GOLD' } }
-    end
-
-    before :each do
-      allow(controller).to receive(:champion_params).and_return(champion_params)
     end
 
     context 'with both roles specified' do
@@ -1027,7 +982,6 @@ describe ChampionsController, type: :controller do
   end
 
   describe 'POST role_performance_summary' do
-    include_context 'determinate speech'
     let(:action) { :role_performance_summary }
     let(:champion_params) do
       {
@@ -1035,10 +989,6 @@ describe ChampionsController, type: :controller do
         role: 'JUNGLE',
         elo: 'GOLD',
       }
-    end
-
-    before :each do
-      allow(controller).to receive(:champion_params).and_return(champion_params)
     end
 
     context 'with a role specified' do
@@ -1087,17 +1037,12 @@ describe ChampionsController, type: :controller do
   end
 
   describe 'POST ability' do
-    include_context 'determinate speech'
     let(:action) { :ability }
     let(:champion_params) do
       {
         name: 'Shyvana',
         ability_position: 'first'
       }
-    end
-
-    before :each do
-      allow(controller).to receive(:champion_params).and_return(champion_params)
     end
 
     it 'should return the ability information for the specified champion' do
@@ -1107,7 +1052,6 @@ describe ChampionsController, type: :controller do
   end
 
   describe 'POST cooldown' do
-    include_context 'determinate speech'
     let(:action) { :cooldown }
     let(:champion_params) do
       {
@@ -1115,10 +1059,6 @@ describe ChampionsController, type: :controller do
         ability_position: 'first',
         rank: '1'
       }
-    end
-
-    before :each do
-      allow(controller).to receive(:champion_params).and_return(champion_params)
     end
 
     context 'with valid rank' do
@@ -1141,14 +1081,9 @@ describe ChampionsController, type: :controller do
   end
 
   describe 'POST lore' do
-    include_context 'determinate speech'
     let(:action) { :lore }
     let(:champion_params) do
       { name: 'Shyvana' }
-    end
-
-    before :each do
-      allow(controller).to receive(:champion_params).and_return(champion_params)
     end
 
     it 'should return the lore of the champion' do
@@ -1158,14 +1093,9 @@ describe ChampionsController, type: :controller do
   end
 
   describe 'POST title' do
-    include_context 'determinate speech'
     let(:action) { :title }
     let(:champion_params) do
       { name: 'Shyvana' }
-    end
-
-    before :each do
-      allow(controller).to receive(:champion_params).and_return(champion_params)
     end
 
     it 'should return the champions title' do
@@ -1175,7 +1105,6 @@ describe ChampionsController, type: :controller do
   end
 
   describe 'POST ally_tips' do
-    include_context 'determinate speech'
     let(:action) { :ally_tips }
     let(:champion_params) do
       { name: 'Shyvana' }
@@ -1197,7 +1126,6 @@ describe ChampionsController, type: :controller do
   end
 
   describe 'POST enemy_tips' do
-    include_context 'determinate speech'
     let(:action) { :enemy_tips }
     let(:champion_params) do
       { name: 'Shyvana' }

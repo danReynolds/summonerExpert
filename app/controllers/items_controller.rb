@@ -41,19 +41,4 @@ class ItemsController < ApplicationController
   def item_params
     params.require(:result).require(:parameters).permit(:name)
   end
-
-  def item_not_found_response(name)
-    { speech: "I could not find an item called '#{name}'." }
-  end
-
-  def no_item_specified_response
-    {
-      speech: 'What item are you looking for?',
-      data: {
-        google: {
-          expect_user_response: true # Used to keep mic open when a response is needed
-        }
-      }
-    }
-  end
 end
