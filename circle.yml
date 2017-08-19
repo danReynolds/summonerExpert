@@ -4,18 +4,23 @@ jobs:
     working_directory: /home/circleci/SummonerExpert
     docker:
       - image: circleci/ruby:2.3
+      - image: danreynolds/summonerexpert_circle:0.0.5
+        environment:
+          RAILS_ENV: test
+          RACK_ENV: test
     steps:
       - checkout
-      # Enables the remote environment necessary for deployment
-      - setup_remote_docker
 
       - run:
           name: Setup Dependencies
-          command: bundle exec rake secrets:decrypt
+          command: bundle install
 
       - run:
           name: Run Tests
-          command: docker-compose -f docker-compose.yml -f docker-compose.development.yml run app rspec
+          command: rspec
+
+      # Enables the remote environment necessary for deployment
+      - setup_remote_docker
 
       - deploy:
           name: Deploy to Production
