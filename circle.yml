@@ -3,7 +3,7 @@ jobs:
   build:
     working_directory: /home/circleci/SummonerExpert
     docker:
-      - image: circleci/ruby:2.3.4
+      - image: danreynolds/summonerexpert_circle:0.0.4
         environment:
           RAILS_ENV: test
           RACK_ENV: test
