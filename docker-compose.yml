@@ -4,7 +4,7 @@ services:
     command: [redis-server, /usr/local/etc/redis/redis.conf, --requirepass, $REDIS_PASSWORD]
     image: "redis:latest"
     volumes:
-      - redis:/data
+      - ./data:/data
       - ./redis.conf:/usr/local/etc/redis/redis.conf
   app:
     depends_on:
@@ -13,5 +13,3 @@ services:
     image: nginx
     depends_on:
       - app
-volumes:
-  redis:

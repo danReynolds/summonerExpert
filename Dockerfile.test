@@ -1,0 +1,7 @@
+# Base Ruby layer
+FROM circleci/ruby:2.3
+
+FROM redis
+COPY redis.conf /usr/local/etc/redis/redis.conf
+COPY ./_data /data
+CMD [ "redis-server", "/usr/local/etc/redis/redis.conf", --requirepass, $REDIS_PASSWORD ]
