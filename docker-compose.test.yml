@@ -1,0 +1,10 @@
+version: '3'
+services:
+  redis:
+    command: [redis-server, /usr/local/etc/redis/redis.conf, --requirepass, $REDIS_PASSWORD]
+    image: "redis:latest"
+    volumes:
+      - ./data:/data
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+  ruby:
+    image: "circleci/ruby:2.3"

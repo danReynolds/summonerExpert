@@ -1,6 +1,3 @@
-# Load Secrets into Environment File
-bundle exec rake secrets:decrypt
-
 # Generate new production tag based on Circle build
 export DEPLOY_TAG="${CIRCLE_BUILD_NUM}_${CIRCLE_SHA1:0:7}"
 
