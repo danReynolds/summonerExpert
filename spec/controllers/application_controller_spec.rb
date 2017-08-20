@@ -9,7 +9,7 @@ describe ApplicationController, type: :controller do
     let(:action) { :patch }
 
     it 'should return the current patch' do
-      post action, params
+      post action, params: params
       expect(speech).to eq 'All data is currently based off of patch 7.14.'
     end
   end

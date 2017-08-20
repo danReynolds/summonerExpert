@@ -27,13 +27,13 @@ describe ChampionsController, type: :controller do
 
     it 'should rank the champions by the specified position' do
       champion_params[:position] = 'deaths'
-      post action, params
+      post action, params: params
       expect(speech).to eq 'The three champions with the highest deaths playing Top in Silver division are Rengar, Yasuo, and Quinn.'
     end
 
     it 'should sort the champions by the specified ordering' do
       champion_params[:list_order] = 'lowest'
-      post action, params
+      post action, params: params
       expect(speech).to eq 'The three champions with the lowest kills playing Top in Silver division are Nautilus, Galio, and Maokai.'
     end
 
@@ -52,14 +52,14 @@ describe ChampionsController, type: :controller do
           end
 
           it 'should indicate that 0 champions were requested' do
-            post action, params
+            post action, params: params
             expect(speech).to eq 'No champions were requested.'
           end
         end
 
         context 'with incomplete champions returned' do
           it 'should indicate that there are no champions for that role and elo' do
-            post action, params
+            post action, params: params
             expect(speech).to eq 'There are no champions available playing Top in Silver division in the current patch.'
           end
         end
@@ -76,7 +76,7 @@ describe ChampionsController, type: :controller do
           end
 
           it 'should indicate that 0 champions were requested' do
-            post action, params
+            post action, params: params
             expect(speech).to eq 'No champions were requested.'
           end
         end
@@ -90,7 +90,7 @@ describe ChampionsController, type: :controller do
           end
 
           it 'should indicate that there are no champions for that role and elo at that position' do
-            post action, params
+            post action, params: params
             expect(speech).to eq 'The current patch only has data for one champion playing Top in Silver division. There are no champions beginning at the second position.'
           end
         end
@@ -109,7 +109,7 @@ describe ChampionsController, type: :controller do
 
         context 'with complete champions returned' do
           it 'should return the champion' do
-            post action, params
+            post action, params: params
             expect(speech).to eq 'The champion with the highest kills playing Top in Silver division is Talon.'
           end
         end
@@ -121,7 +121,7 @@ describe ChampionsController, type: :controller do
           end
 
           it 'should indicate that there are not enough champions' do
-            post action, params
+            post action, params: params
             expect(speech).to eq 'There are no champions available playing Top in Silver division in the current patch.'
           end
         end
@@ -139,7 +139,7 @@ describe ChampionsController, type: :controller do
 
         context 'with complete champions returned' do
           it 'should return the champion' do
-            post action, params
+            post action, params: params
             expect(speech).to eq 'The champion with the second highest kills playing Top in Silver division is Rengar.'
           end
         end
@@ -151,7 +151,7 @@ describe ChampionsController, type: :controller do
           end
 
           it 'should indicate that there are not enough champions' do
-            post action, params
+            post action, params: params
             expect(speech).to eq 'The current patch only has data for zero champions playing Top in Silver division. There are no champions beginning at the second position.'
           end
         end
@@ -166,7 +166,7 @@ describe ChampionsController, type: :controller do
       context 'with normal list position' do
         context 'with complete champions returned' do
           it 'should return the champions' do
-            post action, params
+            post action, params: params
             expect(speech).to eq 'The five champions with the highest kills playing Top in Silver division are Talon, Rengar, Quinn, Pantheon, and Akali.'
           end
         end
@@ -180,7 +180,7 @@ describe ChampionsController, type: :controller do
           end
 
           it 'should indicate that there are not enough champions' do
-            post action, params
+            post action, params: params
             expect(speech).to eq 'The current patch only has enough data for three champions. The three champions with the highest kills playing Top in Silver division are Talon, Rengar, and Quinn.'
           end
         end
@@ -193,7 +193,7 @@ describe ChampionsController, type: :controller do
 
         context 'with complete champions returned' do
           it 'should return the champions' do
-            post action, params
+            post action, params: params
             expect(speech).to eq 'The second through sixth champions with the highest kills playing Top in Silver division are Rengar, Quinn, Pantheon, Akali, and Wukong.'
           end
         end
@@ -207,7 +207,7 @@ describe ChampionsController, type: :controller do
           end
 
           it 'should indicate that there are not enough champions' do
-            post action, params
+            post action, params: params
             expect(speech).to eq 'The current patch only has enough data for three champions. The second through third champions with the highest kills playing Top in Silver division are Rengar and Quinn.'
           end
         end
@@ -227,7 +227,7 @@ describe ChampionsController, type: :controller do
 
     context 'with a valid level' do
       it "should specify the champion's stat value at the given level" do
-        post action, params
+        post action, params: params
         expect(speech).to eq 'Nocturne has 40.88 armor at level 5.'
       end
     end
@@ -238,7 +238,7 @@ describe ChampionsController, type: :controller do
       end
 
       it 'should respond indicating that the level is invalid' do
-        post action, params
+        post action, params: params
         expect(speech).to eq 'A valid champion level is between 1 and 18.'
       end
     end
@@ -256,13 +256,13 @@ describe ChampionsController, type: :controller do
     end
 
     it 'should indicate the ability ordering for the champion' do
-      post action, params
+      post action, params: params
       expect(speech).to eq 'The most frequent ability order for Azir Middle in Gold is W, Q, E, Q, Q, R, Q, W, Q, W, R, W, W, E, E, R, E, E.'
     end
 
     it 'should vary the ability ordering by metric' do
       champion_params[:metric] = 'highestWinrate'
-      post action, params
+      post action, params: params
 
       expect(speech).to eq 'The highest win rate ability order for Azir Middle in Gold is W, Q, E, W, Q, R, W, E, Q, Q, R, Q, W, W, E, R, E, E.'
     end
@@ -280,13 +280,13 @@ describe ChampionsController, type: :controller do
     end
 
     it 'should determine the best build for the champion' do
-      post action, params
+      post action, params: params
       expect(speech).to eq "The most frequent build for Bard Support in Gold division is Boots of Mobility, Eye of the Watchers, Redemption, Locket of the Iron Solari, Knight's Vow, and Mikael's Crucible."
     end
 
     it 'should vary the build based on the specified metric' do
       champion_params[:metric] = 'highestWinrate'
-      post action, params
+      post action, params: params
       expect(speech).to eq "The highest win rate build for Bard Support in Gold division is Boots of Swiftness, Eye of the Watchers, Redemption, Locket of the Iron Solari, Knight's Vow, and Zz'Rot Portal."
     end
   end
@@ -318,7 +318,7 @@ describe ChampionsController, type: :controller do
         end
 
         it 'should indicate that the champions do not play together' do
-          post action, params
+          post action, params: params
           expect(speech).to eq 'I do not have any information on matchups for Jinx Jungle and Nocturne Jungle playing together in Gold division.'
         end
       end
@@ -336,7 +336,7 @@ describe ChampionsController, type: :controller do
         end
 
         it 'should indicate that the champions do not play together' do
-          post action, params
+          post action, params: params
           expect(speech).to eq 'I cannot find any matchup information on Jinx and Nocturne playing Jungle in Gold division.'
         end
       end
@@ -354,7 +354,7 @@ describe ChampionsController, type: :controller do
         end
 
         it 'should indicate that the champions play together in multiple roles' do
-          post action, params
+          post action, params: params
           expect(speech).to eq 'Jinx and Bard have matchups for multiple roles in Gold division. Please specify roles for one or both champions.'
         end
       end
@@ -373,7 +373,7 @@ describe ChampionsController, type: :controller do
       end
 
       it 'should indicate that the champions do not have any shared roles' do
-        post action, params
+        post action, params: params
         expect(speech).to eq 'I cannot find matchup information for Jinx and Darius for any role combination in Gold division.'
       end
     end
@@ -385,7 +385,7 @@ describe ChampionsController, type: :controller do
 
       context 'with general matchup position' do
         it 'should return the matchup for the champions' do
-          post action, params
+          post action, params: params
           expect(speech).to eq 'Shyvana and Nocturne have 6.05 and 7.48 kills respectively playing Jungle in Gold division.'
         end
       end
@@ -396,7 +396,7 @@ describe ChampionsController, type: :controller do
         end
 
         it 'should return the matchup for the champions' do
-          post action, params
+          post action, params: params
           expect(speech).to eq 'Shyvana has a 50.21% win rate against Nocturne playing Jungle in Gold division.'
         end
       end
@@ -405,7 +405,7 @@ describe ChampionsController, type: :controller do
     context 'with duo role' do
       context 'with general matchup position' do
         it 'should return the matchup for the champions' do
-          post action, params
+          post action, params: params
           expect(speech).to eq 'Shyvana and Nocturne have 6.05 and 7.48 kills respectively playing Jungle in Gold division.'
         end
       end
@@ -416,7 +416,7 @@ describe ChampionsController, type: :controller do
         end
 
         it 'should return the matchup for the champions' do
-          post action, params
+          post action, params: params
           expect(speech).to eq 'Shyvana has a 50.21% win rate against Nocturne playing Jungle in Gold division.'
         end
       end
@@ -431,7 +431,7 @@ describe ChampionsController, type: :controller do
 
       context 'with general matchup position' do
         it 'should return the matchup for the champions' do
-          post action, params
+          post action, params: params
           expect(speech).to eq 'Bard averages 3.29 kills in Support when playing with Jinx Adc in Gold.'
         end
       end
@@ -442,7 +442,7 @@ describe ChampionsController, type: :controller do
         end
 
         it 'should return the matchup for the champions' do
-          post action, params
+          post action, params: params
           expect(speech).to eq 'Bard averages a 50.83% win rate in Support when playing alongside Jinx Adc in Gold.'
         end
       end
@@ -470,7 +470,7 @@ describe ChampionsController, type: :controller do
     context 'with both roles specified' do
       context 'with both roles the same' do
         it 'should return the matchups for that role combination' do
-          post action, params
+          post action, params: params
           expect(speech).to eq "The champion with the highest win rate playing Jungle against Shyvana from Gold division is Cho'Gath."
         end
       end
@@ -481,7 +481,7 @@ describe ChampionsController, type: :controller do
           champion_params[:name] = 'Sivir'
         end
         it 'should return the matchups for the synergy role' do
-          post action, params
+          post action, params: params
           expect(speech).to eq 'The champion with the highest win rate playing Support with Sivir Adc from Gold division is Sion.'
         end
       end
@@ -493,7 +493,7 @@ describe ChampionsController, type: :controller do
           champion_params[:name] = 'Jhin'
         end
         it 'should return the matchups for the synergy role' do
-          post action, params
+          post action, params: params
           expect(speech).to eq 'The champion with the highest win rate playing Support against Jhin Adc from Gold division is Taric.'
         end
       end
@@ -507,7 +507,7 @@ describe ChampionsController, type: :controller do
 
       context 'with only one role played by the champion' do
         it 'should return the complete list of champions' do
-          post action, params
+          post action, params: params
           expect(speech).to eq "The champion with the highest win rate playing Jungle against Shyvana from Gold division is Cho'Gath."
         end
       end
@@ -520,7 +520,7 @@ describe ChampionsController, type: :controller do
       end
 
       it 'should use the named role to find the matchups' do
-        post action, params
+        post action, params: params
         expect(speech).to eq "The champion with the highest win rate playing Jungle against Shyvana from Gold division is Cho'Gath."
       end
     end
@@ -532,7 +532,7 @@ describe ChampionsController, type: :controller do
 
       context 'as a non-adc/support role' do
         it 'should use the unnamed role and return the complete list of champions' do
-          post action, params
+          post action, params: params
           expect(speech).to eq "The champion with the highest win rate playing Jungle against Shyvana from Gold division is Cho'Gath."
         end
       end
@@ -545,13 +545,13 @@ describe ChampionsController, type: :controller do
 
         it 'should use the unnamed role to determine if the named champion is an ADC' do
           champion_params[:name] = 'Jinx'
-          post action, params
+          post action, params: params
           expect(speech).to eq 'The champion with the highest win rate playing Support against Jinx from Gold division is Janna.'
         end
 
         it 'should use the unnamed role to determine if the named champion is a Support' do
           champion_params[:name] = 'Janna'
-          post action, params
+          post action, params: params
           expect(speech).to eq 'The champion with the highest win rate playing Support against Janna from Gold division is Sona.'
         end
       end
@@ -564,13 +564,13 @@ describe ChampionsController, type: :controller do
 
         it 'should use the unnamed role to determine if the named champion is an ADC' do
           champion_params[:name] = 'Jinx'
-          post action, params
+          post action, params: params
           expect(speech).to eq 'The champion with the highest win rate playing Adc against Jinx from Gold division is Miss Fortune.'
         end
 
         it 'should use the unnamed role to determine if the named champion is a Support' do
           champion_params[:name] = 'Janna'
-          post action, params
+          post action, params: params
           expect(speech).to eq 'The champion with the highest win rate playing Adc against Janna from Gold division is Miss Fortune.'
         end
       end
@@ -585,7 +585,7 @@ describe ChampionsController, type: :controller do
           end
 
           it 'should indicate that the champion has no matchup rankings for the given two roles' do
-            post action, params
+            post action, params: params
             expect(speech).to eq 'There are no matchup rankings for champions playing Middle with Shyvana Top in Gold division.'
           end
         end
@@ -601,7 +601,7 @@ describe ChampionsController, type: :controller do
             end
 
             it 'should indicate that the champion has no matchup rankings for the given role' do
-              post action, params
+              post action, params: params
               expect(speech).to eq 'There are no matchup rankings for Shyvana Jungle.'
             end
           end
@@ -618,7 +618,7 @@ describe ChampionsController, type: :controller do
             end
 
             it 'should indicate that there are no matchup rankings for the unnamed role' do
-              post action, params
+              post action, params: params
               expect(speech).to eq 'There are no matchup rankings for champions playing Jungle with Shyvana.'
             end
           end
@@ -632,7 +632,7 @@ describe ChampionsController, type: :controller do
           end
 
           it 'should ask for role specification' do
-            post action, params
+            post action, params: params
             expect(speech).to eq "There are multiple matchup rankings for Jinx, please specify Jinx's role."
           end
         end
@@ -648,7 +648,7 @@ describe ChampionsController, type: :controller do
             end
 
             it 'should indicate that no champions were requested' do
-              post action, params
+              post action, params: params
               expect(speech).to eq 'No champions were requested.'
             end
           end
@@ -665,7 +665,7 @@ describe ChampionsController, type: :controller do
             end
 
             it 'should indicate that there were no champions requested' do
-              post action, params
+              post action, params: params
               expect(speech).to eq 'No champions were requested.'
             end
           end
@@ -678,7 +678,7 @@ describe ChampionsController, type: :controller do
             end
 
             it 'should indicate that there are not enough champions when begun at that offset' do
-              post action, params
+              post action, params: params
               expect(speech).to eq 'The current patch only has data for one champion playing Jungle in Gold division. There are no champions beginning at the second position.'
             end
           end
@@ -690,7 +690,7 @@ describe ChampionsController, type: :controller do
           context 'with complete matchup rankings' do
             context 'with a shared role' do
               it 'should return the complete list of champions, specifying one role' do
-                post action, params
+                post action, params: params
                 expect(speech).to eq "The champion with the highest win rate playing Jungle against Shyvana from Gold division is Cho'Gath."
               end
             end
@@ -703,7 +703,7 @@ describe ChampionsController, type: :controller do
               end
 
               it 'should return the complete list of champions, specifying both roles' do
-                post action, params
+                post action, params: params
                 expect(speech).to eq 'The champion with the highest win rate playing Adc against Janna Support from Gold division is Miss Fortune.'
               end
             end
@@ -716,7 +716,7 @@ describe ChampionsController, type: :controller do
               end
 
               it 'should return the complete list of champions, specifying that it is a synergy ranking' do
-                post action, params
+                post action, params: params
                 expect(speech).to eq 'The champion with the highest win rate playing Adc with Janna Support from Gold division is Twitch.'
               end
             end
@@ -731,7 +731,7 @@ describe ChampionsController, type: :controller do
             end
 
             it 'should return the partial list of champions, indicating that there are not enough' do
-              post action, params
+              post action, params: params
               expect(speech).to eq 'The current patch only has enough data for a single champion. The single champion with the highest win rate playing Jungle against Shyvana from Gold division is Lee Sin.'
             end
           end
@@ -745,7 +745,7 @@ describe ChampionsController, type: :controller do
           context 'with complete matchup rankings' do
             context 'with a shared role' do
               it 'should return the complete list of champions, indicating the offset and one role' do
-                post action, params
+                post action, params: params
                 expect(speech).to eq 'The champion with the second highest win rate playing Jungle against Shyvana from Gold division is Kindred.'
               end
             end
@@ -758,7 +758,7 @@ describe ChampionsController, type: :controller do
               end
 
               it 'should return the complete list of champions, indicating the offset and both roles' do
-                post action, params
+                post action, params: params
                 expect(speech).to eq 'The champion with the second highest win rate playing Support against Jinx Adc from Gold division is Sion.'
               end
             end
@@ -771,7 +771,7 @@ describe ChampionsController, type: :controller do
               end
 
               it 'should return the complete list of champions, indicating the offset and specifying that it is a synergy role' do
-                post action, params
+                post action, params: params
                 expect(speech).to eq 'The champion with the second highest win rate playing Support with Jinx Adc from Gold division is Sion.'
               end
             end
@@ -789,7 +789,7 @@ describe ChampionsController, type: :controller do
             end
 
             it 'should return the incomplete list of champions, indicating the offset position' do
-              post action, params
+              post action, params: params
               expect(speech).to eq 'The current patch only has enough data for a single champion beginning at the second position. The single champion with the highest win rate playing Jungle against Shyvana from Gold division is Kayn.'
             end
           end
@@ -805,7 +805,7 @@ describe ChampionsController, type: :controller do
           context 'with complete matchup rankings' do
             context 'with a shared role' do
               it 'should return the complete list of champions, indicating the one shared role' do
-                post action, params
+                post action, params: params
                 expect(speech).to eq "The champions with the highest win rate playing Jungle against Shyvana from Gold division are Cho'Gath, Kindred, and Nunu."
               end
             end
@@ -818,7 +818,7 @@ describe ChampionsController, type: :controller do
               end
 
               it 'should return the complete list of champions, indicating the two roles' do
-                post action, params
+                post action, params: params
                 expect(speech).to eq 'The champions with the highest win rate playing Support against Jinx Adc from Gold division are Janna, Sion, and Trundle.'
               end
             end
@@ -831,7 +831,7 @@ describe ChampionsController, type: :controller do
               end
 
               it 'should return the complete list of champions, indicating they synergize' do
-                post action, params
+                post action, params: params
                 expect(speech).to eq 'The champions with the highest win rate playing Support with Jinx Adc from Gold division are Poppy, Sion, and Janna.'
               end
             end
@@ -849,7 +849,7 @@ describe ChampionsController, type: :controller do
 
             context 'with a shared role' do
               it 'should return the partial list of champions, indicating the one shared role' do
-                post action, params
+                post action, params: params
                 expect(speech).to eq 'The current patch only has enough data for two champions. The two champions with the highest win rate playing Jungle against Shyvana from Gold division are Lee Sin and Kayn.'
               end
             end
@@ -865,7 +865,7 @@ describe ChampionsController, type: :controller do
               end
 
               it 'should return the partial list of champions, indicating the multiple roles' do
-                post action, params
+                post action, params: params
                 expect(speech).to eq 'The current patch only has enough data for two champions. The two champions with the highest win rate playing Support against Jinx Adc from Gold division are Blitzcrank and Thresh.'
               end
             end
@@ -881,7 +881,7 @@ describe ChampionsController, type: :controller do
               end
 
               it 'should return the partial list of champions, indicating the synergy role' do
-                post action, params
+                post action, params: params
                 expect(speech).to eq 'The current patch only has enough data for two champions. The two champions with the highest win rate playing Support with Jinx Adc from Gold division are Blitzcrank and Thresh.'
               end
             end
@@ -896,7 +896,7 @@ describe ChampionsController, type: :controller do
             context 'with complete matchup rankings' do
               context 'with a shared role' do
                 it 'should return the complete list of champions, specifying the offset and shared role' do
-                  post action, params
+                  post action, params: params
                   expect(speech).to eq 'The second through fifth champions with the highest win rate playing Jungle against Shyvana from Gold division are Kindred, Nunu, Rammus, and Jax.'
                 end
               end
@@ -909,7 +909,7 @@ describe ChampionsController, type: :controller do
                 end
 
                 it 'should return the complete list of champions, specifying the offset and duo roles' do
-                  post action, params
+                  post action, params: params
                   expect(speech).to eq 'The second through fifth champions with the highest win rate playing Adc against Janna Support from Gold division are Twitch, Tristana, Draven, and Jhin.'
                 end
               end
@@ -922,7 +922,7 @@ describe ChampionsController, type: :controller do
                 end
 
                 it 'should return the complete list of champions, specifying the offset and synergy role' do
-                  post action, params
+                  post action, params: params
                   expect(speech).to eq 'The second through fifth champions with the highest win rate playing Adc with Janna Support from Gold division are Miss Fortune, Jinx, Tristana, and Draven.'
                 end
               end
@@ -938,7 +938,7 @@ describe ChampionsController, type: :controller do
               end
               context 'with a shared role' do
                 it 'should return the partial list of champions, specifying the offset and shared role' do
-                  post action, params
+                  post action, params: params
                   expect(speech).to eq 'The current patch only has enough data for three champions. The second through third champions with the highest win rate playing Jungle against Shyvana from Gold division are Lee Sin and Kayn.'
                 end
               end
@@ -954,7 +954,7 @@ describe ChampionsController, type: :controller do
                 end
 
                 it 'should return the partial list of champions, specifying the offset and duo roles' do
-                  post action, params
+                  post action, params: params
                   expect(speech).to eq 'The current patch only has enough data for three champions. The second through third champions with the highest win rate playing Support against Jinx Adc from Gold division are Blitzcrank and Thresh.'
                 end
               end
@@ -970,7 +970,7 @@ describe ChampionsController, type: :controller do
                 end
 
                 it 'should return the partial list of champions, specifying the offset and synergy role' do
-                  post action, params
+                  post action, params: params
                   expect(speech).to eq 'The current patch only has enough data for three champions. The second through third champions with the highest win rate playing Support with Jinx Adc from Gold division are Thresh and Lulu.'
                 end
               end
@@ -993,7 +993,7 @@ describe ChampionsController, type: :controller do
 
     context 'with a role specified' do
       it 'should return the role performance for the given role' do
-        post action, params
+        post action, params: params
         expect(speech). to eq 'Shyvana is doing better this patch in Jungle and is ranked 8th out of 45 with a 6.1/5.28/6.86 KDA, 51.87% win rate and a 0.02% ban rate in Gold division.'
       end
     end
@@ -1004,7 +1004,7 @@ describe ChampionsController, type: :controller do
       end
 
       it 'should determine the role based on the roles the champion plays' do
-        post action, params
+        post action, params: params
         expect(speech).to eq 'Shyvana is doing better this patch in Jungle and is ranked 8th out of 45 with a 6.1/5.28/6.86 KDA, 51.87% win rate and a 0.02% ban rate in Gold division.'
       end
     end
@@ -1017,7 +1017,7 @@ describe ChampionsController, type: :controller do
         end
 
         it 'should indicate that the champion does not play that role' do
-          post action, params
+          post action, params: params
           expect(speech).to eq 'I do not have any information on Jayce playing Support.'
         end
       end
@@ -1029,7 +1029,7 @@ describe ChampionsController, type: :controller do
         end
 
         it 'should indicate that a role must be specified' do
-          post action, params
+          post action, params: params
           expect(speech).to eq 'Jayce plays multiple roles, please specify a role.'
         end
       end
@@ -1046,7 +1046,7 @@ describe ChampionsController, type: :controller do
     end
 
     it 'should return the ability information for the specified champion' do
-      post action, params
+      post action, params: params
       expect(speech).to eq "Shyvana's first ability is called Twin Bite. Shyvana strikes twice on her next attack. Basic attacks reduce the cooldown of Twin Bite by 0.5 seconds. Dragon Form: Twin Bite cleaves all units in front Shyvana."
     end
   end
@@ -1063,7 +1063,7 @@ describe ChampionsController, type: :controller do
 
     context 'with valid rank' do
       it 'should indicate the cooldown for the specified ability' do
-        post action, params
+        post action, params: params
         expect(speech).to eq "The cooldown of Shyvana's first ability, Twin Bite, is 8 seconds at rank 1."
       end
     end
@@ -1074,7 +1074,7 @@ describe ChampionsController, type: :controller do
       end
 
       it 'should indicate the valid rank range' do
-        post action, params
+        post action, params: params
         expect(speech).to eq 'A valid ability rank is between 1 and 5.'
       end
     end
@@ -1087,7 +1087,7 @@ describe ChampionsController, type: :controller do
     end
 
     it 'should return the lore of the champion' do
-      post action, params
+      post action, params: params
       expect(speech).to eq "I will tell you about the history of Shyvana. This is all I know: A half-breed born from the union between dragon and human, Shyvana searched all her life for belonging. Persecution forged her into a brutal warrior, and those who dare stand against Shyvana face the fiery beast lurking just beneath her skin..."
     end
   end
@@ -1099,7 +1099,7 @@ describe ChampionsController, type: :controller do
     end
 
     it 'should return the champions title' do
-      post action, params
+      post action, params: params
       expect(speech).to eq 'Shyvana has the illustrious title of the Half-Dragon.'
     end
   end
@@ -1120,7 +1120,7 @@ describe ChampionsController, type: :controller do
     end
 
     it 'should provide tips for playing with the champion' do
-      post action, params
+      post action, params: params
       expect(speech).to eq "Here's something you should know about Shyvana: It can be valuable to purchase one of the items that can slow enemies: Frozen Mallet, Dead Man's Plate, or Entropy."
     end
   end
@@ -1141,7 +1141,7 @@ describe ChampionsController, type: :controller do
     end
 
     it 'should provide tips for playing against the champion' do
-      post action, params
+      post action, params: params
       expect(speech).to eq "I have seen Shyvana fall in battle before and this is what I would recommend: Shyvana's Fury Bar indicate her ultimate can be activated. Harassing her when she's low on Fury can be very effective."
     end
   end
