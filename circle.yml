@@ -13,13 +13,8 @@ jobs:
           command: gem install bundler && bundle
 
       - run:
-          name: Decrypt environment variables
+          name: Load environment variables
           command: bundle exec rake secrets:decrypt
-
-      - run:
-          name: Build Development Image
-          command: |
-            docker build -f Dockerfile .
 
       - run:
           name: Run Tests
