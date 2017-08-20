@@ -5,7 +5,6 @@ jobs:
     machine: true
     steps:
       # Enables the remote environment necessary for deployment
-      - setup_remote_docker
       - checkout
 
       - run:
