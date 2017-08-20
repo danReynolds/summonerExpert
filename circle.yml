@@ -3,6 +3,8 @@ jobs:
   build:
     working_directory: /home/circleci/SummonerExpert
     machine: true
+      ruby:
+        version: "2.3.4"
     steps:
       # Enables the remote environment necessary for deployment
       - checkout
@@ -10,8 +12,6 @@ jobs:
       - run:
           name: Build Test Image
           command: |
-            rvm install 2.3.4
-            bash -l -c "rvm use 2.3.4"
             gem install bundler && bundle
             bundle exec rake secrets:decrypt
             export DEPLOY_TAG="${CIRCLE_BUILD_NUM}_${CIRCLE_SHA1:0:7}"
