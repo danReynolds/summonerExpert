@@ -1,6 +1,3 @@
-# Load Secrets into Environment File
-bundle exec rake secrets:decrypt
-
 # Build Production Image
 docker build -f Dockerfile.prod -t danreynolds/summonerexpert:$DEPLOY_TAG .
 

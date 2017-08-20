@@ -9,13 +9,22 @@ jobs:
       - checkout
 
       - run:
-          name: Build Test Image
-          command: |
-            gem install bundler && bundle
-            bundle exec rake secrets:decrypt
+          name: Install Dependencies
+          command: gem install bundler && bundle
+
+      - run:
+          name: Decrypt environment variables
+          command: bundle exec rake secrets:decrypt
+
+      - run:
+          name: Build Development Image
+          command:
             export DEPLOY_TAG="${CIRCLE_BUILD_NUM}_${CIRCLE_SHA1:0:7}"
             docker build -f Dockerfile -t danreynolds/summonerexpert:$DEPLOY_TAG .
-            docker-compose -f docker-compose.test.yml run app rspec
+
+      - run:
+          name: Run Tests
+          command: docker-compose -f docker-compose.test.yml run app rspec
 
       - deploy:
           name: Deploy to Production
