@@ -2,7 +2,8 @@ version: 2
 jobs:
   build:
     working_directory: /home/circleci/SummonerExpert
-    machine: true
+    machine:
+      image: circleci/classic:edge
     steps:
       # Enables the remote environment necessary for deployment
       - checkout
