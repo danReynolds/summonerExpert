@@ -4,6 +4,8 @@ services:
     image: danreynolds/summonerexpert:$DEPLOY_TAG
     ports:
       - 3000
+    volumes:
+      - logs:/app/log/
     environment:
       - ENV_KEY=$ENV_KEY
       - DEPLOY_TAG=$DEPLOY_TAG
