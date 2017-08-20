@@ -1,5 +1,5 @@
-# Generate new production tag based on Circle build
-export DEPLOY_TAG="${CIRCLE_BUILD_NUM}_${CIRCLE_SHA1:0:7}"
+# Load Secrets into Environment File
+bundle exec rake secrets:decrypt
 
 # Build Production Image
 docker build -f Dockerfile.prod -t danreynolds/summonerexpert:$DEPLOY_TAG .

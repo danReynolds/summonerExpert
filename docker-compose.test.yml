@@ -6,5 +6,13 @@ services:
     volumes:
       - ./data:/data
       - ./redis.conf:/usr/local/etc/redis/redis.conf
-  ruby:
-    image: "circleci/ruby:2.3"
+  app:
+    env_file:
+      - .env
+    image: danreynolds/summonerexpert:$DEPLOY_TAG
+    depends_on:
+      - redis
+  nginx:
+    image: nginx
+    depends_on:
+      - app
