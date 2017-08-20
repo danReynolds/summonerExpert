@@ -9,7 +9,7 @@ services:
   app:
     env_file:
       - .env
-    image: danreynolds/summonerexpert:$DEPLOY_TAG
+    build: .
     depends_on:
       - redis
   nginx:

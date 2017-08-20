@@ -1,4 +1,5 @@
 # Build Production Image
+export DEPLOY_TAG="${CIRCLE_BUILD_NUM}_${CIRCLE_SHA1:0:7}"
 docker build -f Dockerfile.prod -t danreynolds/summonerexpert:$DEPLOY_TAG .
 
 # Push Image to Docker Hub
