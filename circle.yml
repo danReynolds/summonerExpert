@@ -11,7 +11,7 @@ jobs:
           name: Build Test Image
           command: |
             rvm install 2.3.4
-            rvm use 2.3.4 --default
+            bash -l -c "rvm use 2.3.4"
             gem install bundler && bundle
             bundle exec rake secrets:decrypt
             export DEPLOY_TAG="${CIRCLE_BUILD_NUM}_${CIRCLE_SHA1:0:7}"
