@@ -32,7 +32,7 @@ module SummonerExpert
     # lazily so not as to burden startup of a rails console for example. In
     # production we want to eager load additional files so that they are already
     # required which also prevents threading problems.
-    if Rails.env == "production"
+    if Rails.env.production?
       config.eager_load_paths += %W(#{config.root}/lib)
     else
       config.autoload_paths += %W(#{config.root}/lib)

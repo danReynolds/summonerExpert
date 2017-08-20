@@ -7,6 +7,9 @@ services:
       - ./data:/data
       - ./redis.conf:/usr/local/etc/redis/redis.conf
   app:
+    environment:
+      - CI=$CI
+      - COVERALLS_REPO_TOKEN=$COVERALLS_REPO_TOKEN
     env_file:
       - .env
     build: .
