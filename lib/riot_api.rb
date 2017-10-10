@@ -10,6 +10,13 @@ module RiotApi
     # Default tags to use for requesting champions
     DEFAULT_TAGS = [:allytips, :blurb, :enemytips, :info, :spells, :stats, :tags, :lore]
 
+    # Current season as defined by season indicated in matches API
+    ACTIVE_SEASON = 9
+
+    # Matches are based off of Ranked Solo Queue
+    RANKED_QUEUE_ID = 420
+
+
     # Constants related to the Riot Api
     TOP = 'Top'.freeze
     JUNGLE = 'Jungle'.freeze
@@ -34,7 +41,7 @@ module RiotApi
     }.freeze
 
     class << self
-      def get_champions(**args)
+      def get_champions
         args[:tags] ||= DEFAULT_TAGS.map do |tag|
           "&tags=#{tag}"
         end.join('')
@@ -47,9 +54,9 @@ module RiotApi
         fetch_response(@api[:items])
       end
 
-      def get_summoner_champions(args)
-        url = "#{replace_url(@api[:summoner][:champions], args)}?season=#{@api[:season]}"
-        fetch_response(url)[:champions].reject { |champ| champ[:id].zero? }
+      def get_matchups(args)
+        url = replace_url(@api[:summoner][:matchups], args)
+        fetch_response(url)
       end
 
       def get_summoner_queues(args)

@@ -2,7 +2,7 @@
 FROM ruby:2.3.4
 
 # Add system libraries layer
-RUN apt-get update -qq && apt-get install -y cron vim
+RUN apt-get update -qq && apt-get install -y cron vim postgresql postgresql-contrib libpq-dev
 
 # Allow crontab to be executed
 RUN chmod 600 /etc/crontab

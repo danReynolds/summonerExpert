@@ -134,6 +134,13 @@ namespace :riot do
     Cache.set_collection(key, ids_to_names)
   end
 
+  desc 'Store matchups'
+  task store_matchups: :environment do
+    puts 'Storing matchups'
+
+    RiotApi::RiotApi.get_matchups
+  end
+
   desc 'Cache items'
   task cache_items: :environment do
     puts 'Fetching item data from Riot'

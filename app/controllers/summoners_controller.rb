@@ -4,7 +4,7 @@ class SummonersController < ApplicationController
 
   def show
     name = @summoner.name
-    queue = @summoner.queue
+    queue = @summoner.queue(summoner_params[:queue])
 
     args = {
       name: name,
@@ -30,10 +30,9 @@ class SummonersController < ApplicationController
   end
 
   def load_summoner
-    @summoner = Summoner.new(
+    @summoner = Summoner.find_by(
       name: summoner_params[:name],
-      region: summoner_params[:region],
-      with_queue: summoner_params[:queue]
+      region: summoner_params[:region]
     )
 
     unless @summoner.valid?

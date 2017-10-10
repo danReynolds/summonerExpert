@@ -12,9 +12,11 @@ services:
     environment:
       - ENV_KEY=$ENV_KEY
       - DEPLOY_TAG=$DEPLOY_TAG
-      - REDIS_PASSWORD=$REDIS_PASSWORD
     env_file:
       - .env
+  db:
+    volumes:
+      - pgdata:/var/lib/postgresql/data
   nginx:
     ports:
       - 80
@@ -30,6 +32,7 @@ services:
 volumes:
   redis:
   logs:
+  pgdata:
 networks:
   nginx_default:
     external: true
