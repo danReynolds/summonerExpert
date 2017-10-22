@@ -1,4 +1,8 @@
+require 'sidekiq/web'
+
 Rails.application.routes.draw do
+  mount Sidekiq::Web => '/sidekiq'
+
   root to: 'application#status'
   post :patch, to: 'application#patch'
   post :reset, to: 'application#reset'

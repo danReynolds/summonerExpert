@@ -16,7 +16,6 @@ module RiotApi
     # Matches are based off of Ranked Solo Queue
     RANKED_QUEUE_ID = 420
 
-
     # Constants related to the Riot Api
     TOP = 'Top'.freeze
     JUNGLE = 'Jungle'.freeze
@@ -52,6 +51,11 @@ module RiotApi
 
       def get_items
         fetch_response(@api[:items])
+      end
+
+      def get_match(args)
+        url = replace_url(@api[:match], args)
+        fetch_response(url)
       end
 
       def get_matchups(args)

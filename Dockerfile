@@ -17,11 +17,8 @@ ADD Gemfile.lock /app/Gemfile.lock
 RUN gem install bundler
 RUN bundle install
 
-# Copy the current directory contents into the container at /app
-ADD . /app
-
 # Turn on cache in dev environment
 RUN rails dev:cache
 
-# Start server
-CMD ["rails","server","-b", "0.0.0.0"]
+# Start server with dependencies
+CMD ./startup.sh

@@ -1,8 +1,12 @@
 require "#{Rails.root}/lib/external_api.rb"
 require "#{Rails.root}/lib/riot_api.rb"
 require "#{Rails.root}/lib/champion_gg_api.rb"
+require "#{Rails.root}/lib/match_helper.rb"
+
 include RiotApi
 include ActionView::Helpers::SanitizeHelper
+
+MATCH_BATCH_SIZE = 1000
 
 namespace :champion_gg do
   task all: [:cache_champion_performance, :cache_site_information]
@@ -135,10 +139,19 @@ namespace :riot do
   end
 
   desc 'Store matchups'
-  task store_matchups: :environment do
-    puts 'Storing matchups'
+  task store_matches: :environment do
+    # API limit of 500 games per 10 seconds and 30000 games per 10 minutes
+    # take the min of 500 and 30000 / (10 * 60) =
+    short_time_limit = 10.seconds
+    long_time_limit = 30.minutes
+    short_time_limit_total_games = 45
+    requests_made = 0
 
-    RiotApi::RiotApi.get_matchups
+    match_index = Rails.cache.read(:match_index)
+    1.times do |i|
+      MatchWorker.perform_async(match_index + i)
+    end
+    # match_index = Rails.cache.write(:match_index + MATCH_BATCH_SIZE)
   end
 
   desc 'Cache items'

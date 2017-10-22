@@ -1,4 +1,6 @@
 class Summoner < ActiveRecord::Base
+  has_many :summoner_performances
+  has_many :matches, through: :summoner_performances
   include RiotApi
 
   validate :matchup_validator
