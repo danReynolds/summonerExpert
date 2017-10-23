@@ -16,7 +16,7 @@ class Cache
 
     # Returns the end match index that is known to exist for all games
     def get_end_match_index
-      Rails.cache.read(:match_index)
+      Rails.cache.read(:end_match_index)
     end
 
     # @collection_key the plural collection identifier such as champions, items
@@ -85,13 +85,13 @@ class Cache
     # @match_index the match index that has been cached up to
     # Returns the current match index that has been cached up to
     def set_match_index(match_index)
-      Rails.cache.write(:match_index)
+      Rails.cache.write(:match_index, match_index)
     end
 
-    # @match_index the match index that is the last game known to exist
+    # @end_match_index the match index that is the last game known to exist
     # Returns the end match index that is known to exist for all games
-    def set_end_match_index
-      Rails.cache.write(:end_match_index)
+    def set_end_match_index(end_match_index)
+      Rails.cache.write(:end_match_index, end_match_index)
     end
 
     # @name the name of the champion

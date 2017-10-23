@@ -2,7 +2,7 @@ class SummonerPerformance < ActiveRecord::Base
   belongs_to :team
   belongs_to :summoner
   belongs_to :match
-  has_many :match_items
+  has_one :ban
 
   validates_presence_of :team_id, :summoner_id, :match_id, :participant_id,
     :champion_id, :spell1_id, :spell2_id, :kills, :deaths, :assists, :role,

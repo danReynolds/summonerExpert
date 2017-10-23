@@ -1,5 +1,5 @@
 class Ban < ActiveRecord::Base
-  belongs_to :match
+  belongs_to :summoner_performance
 
-  validates_presence_of :match_id, :champion_id, :order
+  validates_presence_of :champion_id, :summoner_performance_id
 end

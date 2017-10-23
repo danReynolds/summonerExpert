@@ -24,4 +24,4 @@ ENV RAILS_ENV production
 ENV RACK_ENV production
 
 # Start server with dependencies
-CMD ./startup.sh
+CMD ./startup.prod.sh

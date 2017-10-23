@@ -9,7 +9,7 @@ include ActionView::Helpers::SanitizeHelper
 # The API limit is 500 requests every 10 seconds = 180000 every hour
 # Leave a percentage of requests that can be run per hour for manual requests
 # made by the client and testing
-MATCH_BATCH_SIZE = 150000
+MATCH_BATCH_SIZE = 10000
 
 namespace :champion_gg do
   task all: [:cache_champion_performance, :cache_site_information]
@@ -149,7 +149,7 @@ namespace :riot do
       .order('summoner_performances.created_at DESC').limit(500)
       .select('summoners.account_id', 'summoners.region')
 
-    end_match_index = recent_players.inject(Rails.cache.read(:end_match_index)) do |end_index, summoner|
+    end_match_index = recent_players.inject(Cache.get_end_match_index) do |end_index, summoner|
       recent_matches = RiotApi::RiotApi.get_recent_matches(
         region: summoner.region, id: summoner.account_id
       )
@@ -162,15 +162,15 @@ namespace :riot do
 
     # If the system has caught up to < the most recent 150000 games, then only
     # do that remaining amount
-    match_index = Rails.cache.read(:match_index)
-    batch_end_index = [end_match_index - match_index, MATCH_BATCH_SIZE].min
+    match_index = Cache.get_match_index
+    batch_size = [end_match_index - match_index, MATCH_BATCH_SIZE].min
 
-    batch_end_index.times do |i|
+    batch_size.times do |i|
       MatchWorker.perform_async(match_index + i)
     end
 
-    Rails.cache.write(:match_index, match_index + batch_end_index)
-    Rails.cache.write(:end_match_index, end_match_index)
+    Cache.set_match_index(match_index + batch_size)
+    Cache.set_end_match_index(end_match_index)
   end
 
   desc 'Cache items'
