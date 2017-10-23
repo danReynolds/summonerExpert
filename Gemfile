@@ -13,6 +13,7 @@ gem 'rspec-rails', '~> 3.5'
 gem 'whenever'
 gem 'coveralls', require: false
 gem 'sidekiq'
+gem 'sidekiq-throttler'
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 group :development, :test do

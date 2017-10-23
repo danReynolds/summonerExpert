@@ -7,6 +7,9 @@ module RiotApi
     @api_key = ENV['RIOT_API_KEY']
     @api = load_api('riot_api')
 
+    # Limited to 500 requests per 10 seconds, 30000 requests per 10 minutes
+    RIOT_API_RATE_LIMIT = 500
+
     # Default tags to use for requesting champions
     DEFAULT_TAGS = [:allytips, :blurb, :enemytips, :info, :spells, :stats, :tags, :lore]
 
@@ -15,6 +18,18 @@ module RiotApi
 
     # Matches are based off of Ranked Solo Queue
     RANKED_QUEUE_ID = 420
+
+    # API Error Codes
+    RATE_LIMIT_EXCEEDED = 429
+    INTERNAL_SERVER_ERROR = 500
+    SERVICE_UNAVAILABLE = 503
+    BAD_REQUEST = 400
+    ERROR_CODES = [
+      RATE_LIMIT_EXCEEDED,
+      INTERNAL_SERVER_ERROR,
+      SERVICE_UNAVAILABLE,
+      BAD_REQUEST
+    ]
 
     # Constants related to the Riot Api
     TOP = 'Top'.freeze
@@ -55,7 +70,12 @@ module RiotApi
 
       def get_match(args)
         url = replace_url(@api[:match], args)
-        fetch_response(url)
+        fetch_response(url, ERROR_CODES)
+      end
+
+      def get_recent_matches(args)
+        url = replace_url(@api[:summoner][:recent_matches], args)
+        fetch_response(url, ERROR_CODES)
       end
 
       def get_matchups(args)

@@ -1,6 +1,8 @@
 require 'sidekiq/web'
+# https://github.com/mperham/sidekiq/wiki/Monitoring#forbidden
 
 Rails.application.routes.draw do
+  Sidekiq::Web.set :session_secret, Rails.application.secrets[:secret_key_base]
   mount Sidekiq::Web => '/sidekiq'
 
   root to: 'application#status'

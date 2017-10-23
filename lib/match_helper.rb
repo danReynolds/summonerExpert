@@ -1,7 +1,6 @@
 class MatchHelper
   def self.store_match(match_data)
     team1_params, team2_params = match_data['teams']
-
     team1 = Team.create(
       team_id: team1_params['teamId'],
       tower_kills: team1_params['towerKills'],

@@ -6,7 +6,10 @@ require "#{Rails.root}/lib/match_helper.rb"
 include RiotApi
 include ActionView::Helpers::SanitizeHelper
 
-MATCH_BATCH_SIZE = 1000
+# The API limit is 500 requests every 10 seconds = 180000 every hour
+# Leave a percentage of requests that can be run per hour for manual requests
+# made by the client and testing
+MATCH_BATCH_SIZE = 150000
 
 namespace :champion_gg do
   task all: [:cache_champion_performance, :cache_site_information]
@@ -120,7 +123,7 @@ end
 
 
 namespace :riot do
-  task all: [:cache_champions, :cache_items]
+  task daily: [:cache_champions, :cache_items]
 
   def remove_tags(description)
     prepared_text = description.split("<br>")
@@ -138,20 +141,36 @@ namespace :riot do
     Cache.set_collection(key, ids_to_names)
   end
 
-  desc 'Store matchups'
+  desc 'Store matches'
   task store_matches: :environment do
-    # API limit of 500 games per 10 seconds and 30000 games per 10 minutes
-    # take the min of 500 and 30000 / (10 * 60) =
-    short_time_limit = 10.seconds
-    long_time_limit = 30.minutes
-    short_time_limit_total_games = 45
-    requests_made = 0
+    # Use the most recently active 500 players to determine the point at which
+    # no more games exist
+    recent_players = SummonerPerformance.joins(:summoner)
+      .order('summoner_performances.created_at DESC').limit(500)
+      .select('summoners.account_id', 'summoners.region')
 
+    end_match_index = recent_players.inject(Rails.cache.read(:end_match_index)) do |end_index, summoner|
+      recent_matches = RiotApi::RiotApi.get_recent_matches(
+        region: summoner.region, id: summoner.account_id
+      )
+      if recent_matches
+        local_max_index = recent_matches['matches'].max_by { |game| game['gameId'] }['gameId']
+        end_index = local_max_index if end_index.nil? || local_max_index > end_index
+      end
+      end_index
+    end
+
+    # If the system has caught up to < the most recent 150000 games, then only
+    # do that remaining amount
     match_index = Rails.cache.read(:match_index)
-    1.times do |i|
+    batch_end_index = [end_match_index - match_index, MATCH_BATCH_SIZE].min
+
+    batch_end_index.times do |i|
       MatchWorker.perform_async(match_index + i)
     end
-    # match_index = Rails.cache.write(:match_index + MATCH_BATCH_SIZE)
+
+    Rails.cache.write(:match_index, match_index + batch_end_index)
+    Rails.cache.write(:end_match_index, end_match_index)
   end
 
   desc 'Cache items'

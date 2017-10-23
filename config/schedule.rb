@@ -26,5 +26,9 @@ ENV.each { |k, v| env(k, v) }
 
 every 1.day, at: "07:20 am" do
   rake "champion_gg:all"
-  rake "riot:all"
+  rake "riot:daily"
+end
+
+every :hour do
+  rake "riot:store_matches"
 end

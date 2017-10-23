@@ -184,6 +184,9 @@ GEM
       connection_pool (~> 2.2, >= 2.2.0)
       rack-protection (>= 1.5.0)
       redis (~> 3.2, >= 3.2.1)
+    sidekiq-throttler (0.5.1)
+      activesupport
+      sidekiq (>= 2.5, < 5.0)
     simplecov (0.12.0)
       docile (~> 1.1.0)
       json (>= 1.8, < 3)
@@ -243,6 +246,7 @@ DEPENDENCIES
   rollbar
   rspec-rails (~> 3.5)
   sidekiq
+  sidekiq-throttler
   spring
   spring-watcher-listen (~> 2.0.0)
   sshkit (~> 1.13.0)
