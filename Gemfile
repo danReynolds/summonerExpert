@@ -14,6 +14,7 @@ gem 'whenever'
 gem 'coveralls', require: false
 gem 'sidekiq'
 gem 'sidekiq-throttler'
+gem 'dogapi'
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 group :development, :test do
@@ -25,6 +26,7 @@ group :development, :test do
 end
 
 group :development do
+  gem 'active_record_doctor'
   gem 'awesome_print'
   gem 'better_errors'
   gem 'binding_of_caller'

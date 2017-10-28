@@ -2,6 +2,7 @@ require "#{Rails.root}/lib/external_api.rb"
 require "#{Rails.root}/lib/riot_api.rb"
 require "#{Rails.root}/lib/champion_gg_api.rb"
 require "#{Rails.root}/lib/match_helper.rb"
+require "#{Rails.root}/lib/datadog.rb"
 
 include RiotApi
 include ActionView::Helpers::SanitizeHelper
@@ -9,7 +10,7 @@ include ActionView::Helpers::SanitizeHelper
 # The API limit is 500 requests every 10 seconds = 180000 every hour
 # Leave a percentage of requests that can be run per hour for manual requests
 # made by the client and testing
-MATCH_BATCH_SIZE = 10000
+MATCH_BATCH_SIZE = 150000
 
 namespace :champion_gg do
   task all: [:cache_champion_performance, :cache_site_information]
@@ -76,15 +77,12 @@ namespace :champion_gg do
 
   desc 'Cache champion role and matchup performance'
   task cache_champion_performance: :environment do
-    puts 'Fetching champion data from Champion.gg'
-
     # Arbitrarily high enough number used for variable combinations of champions x roles
     champion_roles_limit = 10000
 
     ids_to_names = Cache.get_collection(:champions)
 
     ChampionGGApi::ELOS.values.each do |elo|
-      puts "Fetching Champion data for #{elo}"
       champion_rankings = {}
 
       # Platinum plus should be sent as empty string since it is the default if
@@ -117,13 +115,14 @@ namespace :champion_gg do
       cache_champion_rankings(champion_rankings, elo, ids_to_names)
     end
 
-    puts 'Cached champion data from Champion.gg'
+    DataDog.event(DataDog::EVENTS[:CHAMPIONGG_CHAMPION_PERFORMANCE])
   end
 end
 
 
 namespace :riot do
   task daily: [:cache_champions, :cache_items]
+  task hourly: [:store_matches]
 
   def remove_tags(description)
     prepared_text = description.split("<br>")
@@ -164,19 +163,24 @@ namespace :riot do
     # do that remaining amount
     match_index = Cache.get_match_index
     batch_size = [end_match_index - match_index, MATCH_BATCH_SIZE].min
+    new_start_match_index = match_index + batch_size
 
     batch_size.times do |i|
       MatchWorker.perform_async(match_index + i)
     end
 
-    Cache.set_match_index(match_index + batch_size)
+    Cache.set_match_index(new_start_match_index)
     Cache.set_end_match_index(end_match_index)
+
+    DataDog.event(
+      DataDog::EVENTS[:RIOT_MATCHES],
+      start_index: new_start_match_index,
+      end_index: end_match_index
+    )
   end
 
   desc 'Cache items'
   task cache_items: :environment do
-    puts 'Fetching item data from Riot'
-
     items = RiotApi::RiotApi.get_items.values.select do |item|
       item['name'] && item['description']
     end
@@ -187,13 +191,11 @@ namespace :riot do
       Cache.set_collection_entry(:item, item_data['name'], item_data)
     end
 
-    puts 'Cached item data from Riot'
+    DataDog.event(DataDog::EVENTS[:RIOT_ITEMS])
   end
 
   desc 'Cache champions'
   task cache_champions: :environment do
-    puts 'Fetching champion data from Riot'
-
     champions = RiotApi::RiotApi.get_champions.values
     cache_collection(:champions, champions)
 
@@ -204,6 +206,6 @@ namespace :riot do
       Cache.set_collection_entry(:champion, champion_data['name'], champion_data)
     end
 
-    puts 'Cached champion data from Riot'
+    DataDog.event(DataDog::EVENTS[:RIOT_CHAMPIONS])
   end
 end

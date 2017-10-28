@@ -30,5 +30,5 @@ every 1.day, at: "07:20 am" do
 end
 
 every :hour do
-  rake "riot:store_matches"
+  rake "riot:hourly"
 end
