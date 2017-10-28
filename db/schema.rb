@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171023042518) do
+ActiveRecord::Schema.define(version: 20171028221812) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -21,6 +21,8 @@ ActiveRecord::Schema.define(version: 20171023042518) do
     t.integer  "champion_id"
     t.integer  "order"
     t.integer  "summoner_performance_id"
+    t.index ["champion_id"], name: "index_bans_on_champion_id", using: :btree
+    t.index ["summoner_performance_id"], name: "index_bans_on_summoner_performance_id", unique: true, using: :btree
   end
 
   create_table "matches", force: :cascade do |t|
@@ -42,6 +44,21 @@ ActiveRecord::Schema.define(version: 20171023042518) do
     t.integer  "first_tower_summoner_id"
     t.integer  "first_inhibitor_summoner_id"
     t.integer  "game_duration"
+    t.index ["first_baron_id"], name: "index_matches_on_first_baron_id", unique: true, using: :btree
+    t.index ["first_blood_id"], name: "index_matches_on_first_blood_id", unique: true, using: :btree
+    t.index ["first_blood_summoner_id"], name: "index_matches_on_first_blood_summoner_id", using: :btree
+    t.index ["first_inhibitor_id"], name: "index_matches_on_first_inhibitor_id", unique: true, using: :btree
+    t.index ["first_inhibitor_summoner_id"], name: "index_matches_on_first_inhibitor_summoner_id", using: :btree
+    t.index ["first_rift_herald_id"], name: "index_matches_on_first_rift_herald_id", unique: true, using: :btree
+    t.index ["first_tower_id"], name: "index_matches_on_first_tower_id", unique: true, using: :btree
+    t.index ["first_tower_summoner_id"], name: "index_matches_on_first_tower_summoner_id", using: :btree
+    t.index ["game_id"], name: "index_matches_on_game_id", unique: true, using: :btree
+    t.index ["queue_id"], name: "index_matches_on_queue_id", using: :btree
+    t.index ["region_id"], name: "index_matches_on_region_id", using: :btree
+    t.index ["season_id"], name: "index_matches_on_season_id", using: :btree
+    t.index ["team1_id"], name: "index_matches_on_team1_id", unique: true, using: :btree
+    t.index ["team2_id"], name: "index_matches_on_team2_id", unique: true, using: :btree
+    t.index ["winning_team_id"], name: "index_matches_on_winning_team_id", unique: true, using: :btree
   end
 
   create_table "summoner_performances", force: :cascade do |t|
@@ -94,6 +111,20 @@ ActiveRecord::Schema.define(version: 20171023042518) do
     t.integer  "item6_id"
     t.integer  "neutral_minions_killed_team_jungle"
     t.integer  "neutral_minions_killed_enemy_jungle"
+    t.index ["champion_id"], name: "index_summoner_performances_on_champion_id", using: :btree
+    t.index ["item0_id"], name: "index_summoner_performances_on_item0_id", using: :btree
+    t.index ["item1_id"], name: "index_summoner_performances_on_item1_id", using: :btree
+    t.index ["item2_id"], name: "index_summoner_performances_on_item2_id", using: :btree
+    t.index ["item3_id"], name: "index_summoner_performances_on_item3_id", using: :btree
+    t.index ["item4_id"], name: "index_summoner_performances_on_item4_id", using: :btree
+    t.index ["item5_id"], name: "index_summoner_performances_on_item5_id", using: :btree
+    t.index ["item6_id"], name: "index_summoner_performances_on_item6_id", using: :btree
+    t.index ["match_id"], name: "index_summoner_performances_on_match_id", using: :btree
+    t.index ["participant_id"], name: "index_summoner_performances_on_participant_id", using: :btree
+    t.index ["spell1_id"], name: "index_summoner_performances_on_spell1_id", using: :btree
+    t.index ["spell2_id"], name: "index_summoner_performances_on_spell2_id", using: :btree
+    t.index ["summoner_id"], name: "index_summoner_performances_on_summoner_id", using: :btree
+    t.index ["team_id"], name: "index_summoner_performances_on_team_id", using: :btree
   end
 
   create_table "summoners", force: :cascade do |t|
@@ -103,6 +134,9 @@ ActiveRecord::Schema.define(version: 20171023042518) do
     t.datetime "created_at",  null: false
     t.datetime "updated_at",  null: false
     t.string   "region"
+    t.index ["account_id"], name: "index_summoners_on_account_id", using: :btree
+    t.index ["name"], name: "index_summoners_on_name", unique: true, using: :btree
+    t.index ["summoner_id"], name: "index_summoners_on_summoner_id", unique: true, using: :btree
   end
 
   create_table "teams", force: :cascade do |t|
@@ -114,6 +148,7 @@ ActiveRecord::Schema.define(version: 20171023042518) do
     t.integer  "baron_kills"
     t.integer  "dragon_kills"
     t.integer  "riftherald_kills"
+    t.index ["team_id"], name: "index_teams_on_team_id", using: :btree
   end
 
 end

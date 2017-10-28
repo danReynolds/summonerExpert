@@ -10,7 +10,7 @@ include ActionView::Helpers::SanitizeHelper
 # The API limit is 500 requests every 10 seconds = 180000 every hour
 # Leave a percentage of requests that can be run per hour for manual requests
 # made by the client and testing
-MATCH_BATCH_SIZE = 150000
+MATCH_BATCH_SIZE = 100000
 
 namespace :champion_gg do
   task all: [:cache_champion_performance, :cache_site_information]
@@ -145,7 +145,7 @@ namespace :riot do
     # Use the most recently active 500 players to determine the point at which
     # no more games exist
     recent_players = SummonerPerformance.joins(:summoner)
-      .order('summoner_performances.created_at DESC').limit(500)
+      .order('summoner_performances.match_id DESC').limit(500)
       .select('summoners.account_id', 'summoners.region')
 
     end_match_index = recent_players.inject(Cache.get_end_match_index) do |end_index, summoner|
