@@ -1,7 +1,11 @@
 class MatchWorker
   include Sidekiq::Worker
+  include Sidekiq::Throttled::Worker
   include RiotApi
-  sidekiq_options throttle: { threshold: 500, period: 10.seconds }
+
+  sidekiq_throttle({
+   threshold: { limit: 450, period: 10.seconds }
+ })
 
   def perform(game_id)
     # Skip if the game is somehow already saved
