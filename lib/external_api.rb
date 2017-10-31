@@ -18,6 +18,7 @@ class ExternalApi
       end
 
       if code != 200
+        puts "Error: #{code}"
         if error_codes.include?(code)
           raise Exception.new({ uri: endpoint, code: code })
         else
