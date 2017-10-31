@@ -58,11 +58,7 @@ module RiotApi
 
     class << self
       def get_champions
-        args[:tags] ||= DEFAULT_TAGS.map do |tag|
-          "&tags=#{tag}"
-        end.join('')
-
-        url = replace_url(@api[:champions], args)
+        url = replace_url(@api[:champions])
         fetch_response(url)
       end
 
