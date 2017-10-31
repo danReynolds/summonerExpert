@@ -9,9 +9,6 @@ services:
       - ./scheduler.log:/app/scheduler.log
       - ./scheduler-error.log:/app/scheduler-error.log
       - logs:/app/log/
-    environment:
-      - ENV_KEY=$ENV_KEY
-      - DEPLOY_TAG=$DEPLOY_TAG
     env_file:
       - .env
   db:
@@ -32,10 +29,3 @@ services:
       - ./nginx.upstream.conf:/etc/nginx/conf.d/default.conf
 volumes:
   logs:
-<<<<<<< HEAD
-  pgdata:
-networks:
-  nginx_default:
-    external: true
-=======
->>>>>>> feature/googleCloudDocker
