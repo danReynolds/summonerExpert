@@ -33,6 +33,7 @@ Rails.application.routes.draw do
   end
 
   namespace :summoners do
-    post :show
+    post :performance_summary
+    post :champion_performance_summary
   end
 end

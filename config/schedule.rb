@@ -19,7 +19,7 @@
 
 # Learn more: http://github.com/javan/whenever
 
-set :environment, "production"
+set :environment, "development"
 set :output, { error: '/app/scheduler-error.log', standard: '/app/scheduler.log' }
 
 ENV.each { |k, v| env(k, v) }
@@ -27,9 +27,9 @@ ENV.each { |k, v| env(k, v) }
 every 1.day, at: "07:40 am" do
   command "echo Starting Nightly Redis Update at $(date) >> /app/scheduler.log"
   rake "champion_gg:all"
-  # rake "riot:daily"
+  rake "riot:daily"
 end
 
-every :hour do
-  # rake "riot:hourly"
+every 1.hour do
+  rake "riot:hourly"
 end

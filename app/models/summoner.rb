@@ -12,6 +12,17 @@ class Summoner < ActiveRecord::Base
     RankedQueue.new(queue_data)
   end
 
+  def aggregate_performance(champion, *metrics)
+    summoner_performances.where(champion_id: champion.id).inject({}) do |acc, performance|
+      acc.tap do
+        metrics.each do |metric|
+          acc[metric] ||= []
+          acc[metric] << performance.send(metric)
+        end
+      end
+    end
+  end
+
   def error_message
     errors.messages.values.map(&:first).en.conjunction(article: false)
   end

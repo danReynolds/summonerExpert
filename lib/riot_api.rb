@@ -41,7 +41,7 @@ module RiotApi
     MIDDLE = 'Middle'.freeze
     ROLES = [TOP, JUNGLE, SUPPORT, ADC, MIDDLE]
 
-    REGIONS = %w(br1 eun1 euw1 jp1 kr la1 la2 na1 oc1 ru tr1)
+    REGIONS = %w(BR1 EUN1 EUW1 JP1 KR LA1 LA2 NA1 NA2 OC1 RU TR1)
 
     STATS = {
       armor: 'armor',
@@ -58,8 +58,7 @@ module RiotApi
 
     class << self
       def get_champions
-        url = replace_url(@api[:champions])
-        fetch_response(url)
+        fetch_response(@api[:champions])
       end
 
       def get_items

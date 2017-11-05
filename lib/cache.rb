@@ -58,20 +58,6 @@ class Cache
       Rails.cache.read({ name: name, role: role, elo: elo })
     end
 
-    # @name the name of the summoner
-    # @region the region the summoner is playing in
-    # Returns the id of the summoner
-    def get_summoner_id(name, region)
-      Rails.cache.read(id: { name: name, region: region })
-    end
-
-    # @name the name of the summoner
-    # @region the region the summoner is playing in
-    # Returns the queues for the summoner
-    def get_summoner_queues(name, region)
-      Rails.cache.read(queues: { name: name, region: region })
-    end
-
     ###
     ### Setting Information into the Cache
     ###
@@ -138,28 +124,6 @@ class Cache
       search_params = {}
       search_params[collection_key] = entry_name
       Rails.cache.write(search_params, entry_info)
-    end
-
-    # @name the name of the summoner
-    # @region the region the summoner is playing in
-    # @id the summoner id
-    # Returns success or failure status
-    def set_summoner_id(name, region, id)
-      Rails.cache.write({ id: { name: name, region: region } }, id)
-    end
-
-    # @name the name of the summoner
-    # @region the region the summoner is playing in
-    # @queues the queues for the summoner
-    # @expiration the default expiration is 25 minutes, approximate duration of
-    # one game
-    # Returns success or failure status
-    def set_summoner_queues(name, region, queues, expiration = 25.minutes)
-      Rails.cache.write(
-        { queues: { name: name, region: region } },
-        queues,
-        expires_in: expiration
-      )
     end
   end
 

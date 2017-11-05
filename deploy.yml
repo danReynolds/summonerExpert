@@ -8,3 +8,5 @@ remote_files:
   - nginx.conf
   - nginx.upstream.conf
   - redis.conf
+pre:
+  - rake db:migrate

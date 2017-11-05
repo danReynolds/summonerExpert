@@ -156,8 +156,13 @@ items:
   description:
     - "I have seen many champions use {name} on the field of battle. It costs {total_cost} gold and can be sold for {sell_cost}. Here is what it does: {description}"
 summoners:
-  show:
-    - "{name} is ranked {elo} {rank} with {lp} LP in {queue}. The summoner currently has a {winrate}% win rate and is {hot_streak} a hot streak."
+  performance_summary:
+    - "{name} is ranked {elo} {rank} with {lp} LP in {queue}. The summoner currently has a {winrate}% win rate."
+  champion_performance_summary:
+    role_specified:
+      - "{name} has played {champion} {given_role} in {total_performances} with a {kills}/{deaths}/{assists} KDA."
+    no_role_specified:
+      - "{name} has played {champion} {total_performances} with a {kills}/{deaths}/{assists} KDA and in the following roles: {roles}."
 errors:
   summoner:
     not_active:

@@ -1,5 +1,5 @@
 # Base Ruby layer
-FROM ruby:2.3.4
+FROM ruby:2.4
 
 # Add system libraries layer
 RUN apt-get update -qq && apt-get install -y cron vim postgresql postgresql-contrib libpq-dev

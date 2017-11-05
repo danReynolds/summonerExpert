@@ -1,6 +1,7 @@
 class DataDog
   @client = Dogapi::Client.new(ENV['DATA_DOG_KEY'])
 
+  RETRY_LIMIT = 5
   HOST = 'ServerManager'
   EVENTS = {
     CHAMPIONGG_CHAMPION_PERFORMANCE: 'Champion GG Performance Event',
@@ -11,10 +12,17 @@ class DataDog
 
   class << self
     def event(type, **args)
-      @client.emit_event(
-        Dogapi::Event.new("#{type}. #{args}"),
-        host: HOST
-      )
+      RETRY_LIMIT.times do
+        begin
+          @client.emit_event(
+            Dogapi::Event.new("#{type}. #{args}"),
+            host: HOST
+          )
+          return
+        rescue Exception => e
+          puts "No work #{e}"
+        end
+      end
     end
   end
 end

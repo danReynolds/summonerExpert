@@ -8,15 +8,6 @@ class ExternalApi
       response = Net::HTTP.get_response(uri)
       code = response.code.to_i
 
-
-      rate_limit = response['x-app-rate-limit'].split(",")
-      rate_usage = response['x-app-rate-limit-count'].split(",")
-      rate_usage.each_with_index do |usage, i|
-        used, _ = usage.split(":").map(&:to_i)
-        allowed, _ = rate_limit[i].split(":").map(&:to_i)
-        binding.pry if used > allowed
-      end
-
       if code != 200
         puts "Error: #{code}"
         if error_codes.include?(code)
