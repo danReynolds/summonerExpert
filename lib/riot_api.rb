@@ -57,8 +57,13 @@ module RiotApi
     }.freeze
 
     class << self
-      def get_champions
-        fetch_response(@api[:champions])
+      def get_champions(**args)
+        args[:tags] ||= DEFAULT_TAGS.map do |tag|
+          "&tags=#{tag}"
+        end.join('')
+
+        url = replace_url(@api[:champions], args)
+        fetch_response(url)
       end
 
       def get_items

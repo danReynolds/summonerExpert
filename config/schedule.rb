@@ -19,7 +19,7 @@
 
 # Learn more: http://github.com/javan/whenever
 
-set :environment, "development"
+set :environment, "production"
 set :output, { error: '/app/scheduler-error.log', standard: '/app/scheduler.log' }
 
 ENV.each { |k, v| env(k, v) }
