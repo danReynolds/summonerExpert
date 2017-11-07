@@ -77,7 +77,7 @@ module RiotApi
 
       def get_recent_matches(args)
         url = replace_url(@api[:summoner][:recent_matches], args)
-        fetch_response(url, ERROR_CODES)
+        fetch_response(url)
       end
 
       def get_matchups(args)
