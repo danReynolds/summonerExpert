@@ -160,6 +160,8 @@ summoners:
     - "{name} is ranked {elo} {rank} with {lp} LP in {queue}. The summoner currently has a {winrate}% win rate."
   champion_performance_summary:
     - "{name} has played {champion} {role} {total_performances} with a {winrate}% win rate and an overall {kills}/{deaths}/{assists} KDA."
+  champion_performance_position:
+    - "{name} has played {champion} {role} {total_performances} and averages {position_value} {position_name}."
 errors:
   champion_performance_summary:
     does_not_play:
@@ -171,7 +173,7 @@ errors:
       - '{name} has played {champion} {total_performances} across {roles}. Which role do you want to know about?'
   summoner:
     not_active:
-      - "{name} is not currently an active player in {queue}."
+      - "{name} is not an active player in ranked this season."
   matchups:
     duo_role_no_matchup:
       - 'I do not have any information on matchups for {name1} {role1} and {name2} {role2} playing together in {elo} division.'

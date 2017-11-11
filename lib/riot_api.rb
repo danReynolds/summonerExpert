@@ -56,6 +56,42 @@ module RiotApi
       spellblock: 'magic resist'
     }.freeze
 
+    # Summoner champion position details
+    POSITION_DETAILS = {
+      kills: 'kills',
+      deaths: 'deaths',
+      assists: 'assists',
+      largest_killing_spree: 'largest killing spree',
+      total_killing_sprees: 'total killing sprees',
+      double_kills: 'double kills',
+      triple_kills: 'triple kills',
+      quadra_kills: 'quadra_kills',
+      penta_kills: 'penta_kills',
+      total_damage_dealt: 'total damage dealt',
+      magic_damage_dealt: 'magic damage dealt',
+      physical_damage_dealt: 'physical damage dealt',
+      true_damage_dealt: 'true damage dealt',
+      largest_critical_strike: 'largest critical strike',
+      total_damage_dealt_to_champions: 'total damage dealt to champions',
+      magic_damage_dealt_to_champions: 'magic damage dealt to champions',
+      physical_damage_dealt_to_champions: 'physical damage dealt to champions',
+      true_damage_dealt_to_champions: 'true damage dealt to champions',
+      total_healing_done: 'total healing done',
+      vision_score: 'vision score',
+      cc_score: 'cc score',
+      gold_earned: 'gold',
+      turrets_killed: 'towers destroyed',
+      inhibitors_killed: 'inhibitors destroyed',
+      total_minions_killed: 'creep score',
+      vision_wards_bought: 'vision wards',
+      sight_wards_bought: 'sight wards',
+      wards_placed: 'wards placed',
+      wards_killed: 'wards destroyed',
+      neutral_minions_killed: 'jungle minions killed',
+      neutral_minions_killed_team_jungle: 'own jungle minions killed',
+      neutral_minions_killed_enemy_jungle: 'enemy jungle minions killed'
+    }
+
     class << self
       def get_champions(**args)
         args[:tags] ||= DEFAULT_TAGS.map do |tag|

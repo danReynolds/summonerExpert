@@ -12,7 +12,7 @@ class Summoner < ActiveRecord::Base
     RankedQueue.new(queue_data)
   end
 
-  def aggregate_performance(filter, *metrics)
+  def aggregate_performance(filter, metrics)
     summoner_performances.where(filter).inject({}) do |acc, performance|
       acc.tap do
         metrics.each do |metric|

@@ -9,6 +9,12 @@ describe SummonersController, type: :controller do
     allow(controller).to receive(:summoner_params).and_return(summoner_params)
   end
 
+  describe 'load summoner' do
+    let(:summoner_params) do
+      { name: 'Hero man', region: 'NA1', champion: 'Tristana', role: 'DUO_CARRY' }
+    end
+  end
+
   describe 'POST performance_summary' do
     let(:action) { :performance_summary }
     let(:external_response) do
@@ -58,6 +64,90 @@ describe SummonersController, type: :controller do
     end
   end
 
+  describe 'POST champion_performance_position' do
+    let(:action) { :champion_performance_position }
+    let(:summoner_params) do
+      {
+        name: 'Hero man',
+        champion: 'Tristana',
+        role: 'DUO_CARRY',
+        position_details: 'kills',
+        region: 'NA1'
+      }
+    end
+
+    before :each do
+      @match1 = create(:match)
+      @match2 = create(:match)
+      summoner_performance = @match1.summoner_performances.first
+      summoner_performance.update!(champion_id: 18, role: 'DUO_CARRY')
+      summoner_performance.summoner.update!(name: 'Hero man')
+      @match2.summoner_performances.first.update(
+        champion_id: 18,
+        role: 'DUO_CARRY',
+        summoner: summoner_performance.summoner
+      )
+    end
+
+    context 'with no games played as that champion' do
+      context 'with a role specified' do
+        before :each do
+          summoner_params[:role] = 'TOP'
+        end
+
+        it 'should indicate that the summoner has not played the champion in that role' do
+          post action, params: params
+          expect(speech).to eq 'Hero man has not played any games this season as Tristana Top.'
+        end
+      end
+
+      context 'with no role specified' do
+        before :each do
+          summoner_params[:role] = nil
+          summoner_params[:champion] = 'Zed'
+        end
+
+        it 'should indicate that the summoner has not played the champion this season' do
+          post action, params: params
+          expect(speech).to eq 'Hero man has not played any games this season as Zed.'
+        end
+      end
+    end
+
+    context 'with games played as that champion' do
+      context 'with a role specified' do
+        it 'should determine the position performance for that role' do
+          post action, params: params
+          expect(speech).to eq 'Hero man has played Tristana Adc two times and averages 2.0 kills.'
+        end
+      end
+
+      context 'with no role specified' do
+        before :each do
+          summoner_params[:role] = nil
+        end
+
+        context 'with one role' do
+          it 'should determine the position performance for the one role' do
+            post action, params: params
+            expect(speech).to eq 'Hero man has played Tristana Adc two times and averages 2.0 kills.'
+          end
+        end
+
+        context 'with multiple roles' do
+          before :each do
+            @match2.summoner_performances.first.update(role: 'DUO_SUPPORT')
+          end
+
+          it 'should prompt to specify a role' do
+            post action, params: params
+            expect(speech).to eq 'Hero man has played Tristana two times across Adc and Support. Which role do you want to know about?'
+          end
+        end
+      end
+    end
+  end
+
   describe 'POST champion_performance_summary' do
     let(:action) { :champion_performance_summary }
     let(:summoner_params) do
@@ -104,7 +194,7 @@ describe SummonersController, type: :controller do
 
     context 'with games played as that champion' do
       context 'with a role specified' do
-        it 'should only include performances for the specified role' do
+        it 'should determine the win rate and KDA for the specified role' do
           post action, params: params
           expect(speech).to eq 'Hero man has played Tristana Adc two times with a 100.0% win rate and an overall 2.0/3.0/7.0 KDA.'
         end
@@ -116,7 +206,7 @@ describe SummonersController, type: :controller do
         end
 
         context 'with one role' do
-          it 'should only list the single role played' do
+          it 'should determine the win rate and KDA for the one role' do
             post action, params: params
             expect(speech).to eq 'Hero man has played Tristana Adc two times with a 100.0% win rate and an overall 2.0/3.0/7.0 KDA.'
           end

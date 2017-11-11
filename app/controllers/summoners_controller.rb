@@ -22,21 +22,25 @@ class SummonersController < ApplicationController
     }
   end
 
+  def champion_performance_position
+    champion_performance_request(:position, [summoner_params[:position_details].to_sym, :role])
+  end
+
   def champion_performance_summary
+    champion_performance_request(:summary, [:kills, :deaths, :assists, :role])
+  end
+
+  def champion_performance_request(type, metrics)
     champion = Champion.new(name: summoner_params[:champion])
     args = { name: @summoner.name, champion: champion.name }
     role = summoner_params[:role]
     filter = { champion_id: champion.id }
     filter.merge!({ role: role }) if role.present?
+
     champion_performances = @summoner.summoner_performances.where(filter)
-
     total_performances = champion_performances.size.to_f
-    total_performance_text = "#{total_performances.to_i.en.numwords} #{'time'.pluralize(total_performances)}"
-    aggregate_performance = @summoner.aggregate_performance(
-      filter, :kills, :deaths, :assists, :role
-    )
 
-    if aggregate_performance.empty?
+    if total_performances.zero?
       role_type = role ? :role_specified : :no_role_specified
       return render json: {
         speech: ApiResponse.get_response(
@@ -46,7 +50,10 @@ class SummonersController < ApplicationController
       }
     end
 
+    total_performance_text = "#{total_performances.to_i.en.numwords} #{'time'.pluralize(total_performances)}"
+    aggregate_performance = @summoner.aggregate_performance(filter, metrics)
     role = aggregate_performance[:role].first if aggregate_performance[:role].uniq.length == 1
+
     unless role
       args.merge!({
         roles: aggregate_performance[:role].map do |aggregate_role|
@@ -59,17 +66,24 @@ class SummonersController < ApplicationController
       }
     end
 
+    if type == :summary
+      metrics.reject { |metric| metric == :role }.each do |metric|
+        args[metric] = (aggregate_performance[metric].sum / total_performances).round(2)
+      end
+      args[:winrate] = @summoner.winrate(filter)
+    else
+      position = metrics.first
+      args[:position_name] = RiotApi::POSITION_DETAILS[position]
+      args[:position_value] = (aggregate_performance[position].sum / total_performances).round(2)
+    end
+
     args.merge!({
-      kills: aggregate_performance[:kills].sum / total_performances,
-      deaths: aggregate_performance[:deaths].sum / total_performances,
-      assists: aggregate_performance[:assists].sum / total_performances,
-      winrate: @summoner.winrate(filter),
       role: ChampionGGApi::ROLES[role.to_sym].humanize,
       total_performances: total_performance_text
     })
 
     render json: {
-      speech: ApiResponse.get_response({ summoners: :champion_performance_summary }, args)
+      speech: ApiResponse.get_response({ summoners: "champion_performance_#{type}" }, args)
     }
   end
 
@@ -77,7 +91,7 @@ class SummonersController < ApplicationController
 
   def summoner_params
     params.require(:result).require(:parameters).permit(
-      :name, :region, :champion, :queue, :role
+      :name, :region, :champion, :queue, :role, :position_details
     )
   end
 
@@ -86,8 +100,13 @@ class SummonersController < ApplicationController
       name: summoner_params[:name],
       region: summoner_params[:region]
     )
+
     unless @summoner.try(:valid?)
-      render json: { speech: @summoner.error_message }
+      speech = @summoner ? @summoner.error_message : ApiResponse.get_response(
+        dig_set(:errors, :summoner, :not_active),
+        { name: summoner_params[:name] }
+      )
+      render json: { speech: speech }
       return false
     end
   end

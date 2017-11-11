@@ -1,7 +1,7 @@
 {
 	"_type": "export",
 	"__export_format": 3,
-	"__export_date": "2017-11-05T21:03:20.581Z",
+	"__export_date": "2017-11-11T03:49:53.221Z",
 	"__export_source": "insomnia.desktop.app:v5.5.2",
 	"resources": [
 		{
@@ -587,7 +587,7 @@
 		{
 			"_id": "req_adbd92c820914d2ca5dd48b7ce602752",
 			"parentId": "wrk_6d555102de1a469aa75025d23e488d2b",
-			"modified": 1509915493766,
+			"modified": 1510371907280,
 			"created": 1509909890439,
 			"url": "{{ url }}",
 			"name": "summoners/champion_performance_summary",
@@ -595,7 +595,7 @@
 			"method": "POST",
 			"body": {
 				"mimeType": "application/json",
-				"text": "{\n  \"id\": \"df89b7c1-846a-44c1-b784-f939a4fc1aba\",\n  \"timestamp\": \"2017-11-05T19:30:36.515Z\",\n  \"lang\": \"en\",\n  \"result\": {\n    \"source\": \"agent\",\n    \"resolvedQuery\": \"how is StaRxPAuL's shyvana?\",\n    \"action\": \"summoners/champion_performance_summary\",\n    \"actionIncomplete\": false,\n    \"parameters\": {\n      \"champion\": \"Pantheon\",\n      \"lane\": \"\",\n      \"name\": \"Sir Cold\",\n      \"region\": \"NA1\"\n    },\n    \"contexts\": [\n      {\n        \"name\": \"summoner_champion_performance_summary\",\n        \"parameters\": {\n          \"name.original\": \"StaRxPAuL\",\n          \"lane.original\": \"\",\n          \"name\": \"StaRxPAuL\",\n          \"region.original\": \"\",\n          \"region\": \"NA1\",\n          \"champion.original\": \"shyvana\",\n          \"lane\": \"\",\n          \"champion\": \"Shyvana\"\n        },\n        \"lifespan\": 1\n      }\n    ],\n    \"metadata\": {\n      \"intentId\": \"26ec6722-a7b6-41ed-aa1d-bb3911ad15ca\",\n      \"webhookUsed\": \"true\",\n      \"webhookForSlotFillingUsed\": \"false\",\n      \"intentName\": \"summoner/champion_performance_summary\"\n    },\n    \"fulfillment\": {\n      \"speech\": \"\",\n      \"messages\": [\n        {\n          \"type\": 0,\n          \"speech\": \"\"\n        }\n      ]\n    },\n    \"score\": 1\n  },\n  \"status\": {\n    \"code\": 206,\n    \"errorType\": \"partial_content\",\n    \"errorDetails\": \"Webhook call failed. Error: 404 Not Found\"\n  },\n  \"sessionId\": \"30b972fb-1b3b-40b1-8d8f-82ab5b1ddf4a\"\n}"
+				"text": "{\n  \"id\": \"df89b7c1-846a-44c1-b784-f939a4fc1aba\",\n  \"timestamp\": \"2017-11-05T19:30:36.515Z\",\n  \"lang\": \"en\",\n  \"result\": {\n    \"source\": \"agent\",\n    \"resolvedQuery\": \"how is StaRxPAuL's shyvana?\",\n    \"action\": \"summoners/champion_performance_summary\",\n    \"actionIncomplete\": false,\n    \"parameters\": {\n      \"champion\": \"Tristana\",\n      \"role\": \"DUO_CARRY\",\n      \"name\": \"Elekktric\",\n      \"region\": \"NA1\"\n    },\n    \"contexts\": [\n      {\n        \"name\": \"summoner_champion_performance_summary\",\n        \"parameters\": {\n          \"name.original\": \"StaRxPAuL\",\n          \"lane.original\": \"\",\n          \"name\": \"StaRxPAuL\",\n          \"region.original\": \"\",\n          \"region\": \"NA1\",\n          \"champion.original\": \"shyvana\",\n          \"lane\": \"\",\n          \"champion\": \"Shyvana\"\n        },\n        \"lifespan\": 1\n      }\n    ],\n    \"metadata\": {\n      \"intentId\": \"26ec6722-a7b6-41ed-aa1d-bb3911ad15ca\",\n      \"webhookUsed\": \"true\",\n      \"webhookForSlotFillingUsed\": \"false\",\n      \"intentName\": \"summoner/champion_performance_summary\"\n    },\n    \"fulfillment\": {\n      \"speech\": \"\",\n      \"messages\": [\n        {\n          \"type\": 0,\n          \"speech\": \"\"\n        }\n      ]\n    },\n    \"score\": 1\n  },\n  \"status\": {\n    \"code\": 206,\n    \"errorType\": \"partial_content\",\n    \"errorDetails\": \"Webhook call failed. Error: 404 Not Found\"\n  },\n  \"sessionId\": \"30b972fb-1b3b-40b1-8d8f-82ab5b1ddf4a\"\n}"
 			},
 			"parameters": [],
 			"headers": [
@@ -607,6 +607,35 @@
 			],
 			"authentication": {},
 			"metaSortKey": -1509909890439,
+			"settingStoreCookies": true,
+			"settingSendCookies": true,
+			"settingDisableRenderRequestBody": false,
+			"settingEncodeUrl": true,
+			"_type": "request"
+		},
+		{
+			"_id": "req_b19564b39ce94afa913e45881489efd6",
+			"parentId": "wrk_6d555102de1a469aa75025d23e488d2b",
+			"modified": 1510371611022,
+			"created": 1510371412262,
+			"url": "{{ url }}",
+			"name": "summoners/champion_performance_position",
+			"description": "",
+			"method": "POST",
+			"body": {
+				"mimeType": "application/json",
+				"text": "{\n  \"id\": \"1ee868b2-dc57-48e1-92b2-d993e4c555aa\",\n  \"timestamp\": \"2017-11-11T03:39:47.539Z\",\n  \"lang\": \"en\",\n  \"result\": {\n    \"source\": \"agent\",\n    \"resolvedQuery\": \"How many kills does wingilote's ryze get?\",\n    \"action\": \"summoners/champion_performance_position\",\n    \"actionIncomplete\": false,\n    \"parameters\": {\n      \"champion\": \"Tristana\",\n      \"name\": \"Elekktric\",\n      \"position_details\": \"kills\",\n      \"region\": \"NA1\",\n      \"role\": \"\"\n    },\n    \"contexts\": [\n      {\n        \"name\": \"summoners_champion_performance\",\n        \"parameters\": {\n          \"name.original\": \"wingilote\",\n          \"role\": \"\",\n          \"name\": \"wingilote\",\n          \"role.original\": \"\",\n          \"region.original\": \"\",\n          \"position_details\": \"kills\",\n          \"region\": \"NA1\",\n          \"position_details.original\": \"kills\",\n          \"champion.original\": \"ryze\",\n          \"champion\": \"Ryze\"\n        },\n        \"lifespan\": 1\n      }\n    ],\n    \"metadata\": {\n      \"intentId\": \"8a86ef68-1735-465a-b7be-7478e44115df\",\n      \"webhookUsed\": \"true\",\n      \"webhookForSlotFillingUsed\": \"false\",\n      \"intentName\": \"summoner/champion_performance_position\"\n    },\n    \"fulfillment\": {\n      \"speech\": \"\",\n      \"messages\": [\n        {\n          \"type\": 0,\n          \"speech\": \"\"\n        }\n      ]\n    },\n    \"score\": 1\n  },\n  \"status\": {\n    \"code\": 206,\n    \"errorType\": \"partial_content\",\n    \"errorDetails\": \"Webhook call failed. Error: 404 Not Found\"\n  },\n  \"sessionId\": \"dde95941-4b56-4c19-928f-b94cd966644b\"\n}"
+			},
+			"parameters": [],
+			"headers": [
+				{
+					"name": "Content-Type",
+					"value": "application/json",
+					"id": "pair_8ede475e15c1414aa47fb459d0df9a9e"
+				}
+			],
+			"authentication": {},
+			"metaSortKey": -1510371412262,
 			"settingStoreCookies": true,
 			"settingSendCookies": true,
 			"settingDisableRenderRequestBody": false,
