@@ -61,64 +61,77 @@ describe SummonersController, type: :controller do
   describe 'POST champion_performance_summary' do
     let(:action) { :champion_performance_summary }
     let(:summoner_params) do
-      { name: 'Sir Cold', region: 'NA1', champion: 'Pantheon' }
+      { name: 'Hero man', region: 'NA1', champion: 'Tristana', role: 'DUO_CARRY' }
     end
 
-    context 'with a role specified' do
-      let(:summoner_params) do
-        { name: 'RivetingObstacle', region: 'NA1', champion: 'Sivir', role: 'DUO_CARRY' }
-      end
-
-      before :all do
-        Summoner.find_by_name('RivetingObstacle').summoner_performances.last.update_attribute(:role, 'DUO_SUPPORT')
-      end
-
-      after :all do
-        Summoner.find_by_name('RivetingObstacle').summoner_performances.last.update_attribute(:role, 'DUO_CARRY')
-      end
-
-      it 'should only include performances for the specified role' do
-        post action, params: params
-        expect(speech).to eq 'RivetingObstacle has played Sivir Adc in one game with a 7.0/6.0/18.0 KDA.'
-      end
+    before :each do
+      @match1 = create(:match)
+      @match2 = create(:match)
+      summoner_performance = @match1.summoner_performances.first
+      summoner_performance.update!(champion_id: 18, role: 'DUO_CARRY')
+      summoner_performance.summoner.update!(name: 'Hero man')
+      @match2.summoner_performances.first.update(
+        champion_id: 18,
+        role: 'DUO_CARRY',
+        summoner: summoner_performance.summoner
+      )
     end
 
-    context 'with one role' do
-      context 'with a single game' do
-        it 'should only list the single role played' do
+    context 'with no games played as that champion' do
+      context 'with a role specified' do
+        before :each do
+          summoner_params[:role] = 'TOP'
+        end
+
+        it 'should indicate that the summoner has not played the champion in that role' do
           post action, params: params
-          expect(speech).to eq 'Sir Cold has played Pantheon one time with a 2.0/8.0/14.0 KDA and in the following roles: Jungle.'
+          expect(speech).to eq 'Hero man has not played any games this season as Tristana Top.'
         end
       end
 
-      context 'with multiple games' do
+      context 'with no role specified' do
+        before :each do
+          summoner_params[:role] = nil
+          summoner_params[:champion] = 'Zed'
+        end
+
+        it 'should indicate that the summoner has not played the champion this season' do
+          post action, params: params
+          expect(speech).to eq 'Hero man has not played any games this season as Zed.'
+        end
+      end
+    end
+
+    context 'with games played as that champion' do
+      context 'with a role specified' do
+        it 'should only include performances for the specified role' do
+          post action, params: params
+          expect(speech).to eq 'Hero man has played Tristana Adc two times with a 100.0% win rate and an overall 2.0/3.0/7.0 KDA.'
+        end
+      end
+
+      context 'with no role specified' do
         let(:summoner_params) do
-          { name: 'RivetingObstacle', region: 'NA1', champion: 'Sivir' }
+          { name: 'Hero man', region: 'NA1', champion: 'Tristana' }
         end
 
-        it 'should list the precentage of play in each role' do
-          post action, params: params
-          expect(speech).to eq 'RivetingObstacle has played Sivir two times with a 3.5/3.0/9.0 KDA and in the following roles: Adc.'
+        context 'with one role' do
+          it 'should only list the single role played' do
+            post action, params: params
+            expect(speech).to eq 'Hero man has played Tristana Adc two times with a 100.0% win rate and an overall 2.0/3.0/7.0 KDA.'
+          end
         end
-      end
-    end
 
-    context 'with multiple roles' do
-      let(:summoner_params) do
-        { name: 'RivetingObstacle', region: 'NA1', champion: 'Sivir' }
-      end
+        context 'with multiple roles' do
+          before :each do
+            @match2.summoner_performances.first.update(role: 'DUO_SUPPORT')
+          end
 
-      before :all do
-        Summoner.find_by_name('RivetingObstacle').summoner_performances.last.update_attribute(:role, 'DUO_SUPPORT')
-      end
-
-      after :all do
-        Summoner.find_by_name('RivetingObstacle').summoner_performances.last.update_attribute(:role, 'DUO_CARRY')
-      end
-
-      it 'should list the roles played' do
-        post action, params: params
-        expect(speech).to eq 'RivetingObstacle has played Sivir two times with a 3.5/3.0/9.0 KDA and in the following roles: Support 50.0% and Adc 50.0%.'
+          it 'should prompt to specify a role' do
+            post action, params: params
+            expect(speech).to eq 'Hero man has played Tristana two times across Adc and Support. Which role do you want to know about?'
+          end
+        end
       end
     end
   end

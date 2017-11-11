@@ -1,5 +1,6 @@
 class SummonersController < ApplicationController
   include RiotApi
+  include Utils
   before_action :load_summoner
 
   def performance_summary
@@ -23,43 +24,52 @@ class SummonersController < ApplicationController
 
   def champion_performance_summary
     champion = Champion.new(name: summoner_params[:champion])
+    args = { name: @summoner.name, champion: champion.name }
     role = summoner_params[:role]
-
-    if role.present?
-      champion_performances = @summoner.summoner_performances.where(champion_id: champion.id, role: role)
-      performance_type = :role_specified
-    else
-      champion_performances = @summoner.summoner_performances.where(champion_id: champion.id)
-      performance_type = :no_role_specified
-    end
+    filter = { champion_id: champion.id }
+    filter.merge!({ role: role }) if role.present?
+    champion_performances = @summoner.summoner_performances.where(filter)
 
     total_performances = champion_performances.size.to_f
+    total_performance_text = "#{total_performances.to_i.en.numwords} #{'time'.pluralize(total_performances)}"
     aggregate_performance = @summoner.aggregate_performance(
-      champion, :kills, :deaths, :assists, :role
+      filter, :kills, :deaths, :assists, :role
     )
-    roles = if aggregate_performance[:role].uniq.length > 1
-      aggregate_performance[:role]
-        .map { |role| ChampionGGApi::ROLES[role.to_sym].humanize }
-        .group_by(&:itself)
-        .map { |role, occurences| "#{role} #{(occurences.length / total_performances * 100).round(2)}%" }
-        .en.conjunction(article: false)
-    else
-      ChampionGGApi::ROLES[aggregate_performance[:role].first.to_sym].humanize
+
+    if aggregate_performance.empty?
+      role_type = role ? :role_specified : :no_role_specified
+      return render json: {
+        speech: ApiResponse.get_response(
+          dig_set(:errors, :champion_performance_summary, :does_not_play, role_type),
+          args.merge({ role: role && ChampionGGApi::ROLES[role.to_sym].humanize })
+        ),
+      }
     end
 
-    args = {
-      name: @summoner.name,
-      champion: champion.name,
+    role = aggregate_performance[:role].first if aggregate_performance[:role].uniq.length == 1
+    unless role
+      args.merge!({
+        roles: aggregate_performance[:role].map do |aggregate_role|
+          ChampionGGApi::ROLES[aggregate_role.to_sym].humanize
+        end.en.conjunction(article: false),
+        total_performances: total_performance_text
+      })
+      return render json: {
+        speech: ApiResponse.get_response({ errors: { champion_performance_summary: :multiple_roles } }, args)
+      }
+    end
+
+    args.merge!({
       kills: aggregate_performance[:kills].sum / total_performances,
       deaths: aggregate_performance[:deaths].sum / total_performances,
       assists: aggregate_performance[:assists].sum / total_performances,
-      roles: roles,
-      given_role: ChampionGGApi::ROLES[role.to_sym].humanize,
-      total_performances: "#{total_performances.to_i.en.numwords} #{'game'.pluralize(total_performances)}"
-    }
+      winrate: @summoner.winrate(filter),
+      role: ChampionGGApi::ROLES[role.to_sym].humanize,
+      total_performances: total_performance_text
+    })
 
     render json: {
-      speech: ApiResponse.get_response({ summoners: { champion_performance_summary: performance_type } }, args)
+      speech: ApiResponse.get_response({ summoners: :champion_performance_summary }, args)
     }
   end
 
@@ -76,7 +86,6 @@ class SummonersController < ApplicationController
       name: summoner_params[:name],
       region: summoner_params[:region]
     )
-
     unless @summoner.try(:valid?)
       render json: { speech: @summoner.error_message }
       return false

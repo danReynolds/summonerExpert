@@ -12,8 +12,8 @@ class Summoner < ActiveRecord::Base
     RankedQueue.new(queue_data)
   end
 
-  def aggregate_performance(champion, *metrics)
-    summoner_performances.where(champion_id: champion.id).inject({}) do |acc, performance|
+  def aggregate_performance(filter, *metrics)
+    summoner_performances.where(filter).inject({}) do |acc, performance|
       acc.tap do
         metrics.each do |metric|
           acc[metric] ||= []
@@ -21,6 +21,12 @@ class Summoner < ActiveRecord::Base
         end
       end
     end
+  end
+
+  def winrate(filter)
+    performances = summoner_performances.where(filter)
+    wins = performances.select { |performance| performance.match.winning_team == performance.team }
+    (wins.count / performances.count.to_f * 100).round(2)
   end
 
   def error_message

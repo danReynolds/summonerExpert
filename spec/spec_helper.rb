@@ -22,12 +22,6 @@ RSpec.configure do |config|
   # assertion/expectation library such as wrong or the stdlib/minitest
   # assertions if you prefer.
 
-  config.before(:suite) do
-    if Match.count == 0
-      Rails.application.load_seed
-    end
-  end
-
   # Temporarily set the content type so that params are parsed as JSON, unresolved
   # issue here: https://github.com/rspec/rspec-rails/issues/1668
   config.before(:each, type: :controller) do

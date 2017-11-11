@@ -33,12 +33,12 @@ class ChampionsController < ApplicationController
       real_size_champion_conjugation: 'champion'.en.pluralize(real_size)
     }
 
-    namespace = dig_set([
+    namespace = dig_set(
       :ranking,
       filter_types[:size_type],
       filter_types[:position_type],
       filter_types[:fulfillment_type]
-    ])
+    )
 
     render json: {
       speech: ApiResponse.get_response({ champions: namespace }, args)
@@ -171,13 +171,13 @@ class ChampionsController < ApplicationController
       list_order: rankings_filter.list_order,
       real_size_champion_conjugation: 'champion'.en.pluralize(real_size)
     }
-    namespace = dig_set([
+    namespace = dig_set(
       :matchup_ranking,
       filter_types[:size_type],
       filter_types[:position_type],
       filter_types[:fulfillment_type],
       @matchup_ranking.role_type
-    ])
+    )
 
     render json: {
       speech: ApiResponse.get_response({ champions: namespace }, args)
