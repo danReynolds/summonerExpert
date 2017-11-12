@@ -22,6 +22,58 @@ class SummonersController < ApplicationController
     }
   end
 
+  def champion_performance_ranking
+    ids_to_names = Cache.get_collection(:champions)
+    metric, position_details, role = summoner_params.slice(:metric, :position_details, :role).values.map(&:to_sym)
+    filter = {}
+
+    sort_type = if metric.present?
+      metric
+    elsif position_details.present?
+      position_details
+    else
+      :winrate
+    end
+
+    if role.present?
+      filter[:role] = role
+      role_type = :role_specified
+    else
+      role_type = :no_role_specified
+    end
+
+    performance_filter = Filterable.new({
+      collection: @summoner.summoner_performances.where(filter).group_by(&:champion_id),
+      sort_method: performance_ranking_sort(sort_type),
+      # The default sort order is best = lowest values
+      reverse: true
+    }.merge(summoner_params.slice(:list_order, :list_size, :list_position)))
+
+    filtered_rankings = performance_filter.filter
+    filter_types = performance_filter.filter_types
+    filter_args = ApiResponse.filter_args(performance_filter)
+    champions = filtered_rankings.map { |performance_data| ids_to_names[performance_data.first] }
+
+    args = {
+      position: RiotApi::POSITION_DETAILS[sort_type] || RiotApi::POSITION_METRICS[sort_type],
+      champions: champions.en.conjunction(article: false),
+      name: @summoner.name,
+      role: ChampionGGApi::ROLES[role.to_sym].try(:humanize),
+      real_size_champion_conjugation: 'champion'.en.pluralize(performance_filter.real_size)
+    }.merge(filter_args)
+
+    namespace = dig_set(
+      :summoners,
+      :champion_performance_ranking,
+      *filter_types.values,
+      role_type
+    )
+
+    render json: {
+      speech: ApiResponse.get_response(namespace, args)
+    }
+  end
+
   def champion_performance_position
     champion_performance_request(:position, [summoner_params[:position_details].to_sym, :role])
   end
@@ -34,8 +86,35 @@ class SummonersController < ApplicationController
 
   def summoner_params
     params.require(:result).require(:parameters).permit(
-      :name, :region, :champion, :queue, :role, :position_details
+      :name, :region, :champion, :queue, :role, :position_details, :metric,
+      :list_order, :list_size, :list_position
     )
+  end
+
+  def performance_ranking_sort(sort_type)
+    case sort_type
+    when :count
+      ->(performance_data) do
+        _, performances = performance_data
+        performances.count
+      end
+    when :KDA
+      ->(performance_data) do
+        _, performances = performance_data
+        performances.map { |performance| performance.kda }.sum / performances.count
+      end
+    when :winrate
+      ->(performance_data) do
+        _, performances = performance_data
+        performances.select { |performance| performance.victorious? }.count / performances.count.to_f
+      end
+    else
+      ->(performance_data) do
+        _, performances = performance_data
+        performances.map { |performance| performance.send(sort_type) }
+         .sum / performances.count.to_f
+      end
+    end
   end
 
   def champion_performance_request(type, metrics)

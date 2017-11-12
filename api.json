@@ -1,7 +1,7 @@
 {
 	"_type": "export",
 	"__export_format": 3,
-	"__export_date": "2017-11-11T03:49:53.221Z",
+	"__export_date": "2017-11-12T00:34:30.357Z",
 	"__export_source": "insomnia.desktop.app:v5.5.2",
 	"resources": [
 		{
@@ -616,7 +616,7 @@
 		{
 			"_id": "req_b19564b39ce94afa913e45881489efd6",
 			"parentId": "wrk_6d555102de1a469aa75025d23e488d2b",
-			"modified": 1510371611022,
+			"modified": 1510373529040,
 			"created": 1510371412262,
 			"url": "{{ url }}",
 			"name": "summoners/champion_performance_position",
@@ -624,7 +624,7 @@
 			"method": "POST",
 			"body": {
 				"mimeType": "application/json",
-				"text": "{\n  \"id\": \"1ee868b2-dc57-48e1-92b2-d993e4c555aa\",\n  \"timestamp\": \"2017-11-11T03:39:47.539Z\",\n  \"lang\": \"en\",\n  \"result\": {\n    \"source\": \"agent\",\n    \"resolvedQuery\": \"How many kills does wingilote's ryze get?\",\n    \"action\": \"summoners/champion_performance_position\",\n    \"actionIncomplete\": false,\n    \"parameters\": {\n      \"champion\": \"Tristana\",\n      \"name\": \"Elekktric\",\n      \"position_details\": \"kills\",\n      \"region\": \"NA1\",\n      \"role\": \"\"\n    },\n    \"contexts\": [\n      {\n        \"name\": \"summoners_champion_performance\",\n        \"parameters\": {\n          \"name.original\": \"wingilote\",\n          \"role\": \"\",\n          \"name\": \"wingilote\",\n          \"role.original\": \"\",\n          \"region.original\": \"\",\n          \"position_details\": \"kills\",\n          \"region\": \"NA1\",\n          \"position_details.original\": \"kills\",\n          \"champion.original\": \"ryze\",\n          \"champion\": \"Ryze\"\n        },\n        \"lifespan\": 1\n      }\n    ],\n    \"metadata\": {\n      \"intentId\": \"8a86ef68-1735-465a-b7be-7478e44115df\",\n      \"webhookUsed\": \"true\",\n      \"webhookForSlotFillingUsed\": \"false\",\n      \"intentName\": \"summoner/champion_performance_position\"\n    },\n    \"fulfillment\": {\n      \"speech\": \"\",\n      \"messages\": [\n        {\n          \"type\": 0,\n          \"speech\": \"\"\n        }\n      ]\n    },\n    \"score\": 1\n  },\n  \"status\": {\n    \"code\": 206,\n    \"errorType\": \"partial_content\",\n    \"errorDetails\": \"Webhook call failed. Error: 404 Not Found\"\n  },\n  \"sessionId\": \"dde95941-4b56-4c19-928f-b94cd966644b\"\n}"
+				"text": "{\n  \"id\": \"1ee868b2-dc57-48e1-92b2-d993e4c555aa\",\n  \"timestamp\": \"2017-11-11T03:39:47.539Z\",\n  \"lang\": \"en\",\n  \"result\": {\n    \"source\": \"agent\",\n    \"resolvedQuery\": \"How many kills does wingilote's ryze get?\",\n    \"action\": \"summoners/champion_performance_position\",\n    \"actionIncomplete\": false,\n    \"parameters\": {\n      \"champion\": \"Tristana\",\n      \"name\": \"Elekktric\",\n      \"position_details\": \"gold_earned\",\n      \"region\": \"NA1\",\n      \"role\": \"\"\n    },\n    \"contexts\": [\n      {\n        \"name\": \"summoners_champion_performance\",\n        \"parameters\": {\n          \"name.original\": \"wingilote\",\n          \"role\": \"\",\n          \"name\": \"wingilote\",\n          \"role.original\": \"\",\n          \"region.original\": \"\",\n          \"position_details\": \"kills\",\n          \"region\": \"NA1\",\n          \"position_details.original\": \"kills\",\n          \"champion.original\": \"ryze\",\n          \"champion\": \"Ryze\"\n        },\n        \"lifespan\": 1\n      }\n    ],\n    \"metadata\": {\n      \"intentId\": \"8a86ef68-1735-465a-b7be-7478e44115df\",\n      \"webhookUsed\": \"true\",\n      \"webhookForSlotFillingUsed\": \"false\",\n      \"intentName\": \"summoner/champion_performance_position\"\n    },\n    \"fulfillment\": {\n      \"speech\": \"\",\n      \"messages\": [\n        {\n          \"type\": 0,\n          \"speech\": \"\"\n        }\n      ]\n    },\n    \"score\": 1\n  },\n  \"status\": {\n    \"code\": 206,\n    \"errorType\": \"partial_content\",\n    \"errorDetails\": \"Webhook call failed. Error: 404 Not Found\"\n  },\n  \"sessionId\": \"dde95941-4b56-4c19-928f-b94cd966644b\"\n}"
 			},
 			"parameters": [],
 			"headers": [
@@ -636,6 +636,35 @@
 			],
 			"authentication": {},
 			"metaSortKey": -1510371412262,
+			"settingStoreCookies": true,
+			"settingSendCookies": true,
+			"settingDisableRenderRequestBody": false,
+			"settingEncodeUrl": true,
+			"_type": "request"
+		},
+		{
+			"_id": "req_58468147d11440609e75f7af6b9ef8ab",
+			"parentId": "wrk_6d555102de1a469aa75025d23e488d2b",
+			"modified": 1510445669676,
+			"created": 1510437793207,
+			"url": "{{ url }}",
+			"name": "summoners/champion_performance_ranking",
+			"description": "",
+			"method": "POST",
+			"body": {
+				"mimeType": "application/json",
+				"text": "{\n  \"id\": \"a495cde2-1b6b-4e2e-a2c9-62c3e06b4e08\",\n  \"timestamp\": \"2017-11-11T22:06:06.888Z\",\n  \"lang\": \"en\",\n  \"result\": {\n    \"source\": \"agent\",\n    \"resolvedQuery\": \"chips and dip2 top 3 champions\",\n    \"action\": \"summoners/champion_performance_ranking\",\n    \"actionIncomplete\": false,\n    \"parameters\": {\n      \"list_order\": \"highest\",\n      \"list_position\": \"1\",\n      \"list_size\": 3,\n      \"metric\": \"\",\n      \"name\": \"StaRxPAuL\",\n      \"position_details\": \"turrets_killed\",\n      \"region\": \"NA1\",\n      \"role\": \"JUNGLE\"\n    },\n    \"contexts\": [\n      {\n        \"name\": \"summoners_champion_performance_ranking\",\n        \"parameters\": {\n          \"name.original\": \"chips and dip2\",\n          \"role\": \"\",\n          \"list_position.original\": \"\",\n          \"region.original\": \"\",\n          \"position_details\": \"\",\n          \"list_size\": 3,\n          \"position_details.original\": \"\",\n          \"list_order.original\": \"top\",\n          \"list_position\": \"1\",\n          \"metric\": \"\",\n          \"metric.original\": \"\",\n          \"name\": \"chips and dip2\",\n          \"list_order\": \"highest\",\n          \"role.original\": \"\",\n          \"list_size.original\": \"3\",\n          \"region\": \"NA1\"\n        },\n        \"lifespan\": 1\n      }\n    ],\n    \"metadata\": {\n      \"intentId\": \"750901ac-403f-4c0d-a9c6-f3aa5b250194\",\n      \"webhookUsed\": \"true\",\n      \"webhookForSlotFillingUsed\": \"false\",\n      \"intentName\": \"summoners/champion_performance_ranking\"\n    },\n    \"fulfillment\": {\n      \"speech\": \"\",\n      \"messages\": [\n        {\n          \"type\": 0,\n          \"speech\": \"\"\n        }\n      ]\n    },\n    \"score\": 1\n  },\n  \"status\": {\n    \"code\": 206,\n    \"errorType\": \"partial_content\",\n    \"errorDetails\": \"Webhook call failed. Error: 404 Not Found\"\n  },\n  \"sessionId\": \"dde95941-4b56-4c19-928f-b94cd966644b\"\n}"
+			},
+			"parameters": [],
+			"headers": [
+				{
+					"name": "Content-Type",
+					"value": "application/json",
+					"id": "pair_f9ca0720e3ff494cabd7ae95de16a745"
+				}
+			],
+			"authentication": {},
+			"metaSortKey": -1510437793207,
 			"settingStoreCookies": true,
 			"settingSendCookies": true,
 			"settingDisableRenderRequestBody": false,

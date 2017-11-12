@@ -15,4 +15,12 @@ class SummonerPerformance < ActiveRecord::Base
     :inhibitors_killed, :total_minions_killed, :vision_wards_bought,
     :sight_wards_bought, :wards_placed, :wards_killed, :neutral_minions_killed,
     :neutral_minions_killed_team_jungle, :neutral_minions_killed_enemy_jungle
+
+  def kda
+    (kills + assists) / deaths.to_f
+  end
+
+  def victorious?
+    team == match.winning_team
+  end
 end

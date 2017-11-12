@@ -92,6 +92,12 @@ module RiotApi
       neutral_minions_killed_enemy_jungle: 'enemy jungle minions killed'
     }
 
+    POSITION_METRICS = {
+      count: 'games played',
+      KDA: 'KDA',
+      winrate: 'win rate'
+    }
+
     class << self
       def get_champions(**args)
         args[:tags] ||= DEFAULT_TAGS.map do |tag|

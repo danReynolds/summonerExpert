@@ -162,6 +162,70 @@ summoners:
     - "{name} has played {champion} {role} {total_performances} with a {winrate}% win rate and an overall {kills}/{deaths}/{assists} KDA."
   champion_performance_position:
     - "{name} has played {champion} {role} {total_performances} and averages {position_value} {position_name}."
+  champion_performance_ranking:
+    empty:
+      normal:
+        complete:
+          - 'No champions were requested.'
+        incomplete:
+          role_specified:
+            - '{name} has not played any games as {role} this season in ranked solo queue.'
+          no_role_specified:
+            - '{name} has not played any games this season in ranked solo queue.'
+      offset:
+        complete:
+          - 'No champions were requested.'
+        incomplete:
+          role_specified:
+            - '{name} has only played {real_size} {real_size_champion_conjugation} as {role} so far this season.'
+          no_role_specified:
+            - '{name} has only played {real_size} {real_size_champion_conjugation} so far this season.'
+    single:
+      normal:
+        complete:
+          role_specified:
+            - 'The champion played by {name} with the {list_order} {position} in {role} is {names}.'
+          no_role_specified:
+            - 'The champion played by {name} with the {list_order} {position} is {champions}.'
+        incomplete:
+          role_specified:
+            - '{name} has only played {real_size} {real_size_champion_conjugation} as {role} so far this season.'
+          no_role_specified:
+            - '{name} has only played {real_size} {real_size_champion_conjugation} so far this season.'
+      offset:
+        complete:
+          role_specified:
+            - 'The champion played by {name} with the {list_position} {list_order} {position} in {role} is {champions}.'
+          no_role_specified:
+            - 'The champion played by {name} with the {list_position} {list_order} {position} is {champions}.'
+        incomplete:
+          role_specified:
+            - '{name} has only played {real_size} {real_size_champion_conjugation} so far this season as {role}. The champion played by {name} with the {list_position} {list_order} {position} as {role} is {champions}.'
+          no_role_specified:
+            - '{name} has only played {real_size} {real_size_champion_conjugation} so far this season. The champion played by {name} with the {list_position} {list_order} {position} is {champions}.'
+    multiple:
+      normal:
+        complete:
+          role_specified:
+            - "The champions played by {name} with the summoner's {list_order} {position} in {role} are {champions}."
+          no_role_specified:
+            - "The champions played by {name} with the summoner's {list_order} {position} are {champions}."
+        incomplete:
+          role_specified:
+            - "{name} has only played {real_size} {real_size_champion_conjugation} so far this season as {role}. The champions played by {name} with the summoner's {list_order} {position} as {role} are {champions}."
+          no_role_specified:
+            - "{name} has only played {real_size} {real_size_champion_conjugation} so far this season. The champions played by {name} with the summoner's {list_order} {position} are {champions}."
+      offset:
+        complete:
+          role_specified:
+            - 'The {list_position} through {filtered_position_offset} champions played by {name} with the {list_order} {position} in {role} are {champions}.'
+          no_role_specified:
+            - 'The {list_position} through {filtered_position_offset} champions played by {name} with the {list_order} {position} are {champions}.'
+        incomplete:
+          role_specified:
+            - '{name} has only played {real_size} {real_size_champion_conjugation} so far this season as {role}. The {list_position} through {filtered_position_offset} champions played by {name} with the {list_order} {position} as {role} are {champions}.'
+          no_role_specified:
+            - '{name} has only played {real_size} {real_size_champion_conjugation} so far this season. The {list_position} through {filtered_position_offset} champions played by {name} with the {list_order} {position} are {champions}.'
 errors:
   champion_performance_summary:
     does_not_play:

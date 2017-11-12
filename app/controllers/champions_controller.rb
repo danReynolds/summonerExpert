@@ -146,15 +146,13 @@ class ChampionsController < ApplicationController
     rankings_filter = Filterable.new({
       collection: @matchup_ranking.matchups,
       # the default sort order is best = lowest
-      sort_value: ->(name, matchup) { matchup[name][matchup_position] * -1 }
+      reverse: true,
+      sort_method: ->(name, matchup) { matchup[name][matchup_position] }
     }.merge(champion_params.slice(:list_position, :list_size, :list_order)))
 
     filtered_rankings = rankings_filter.filter.map { |ranking| ranking.first.dup }
+    filter_args = ApiResponse.filter_args(rankings_filter)
     filter_types = rankings_filter.filter_types
-    list_position = rankings_filter.list_position
-    real_size = rankings_filter.real_size
-    requested_size = rankings_filter.requested_size
-    filtered_size = rankings_filter.filtered_size
 
     args = {
       elo: @matchup_ranking.elo.humanize,
@@ -162,25 +160,19 @@ class ChampionsController < ApplicationController
       unnamed_role: @matchup_ranking.unnamed_role.humanize,
       named_role: @matchup_ranking.named_role.humanize,
       name: @matchup_ranking.name,
-      real_size: real_size.en.numwords,
-      requested_size: requested_size.en.numwords,
-      filtered_size: filtered_size.en.numwords,
       names: filtered_rankings.en.conjunction(article: false),
-      list_position: list_position.en.ordinate,
-      filtered_position_offset: (list_position + filtered_size - 1).en.ordinate,
-      list_order: rankings_filter.list_order,
-      real_size_champion_conjugation: 'champion'.en.pluralize(real_size)
-    }
+      real_size_champion_conjugation: 'champion'.en.pluralize(rankings_filter.real_size)
+    }.merge(filter_args)
+
     namespace = dig_set(
+      :champions
       :matchup_ranking,
-      filter_types[:size_type],
-      filter_types[:position_type],
-      filter_types[:fulfillment_type],
+      *filter_types,
       @matchup_ranking.role_type
     )
 
     render json: {
-      speech: ApiResponse.get_response({ champions: namespace }, args)
+      speech: ApiResponse.get_response(namespace, args)
     }
   end
 
