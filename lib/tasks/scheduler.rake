@@ -170,7 +170,8 @@ namespace :riot do
 
     DataDog.event(
       DataDog::EVENTS[:RIOT_MATCHES],
-      start_index: new_start_match_index,
+      matches_processed: new_start_match_index - match_index
+      new_start_index: new_start_match_index,
       end_index: end_match_index
     )
 
