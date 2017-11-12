@@ -63,8 +63,8 @@ class Filterable
   def filter
     collection = @collection
     collection = collection.sort_by(&@sort_method) if @sort_method
-    collection = collection[((@list_position) - 1)..-1] || []
     collection.reverse! if @list_order.to_sym == ORDER[:lowest] || @reverse
+    collection = collection[((@list_position) - 1)..-1] || []
 
     collection.first(requested_size).tap do |filtered_collection|
       @filtered_size = filtered_collection.size

@@ -43,7 +43,7 @@ class SummonersController < ApplicationController
     end
 
     performance_filter = Filterable.new({
-      collection: @summoner.summoner_performances.where(filter).group_by(&:champion_id),
+      collection: @summoner.summoner_performances.where(filter).group_by(&:champion_id).to_a,
       sort_method: performance_ranking_sort(sort_type),
       # The default sort order is best = lowest values
       reverse: true
@@ -95,24 +95,27 @@ class SummonersController < ApplicationController
     case sort_type
     when :count
       ->(performance_data) do
-        _, performances = performance_data
-        performances.count
+        champion_id, performances = performance_data
+        [performances.count, champion_id]
       end
     when :KDA
       ->(performance_data) do
-        _, performances = performance_data
-        performances.map { |performance| performance.kda }.sum / performances.count
+        champion_id, performances = performance_data
+        [performances.map { |performance| performance.kda }.sum / performances.count, champion_id]
       end
     when :winrate
       ->(performance_data) do
-        _, performances = performance_data
-        performances.select { |performance| performance.victorious? }.count / performances.count.to_f
+        champion_id, performances = performance_data
+        sort_method = performances
+          .select { |performance| performance.victorious? }.count / performances.count.to_f
+        [sort_method, champion_id]
       end
     else
       ->(performance_data) do
-        _, performances = performance_data
-        performances.map { |performance| performance.send(sort_type) }
+        champion_id, performances = performance_data
+        sort_method = performances.map { |performance| performance.send(sort_type) }
          .sum / performances.count.to_f
+       [sort_method, champion_id]
       end
     end
   end

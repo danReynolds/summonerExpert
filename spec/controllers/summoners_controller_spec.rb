@@ -73,7 +73,7 @@ describe SummonersController, type: :controller do
         role: '',
         list_order: 'highest',
         list_position: 1,
-        list_size: 3,
+        list_size: 2,
         metric: '',
         position_details: ''
       }
@@ -88,14 +88,77 @@ describe SummonersController, type: :controller do
         { match: { win: true }, summoner_performance: { champion_id: 20, role: 'JUNGLE' } },
         { match: { win: false }, summoner_performance: { champion_id: 18, role: 'JUNGLE' } },
       ]
-      summoner = Summoner.first
-      summoner.update!(name: 'Hero man')
+      summoner = create(:summoner, name: 'Hero man')
       matches.each_with_index do |match, i|
         summoner_performance = match.summoner_performances.first
-        match.update!(winning_team: summoner_performance.team) if match_data[i][:match][:win]
+        if match_data[i][:match][:win]
+          match.update!(winning_team: summoner_performance.team)
+        else
+          match.update!(winning_team: summoner_performance.team == match.team1 ? match.team2 : match.team1)
+        end
         summoner_performance.update!(
           match_data[i][:summoner_performance].merge({ summoner_id: summoner.id })
         )
+      end
+    end
+
+    context 'with a metric and position details specified' do
+      before :each do
+        summoner_params[:metric] = :count
+        summoner_params[:position_details] = 'kills'
+      end
+
+      it 'should sort the ranking by the metric' do
+        post action, params: params
+        expect(speech).to eq "The champions played by Hero man with the summoner's highest games played are Tristana and Nunu."
+      end
+    end
+
+    context 'with only a metric specified' do
+      context 'with a count metric given' do
+        before :each do
+          summoner_params[:metric] = :count
+        end
+
+        it 'should rank by games played' do
+          post action, params: params
+          expect(speech).to eq "The champions played by Hero man with the summoner's highest games played are Tristana and Nunu."
+        end
+      end
+
+      context 'with a KDA metric given' do
+        before :each do
+          Match.last.summoner_performances.first.update!(kills: 10000)
+          summoner_params[:metric] = :KDA
+        end
+
+        it 'should rank by average KDA' do
+          post action, params: params
+          expect(speech).to eq "The champions played by Hero man with the summoner's highest KDA are Tristana and Nunu."
+        end
+      end
+
+      context 'with a winrate metric given' do
+        before :each do
+          summoner_params[:metric] = :winrate
+        end
+
+        it 'should rank by overall winrate' do
+          post action, params: params
+          expect(speech).to eq "The champions played by Hero man with the summoner's highest win rate are Nunu and Tristana."
+        end
+      end
+    end
+
+    context 'with only a position details specified' do
+      before :each do
+        summoner_params[:position_details] = :wards_placed
+        Match.last.summoner_performances.first.update!(wards_placed: 10000)
+      end
+
+      it 'should rank by the position details' do
+        post action, params: params
+        expect(speech).to eq "The champions played by Hero man with the summoner's highest wards placed are Tristana and Nunu."
       end
     end
 
@@ -175,7 +238,205 @@ describe SummonersController, type: :controller do
       end
     end
 
-    context  'with a single champion returned' do
+    context 'with a single champion returned' do
+      before :each do
+        summoner_params[:list_size] = 1
+      end
+
+      context 'with no position offset' do
+        context 'with a complete response' do
+          context 'with a role specified' do
+            before :each do
+              summoner_params[:role] = 'MIDDLE'
+            end
+
+            it 'should return the single highest ranking for that role' do
+              post action, params: params
+              expect(speech).to eq 'The champion played by Hero man with the highest win rate in Middle is Nunu.'
+            end
+          end
+
+          context 'with no role specified' do
+            it 'should return the single highest ranking for any role' do
+              post action, params: params
+              expect(speech).to eq 'The champion played by Hero man with the highest win rate is Nunu.'
+            end
+          end
+        end
+
+        context 'with an incomplete response' do
+          before :each do
+            summoner_params[:name] = 'inactive player'
+          end
+
+          context 'with a role specified' do
+            before :each do
+              summoner_params[:role] = 'Top'
+            end
+
+            it 'should indicate that the player is inactive this season' do
+              post action, params: params
+              expect(speech).to eq 'inactive player is not an active player in ranked this season.'
+            end
+          end
+
+          context 'with no role specified' do
+            it 'should indicate that the player is inactive this season' do
+              post action, params: params
+              expect(speech).to eq 'inactive player is not an active player in ranked this season.'
+            end
+          end
+        end
+      end
+
+      context 'with a position offset' do
+        before :each do
+          summoner_params[:list_position] = 2
+        end
+
+        context 'with a complete response' do
+          context 'with a role specified' do
+            before :each do
+              summoner_params[:role] = 'MIDDLE'
+            end
+
+            it 'should return the offset highest champion for that role' do
+              post action, params: params
+              expect(speech).to eq 'The champion played by Hero man with the second highest win rate in Middle is Tristana.'
+            end
+          end
+
+          context 'with no role specified' do
+            it 'should return the offset highest champion for any role' do
+              post action, params: params
+              expect(speech).to eq 'The champion played by Hero man with the second highest win rate is Tristana.'
+            end
+          end
+        end
+
+        context 'with an incomplete response' do
+          before :each do
+            summoner_params[:list_size] = 3
+          end
+
+          context 'with a role specified' do
+            before :each do
+              summoner_params[:role] = 'MIDDLE'
+            end
+
+            it 'should indicate the results are incomplete and return the one champion for that role' do
+              post action, params: params
+              expect(speech).to eq 'Hero man has only played two champions so far this season as Middle. The champion played by Hero man with the second highest win rate as Middle is Tristana.'
+            end
+          end
+
+          context 'with no role specified' do
+            it 'should indicate the results are incomplete and return the one champion' do
+              post action, params: params
+              expect(speech).to eq 'Hero man has only played two champions so far this season. The champion played by Hero man with the second highest win rate is Tristana.'
+            end
+          end
+        end
+      end
+    end
+
+    context 'with multiple champions returned' do
+      context 'with no position offset' do
+        context 'with a complete response' do
+          context 'with a role specified' do
+            before :each do
+              summoner_params[:role] = 'MIDDLE'
+            end
+
+            it 'should provide rankings for the champions in that role' do
+              post action, params: params
+              expect(speech).to eq "The champions played by Hero man with the summoner's highest win rate in Middle are Nunu and Tristana."
+            end
+          end
+
+          context 'with no role specified' do
+            it 'should provide rankings for the champions in any role' do
+              post action, params: params
+              expect(speech).to eq "The champions played by Hero man with the summoner's highest win rate are Nunu and Tristana."
+            end
+          end
+        end
+
+        context 'with an incomplete response' do
+          before :each do
+            summoner_params[:list_size] = 3
+          end
+
+          context 'with a role specified' do
+            before :each do
+              summoner_params[:role] = 'MIDDLE'
+            end
+
+            it 'should return an incomplete ranking of champions in that role' do
+              post action, params: params
+              expect(speech).to eq "Hero man has only played two champions so far this season as Middle. The champions played by Hero man with the summoner's highest win rate as Middle are Nunu and Tristana."
+            end
+          end
+
+          context 'with no role specified' do
+            it 'should return an incomplete ranking of champions in any role' do
+              post action, params: params
+              expect(speech).to eq "Hero man has only played two champions so far this season. The champions played by Hero man with the summoner's highest win rate are Nunu and Tristana."
+            end
+          end
+        end
+      end
+
+      context 'with a position offset' do
+        before :each do
+          summoner_params[:list_position] = 2
+          Match.last.summoner_performances.first.update!(champion_id: 30, role: 'MIDDLE')
+        end
+
+        context 'with complete rankings' do
+          context 'with a role specified' do
+            before :each do
+              summoner_params[:role] = 'MIDDLE'
+            end
+
+            it 'should return a complete ranking with champions from that role' do
+              post action, params: params
+              expect(speech).to eq 'The second through third champions played by Hero man with the highest win rate in Middle are Karthus and Tristana.'
+            end
+          end
+
+          context 'with no role specified' do
+            it 'should return a complete ranking with champions from all roles' do
+              post action, params: params
+              expect(speech).to eq 'The second through third champions played by Hero man with the highest win rate are Tristana and Karthus.'
+            end
+          end
+        end
+
+        context 'with incomplete rankings' do
+          before :each do
+            summoner_params[:list_size] = 3
+          end
+
+          context 'with a role specified' do
+            before :each do
+              summoner_params[:role] = 'MIDDLE'
+            end
+
+            it 'should return incomplete rankings for that role' do
+              post action, params: params
+              expect(speech).to eq 'Hero man has only played three champions so far this season as Middle. The second through third champions played by Hero man with the highest win rate as Middle are Karthus and Tristana.'
+            end
+          end
+
+          context 'with no role specified' do
+            it 'should return incomplete rankings across all roles' do
+              post action, params: params
+              expect(speech).to eq 'Hero man has only played three champions so far this season. The second through third champions played by Hero man with the highest win rate are Tristana and Karthus.'
+            end
+          end
+        end
+      end
     end
   end
 

@@ -184,7 +184,7 @@ summoners:
       normal:
         complete:
           role_specified:
-            - 'The champion played by {name} with the {list_order} {position} in {role} is {names}.'
+            - 'The champion played by {name} with the {list_order} {position} in {role} is {champions}.'
           no_role_specified:
             - 'The champion played by {name} with the {list_order} {position} is {champions}.'
         incomplete:
