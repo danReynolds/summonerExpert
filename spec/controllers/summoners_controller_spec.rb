@@ -557,7 +557,7 @@ describe SummonersController, type: :controller do
 
       context 'with no role specified' do
         before :each do
-          summoner_params[:role] = nil
+          summoner_params[:role] = ''
           summoner_params[:champion] = 'Zed'
         end
 
@@ -578,7 +578,7 @@ describe SummonersController, type: :controller do
 
       context 'with no role specified' do
         before :each do
-          summoner_params[:role] = nil
+          summoner_params[:role] = ''
         end
 
         context 'with one role' do

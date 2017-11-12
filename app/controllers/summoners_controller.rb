@@ -131,20 +131,26 @@ class SummonersController < ApplicationController
     total_performances = champion_performances.size.to_f
 
     if total_performances.zero?
-      role_type = role ? :role_specified : :no_role_specified
+      if role.present?
+        role_type = :role_specified
+        args[:role] = ChampionGGApi::ROLES[role.to_sym].humanize
+      else
+        role_type = :no_role_specified
+      end
+
       return render json: {
         speech: ApiResponse.get_response(
           dig_set(:errors, :champion_performance_summary, :does_not_play, role_type),
-          args.merge({ role: role && ChampionGGApi::ROLES[role.to_sym].humanize })
+          args
         ),
       }
     end
 
     args[:total_performances] = "#{total_performances.to_i.en.numwords} #{'time'.pluralize(total_performances)}"
     aggregate_performance = @summoner.aggregate_performance(filter, metrics)
-    role ||= aggregate_performance[:role].first if aggregate_performance[:role].uniq.length == 1
+    role = aggregate_performance[:role].first if role.blank? && aggregate_performance[:role].uniq.length == 1
 
-    if role
+    if role.present?
       args[:role] = ChampionGGApi::ROLES[role.to_sym].humanize
     else
       args[:roles] = aggregate_performance[:role].map do |aggregate_role|
