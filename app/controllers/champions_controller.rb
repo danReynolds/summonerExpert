@@ -144,10 +144,13 @@ class ChampionsController < ApplicationController
     name = @matchup_ranking.name
 
     rankings_filter = Filterable.new({
-      collection: @matchup_ranking.matchups,
+      collection: @matchup_ranking.matchups.to_a,
       # the default sort order is best = lowest
       reverse: true,
-      sort_method: ->(name, matchup) { matchup[name][matchup_position] }
+      sort_method: ->(match_data) do
+        name, champion_matchup = match_data
+        champion_matchup[name][matchup_position]
+      end
     }.merge(champion_params.slice(:list_position, :list_size, :list_order)))
 
     filtered_rankings = rankings_filter.filter.map { |ranking| ranking.first.dup }
@@ -165,9 +168,9 @@ class ChampionsController < ApplicationController
     }.merge(filter_args)
 
     namespace = dig_set(
-      :champions
+      :champions,
       :matchup_ranking,
-      *filter_types,
+      *filter_types.values,
       @matchup_ranking.role_type
     )
 
