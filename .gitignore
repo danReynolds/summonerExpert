@@ -27,3 +27,4 @@ gactions
 /scripts/*
 coverage/*
 pgdata
+todo.md

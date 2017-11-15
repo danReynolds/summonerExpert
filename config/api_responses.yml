@@ -162,6 +162,40 @@ summoners:
     - "{name} has played {champion} {role} {total_performances} with a {winrate}% win rate and an overall {kills}/{deaths}/{assists} KDA."
   champion_performance_position:
     - "{name} has played {champion} {role} {total_performances} and averages {position_value} {position_name}."
+  champion_matchup_ranking:
+    empty:
+      normal:
+        complete:
+          - 'No champions were requested.'
+        incomplete:
+          - '{name} has not played any games as {champion} {role} this season in ranked solo queue.'
+      offset:
+        complete:
+          - 'No champions were requested.'
+        incomplete:
+          - '{name} has only played against {real_size} {real_size_champion_conjugation} playing as {champion} {role} so far this season.'
+    single:
+      normal:
+        complete:
+          - 'The champion with the {list_order} {position} playing against {name} as {champion} {role} is {champions}.'
+        incomplete:
+          - '{name} has not played as {champion} {role} so far this season.'
+      offset:
+        complete:
+          - 'The champion with the {list_position} {list_order} {position} playing against {name} as {champion} {role} is {champions}.'
+        incomplete:
+          - '{name} has only played against {real_size} different {real_size_champion_conjugation} so far this season as {champion} {role}. The champion with the {list_position} {list_order} {position} playing against {name} as {champion} {role} is {champions}.'
+    multiple:
+      normal:
+        complete:
+          - "The champions with the {list_order} {position} against {name} playing {champion} {role} are {champions}."
+        incomplete:
+          - "{name} has only played against {real_size} different {real_size_champion_conjugation} so far this season as {champion} {role}. The champions with the {list_order} {position} playing against {name} {role} are {champions}."
+      offset:
+        complete:
+          - 'The {list_position} through {filtered_position_offset} champions with the {list_order} {position} against {name} playing {champion} {role} are {champions}.'
+        incomplete:
+          - '{name} has only played against {real_size} different {real_size_champion_conjugation} so far this season as {champion} {role}. The {list_position} through {filtered_position_offset} champions with the {list_order} {position} against {name} playing as {champion} {role} are {champions}.'
   champion_performance_ranking:
     empty:
       normal:
@@ -227,15 +261,15 @@ summoners:
           no_role_specified:
             - '{name} has only played {real_size} {real_size_champion_conjugation} so far this season. The {list_position} through {filtered_position_offset} champions played by {name} with the {list_order} {position} are {champions}.'
 errors:
-  champion_performance_summary:
-    does_not_play:
-      role_specified:
-        - '{name} has not played any games this season as {champion} {role}.'
-      no_role_specified:
-        - '{name} has not played any games this season as {champion}.'
-    multiple_roles:
-      - '{name} has played {champion} {total_performances} across {roles}. Which role do you want to know about?'
   summoner:
+    champion:
+      does_not_play:
+        role_specified:
+          - '{name} has not played any games this season as {champion} {role}.'
+        no_role_specified:
+          - '{name} has not played any games this season as {champion}.'
+      multiple_roles:
+        - '{name} has played {champion} {total_performances} across {roles}. Which role do you want to know about?'
     not_active:
       - "{name} is not an active player in ranked this season."
   matchups:

@@ -17,6 +17,7 @@ class Filterable
     list_size: 1,
     list_order: ORDER[:desc],
     collection: [],
+    # The default sort order is best = lowest values
     reverse: false
   }.freeze
 

@@ -23,4 +23,10 @@ class SummonerPerformance < ActiveRecord::Base
   def victorious?
     team == match.winning_team
   end
+
+  def opponent
+    match.summoner_performances.find do |performance|
+      performance.role == role && performance != self
+    end
+  end
 end

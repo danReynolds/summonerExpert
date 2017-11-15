@@ -25,8 +25,7 @@ class Summoner < ActiveRecord::Base
 
   def winrate(filter)
     performances = summoner_performances.where(filter)
-    wins = performances.select { |performance| performance.match.winning_team == performance.team }
-    (wins.count / performances.count.to_f * 100).round(2)
+    (performances.select(&:victorious?).count / performances.count.to_f * 100).round(2)
   end
 
   def error_message

@@ -22,36 +22,80 @@ class SummonersController < ApplicationController
     }
   end
 
-  def champion_performance_ranking
-    ids_to_names = Cache.get_collection(:champions)
-    metric, position_details, role = summoner_params.slice(:metric, :position_details, :role).values.map(&:to_sym)
-    filter = {}
+  def champion_matchup_ranking
+    champion = Champion.new(name: summoner_params[:champion])
+    metric, position_details, role = summoner_params.slice(
+      :metric, :position_details, :role
+    ).values.map(&:to_sym)
+    sort_type = [metric, position_details, :winrate].find(&:present?)
+    args = { name: @summoner.name, champion: champion.name }
+    filter = { champion_id: champion.id }
+    filter[:role] = role if role.present?
+    summoner_performances = @summoner.summoner_performances.where(filter)
+    total_performances = summoner_performances.count
+    args[:total_performances] = "#{total_performances.to_i.en.numwords} #{'time'.pluralize(total_performances)}"
 
-    sort_type = if metric.present?
-      metric
-    elsif position_details.present?
-      position_details
-    else
-      :winrate
+    return does_not_play_response(args, role) if summoner_performances.length.zero?
+
+    if role.blank?
+      roles = summoner_performances.map(&:role).uniq
+      if roles.length == 1
+        role = roles.first
+      else
+        return multiple_roles_response(args, roles)
+      end
     end
 
-    if role.present?
+    performance_rankings = summoner_performances.where(filter)
+      .map(&:opponent).compact.group_by(&:champion_id).to_a
+
+    matchup_filter = Filterable.new({
+      collection: performance_rankings,
+      sort_method: performance_ranking_sort(sort_type),
+      reverse: true
+    }.merge(summoner_params.slice(:list_order, :list_size, :list_position)))
+
+    filtered_rankings = matchup_filter.filter
+    filter_types = matchup_filter.filter_types
+    args.merge!(ApiResponse.filter_args(matchup_filter))
+    ids_to_names = Cache.get_collection(:champions)
+    champions = filtered_rankings.map { |performance_data| ids_to_names[performance_data.first] }
+
+    args.merge!({
+      position: RiotApi::POSITION_DETAILS[sort_type] || RiotApi::POSITION_METRICS[sort_type],
+      champions: champions.en.conjunction(article: false),
+      role: ChampionGGApi::ROLES[role.to_sym].humanize,
+      real_size_champion_conjugation: 'champion'.en.pluralize(matchup_filter.real_size)
+    })
+
+    namespace = dig_set(:summoners, :champion_matchup_ranking, *filter_types.values)
+    render json: { speech: ApiResponse.get_response(namespace, args) }
+  end
+
+  def champion_performance_ranking
+    metric, position_details, role = summoner_params.slice(
+      :metric, :position_details, :role
+    ).values.map(&:to_sym)
+    filter = {}
+    sort_type = [metric, position_details, :winrate].find(&:present?)
+
+    role_type = if role.present?
       filter[:role] = role
-      role_type = :role_specified
+      :role_specified
     else
-      role_type = :no_role_specified
+      :no_role_specified
     end
 
     performance_filter = Filterable.new({
       collection: @summoner.summoner_performances.where(filter).group_by(&:champion_id).to_a,
       sort_method: performance_ranking_sort(sort_type),
-      # The default sort order is best = lowest values
       reverse: true
     }.merge(summoner_params.slice(:list_order, :list_size, :list_position)))
 
     filtered_rankings = performance_filter.filter
     filter_types = performance_filter.filter_types
     filter_args = ApiResponse.filter_args(performance_filter)
+    ids_to_names = Cache.get_collection(:champions)
     champions = filtered_rankings.map { |performance_data| ids_to_names[performance_data.first] }
 
     args = {
@@ -62,16 +106,8 @@ class SummonersController < ApplicationController
       real_size_champion_conjugation: 'champion'.en.pluralize(performance_filter.real_size)
     }.merge(filter_args)
 
-    namespace = dig_set(
-      :summoners,
-      :champion_performance_ranking,
-      *filter_types.values,
-      role_type
-    )
-
-    render json: {
-      speech: ApiResponse.get_response(namespace, args)
-    }
+    namespace = dig_set(:summoners, :champion_performance_ranking, *filter_types.values, role_type)
+    render json: { speech: ApiResponse.get_response(namespace, args) }
   end
 
   def champion_performance_position
@@ -91,6 +127,34 @@ class SummonersController < ApplicationController
     )
   end
 
+  def does_not_play_response(args, role)
+    role_type = if role.present?
+      args[:role] = ChampionGGApi::ROLES[role.to_sym].humanize
+      :role_specified
+    else
+      :no_role_specified
+    end
+
+    render json: {
+      speech: ApiResponse.get_response(
+        dig_set(:errors, :summoner, :champion, :does_not_play, role_type),
+        args
+      )
+    }
+  end
+
+  def multiple_roles_response(args, collection)
+    args[:roles] = collection.map do |role|
+      ChampionGGApi::ROLES[role.to_sym].humanize
+    end.en.conjunction(article: false)
+    return render json: {
+      speech: ApiResponse.get_response(
+        dig_set(:errors, :summoner, :champion, :multiple_roles),
+        args
+      )
+    }
+  end
+
   def performance_ranking_sort(sort_type)
     case sort_type
     when :count
@@ -101,14 +165,12 @@ class SummonersController < ApplicationController
     when :KDA
       ->(performance_data) do
         champion_id, performances = performance_data
-        [performances.map { |performance| performance.kda }.sum / performances.count, champion_id]
+        [performances.map(&:kda).sum / performances.count, champion_id]
       end
     when :winrate
       ->(performance_data) do
         champion_id, performances = performance_data
-        sort_method = performances
-          .select { |performance| performance.victorious? }.count / performances.count.to_f
-        [sort_method, champion_id]
+        [performances.select(&:victorious?).count / performances.count.to_f, champion_id]
       end
     else
       ->(performance_data) do
@@ -129,36 +191,17 @@ class SummonersController < ApplicationController
 
     champion_performances = @summoner.summoner_performances.where(filter)
     total_performances = champion_performances.size.to_f
-
-    if total_performances.zero?
-      if role.present?
-        role_type = :role_specified
-        args[:role] = ChampionGGApi::ROLES[role.to_sym].humanize
-      else
-        role_type = :no_role_specified
-      end
-
-      return render json: {
-        speech: ApiResponse.get_response(
-          dig_set(:errors, :champion_performance_summary, :does_not_play, role_type),
-          args
-        ),
-      }
-    end
-
     args[:total_performances] = "#{total_performances.to_i.en.numwords} #{'time'.pluralize(total_performances)}"
+
+    return does_not_play_response(args, role) if total_performances.zero?
+
     aggregate_performance = @summoner.aggregate_performance(filter, metrics)
     role = aggregate_performance[:role].first if role.blank? && aggregate_performance[:role].uniq.length == 1
 
     if role.present?
       args[:role] = ChampionGGApi::ROLES[role.to_sym].humanize
     else
-      args[:roles] = aggregate_performance[:role].map do |aggregate_role|
-        ChampionGGApi::ROLES[aggregate_role.to_sym].humanize
-      end.en.conjunction(article: false)
-      return render json: {
-        speech: ApiResponse.get_response({ errors: { champion_performance_summary: :multiple_roles } }, args)
-      }
+      return multiple_roles_response(args, aggregate_performance[:role])
     end
 
     if type == :summary
@@ -172,9 +215,7 @@ class SummonersController < ApplicationController
       args[:position_value] = (aggregate_performance[position].sum / total_performances).round(2)
     end
 
-    render json: {
-      speech: ApiResponse.get_response({ summoners: "champion_performance_#{type}" }, args)
-    }
+    render json: { speech: ApiResponse.get_response({ summoners: "champion_performance_#{type}" }, args) }
   end
 
   def load_summoner

@@ -64,6 +64,97 @@ describe SummonersController, type: :controller do
     end
   end
 
+  describe 'POST champion_performance_matchup' do
+    let(:action) { :champion_matchup_ranking }
+    let(:summoner_params) do
+      {
+        name: 'Hero man',
+        champion: 'Shyvana',
+        region: 'NA1',
+        role: 'MIDDLE',
+        list_order: 'highest',
+        list_position: 1,
+        list_size: 2,
+        metric: '',
+        position_details: ''
+      }
+    end
+
+    before :each do
+      matches = create_list(:match, 5)
+      match_data = [
+        { match: { win: true }, summoner_performance: { champion_id: 102, role: 'DUO_CARRY' }, opponent: { champion_id: 40 } },
+        { match: { win: false }, summoner_performance: { champion_id: 102, role: 'MIDDLE' }, opponent: { champion_id: 50 } },
+        { match: { win: true }, summoner_performance: { champion_id: 102, role: 'MIDDLE' }, opponent: { champion_id: 60 } },
+        { match: { win: true }, summoner_performance: { champion_id: 102, role: 'JUNGLE' }, opponent: { champion_id: 40 } },
+        { match: { win: false }, summoner_performance: { champion_id: 102, role: 'JUNGLE' }, opponent: { champion_id: 40 } },
+      ]
+      summoner = create(:summoner, name: 'Hero man')
+      matches.each_with_index do |match, i|
+        summoner_performance = match.summoner_performances.first
+        opposing_team = summoner_performance.team == match.team1 ? match.team2 : match.team1
+        if match_data[i][:match][:win]
+          match.update!(winning_team: summoner_performance.team)
+        else
+          match.update!(winning_team: opposing_team)
+        end
+        summoner_performance.update!(
+          match_data[i][:summoner_performance].merge({ summoner_id: summoner.id })
+        )
+        opposing_team.summoner_performances.first
+          .update!(match_data[i][:opponent].merge({ role: match_data[i][:summoner_performance][:role] }))
+      end
+    end
+
+    context 'with both a metric and position details specified' do
+      before :each do
+        summoner_params[:metric] = :count
+        summoner_params[:position_details] = 'kills'
+      end
+
+      it 'should sort the matchup rankings by metric' do
+        post action, params: params
+        expect(speech).to eq 'The champions with the highest games played against Hero man playing Shyvana Middle are Elise and Swain.'
+      end
+    end
+
+    context 'with only a metric specified' do
+      context 'with a count metric specified' do
+        before :each do
+          summoner_params[:metric] = :count
+        end
+
+        it 'should sort the matchup rankings by metric' do
+          post action, params: params
+          expect(speech).to eq 'The champions with the highest games played against Hero man playing Shyvana Middle are Elise and Swain.'
+        end
+      end
+
+      context 'with a KDA metric specified' do
+        before :each do
+          summoner_params[:metric] = :KDA
+          SummonerPerformance.find_by(champion_id: 50).update!(kills: 100000)
+        end
+
+        it 'should sort the matchup rankings by KDA' do
+          post action, params: params
+          expect(speech).to eq 'The champions with the highest KDA against Hero man playing Shyvana Middle are Swain and Elise.'
+        end
+      end
+
+      context 'with a winrate metric specified' do
+        before :each do
+          summoner_params[:metric] = :winrate
+        end
+
+        it 'should sort the matchup rankings by winrate' do
+          post action, params: params
+          expect(speech).to eq 'The champions with the highest win rate against Hero man playing Shyvana Middle are Swain and Elise.'
+        end
+      end
+    end
+  end
+
   describe 'POST champion_performance_ranking' do
     let(:action) { :champion_performance_ranking }
     let(:summoner_params) do

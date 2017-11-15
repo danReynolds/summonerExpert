@@ -1,7 +1,7 @@
 {
 	"_type": "export",
 	"__export_format": 3,
-	"__export_date": "2017-11-12T00:34:30.357Z",
+	"__export_date": "2017-11-15T07:28:06.242Z",
 	"__export_source": "insomnia.desktop.app:v5.5.2",
 	"resources": [
 		{
@@ -442,7 +442,7 @@
 		{
 			"_id": "req_8a9b75d53d5e479e96ace9d7ef3845db",
 			"parentId": "wrk_6d555102de1a469aa75025d23e488d2b",
-			"modified": 1509864728494,
+			"modified": 1510522080799,
 			"created": 1484257755665,
 			"url": "{{ url }}",
 			"name": "summoners/performance_summary",
@@ -450,7 +450,7 @@
 			"method": "POST",
 			"body": {
 				"mimeType": "application/json",
-				"text": "{\n  \"id\": \"aa3606ab-f191-4234-b55c-8796708a70e6\",\n  \"timestamp\": \"2017-01-12T21:48:59.443Z\",\n  \"result\": {\n    \"source\": \"agent\",\n    \"resolvedQuery\": \"look up mordequess\",\n    \"action\": \"summoners/performance_summary\",\n    \"actionIncomplete\": false,\n    \"parameters\": {\n      \"name\": \"StaRxPAuL\",\n\t  \t\"region\": \"NA1\",\n\t\t\t\"queue\": \"RANKED_SOLO_5x5\"\n    },\n    \"contexts\": [\n      {\n        \"name\": \"lane\",\n        \"parameters\": {\n          \"lane.original\": \"\",\n          \"summoner.original\": \"mordequess\",\n          \"summoner\": \"mordequess\",\n          \"champion.original\": \"lookup mordequess\",\n          \"lane\": \"\",\n          \"champion\": \"lookup mordequess\"\n        },\n        \"lifespan\": 4\n      }\n    ],\n    \"metadata\": {\n      \"intentId\": \"b89e6c2a-3925-4cd5-89c1-5e77b3a0ac37\",\n      \"webhookUsed\": \"false\",\n      \"webhookForSlotFillingUsed\": \"false\",\n      \"intentName\": \"summoners/show\"\n    },\n    \"fulfillment\": {\n      \"speech\": \"\",\n      \"messages\": [\n        {\n          \"type\": 0,\n          \"speech\": \"\"\n        }\n      ]\n    },\n    \"score\": 1\n  },\n  \"status\": {\n    \"code\": 200,\n    \"errorType\": \"success\"\n  },\n  \"sessionId\": \"19a23ebb-39ff-407c-9654-fe4b6eac9815\"\n}"
+				"text": "{\n  \"id\": \"aa3606ab-f191-4234-b55c-8796708a70e6\",\n  \"timestamp\": \"2017-01-12T21:48:59.443Z\",\n  \"result\": {\n    \"source\": \"agent\",\n    \"resolvedQuery\": \"look up mordequess\",\n    \"action\": \"summoners/performance_summary\",\n    \"actionIncomplete\": false,\n    \"parameters\": {\n      \"name\": \"mordequess\",\n\t  \t\"region\": \"NA1\",\n\t\t\t\"queue\": \"RANKED_SOLO_5x5\"\n    },\n    \"contexts\": [\n      {\n        \"name\": \"lane\",\n        \"parameters\": {\n          \"lane.original\": \"\",\n          \"summoner.original\": \"mordequess\",\n          \"summoner\": \"mordequess\",\n          \"champion.original\": \"lookup mordequess\",\n          \"lane\": \"\",\n          \"champion\": \"lookup mordequess\"\n        },\n        \"lifespan\": 4\n      }\n    ],\n    \"metadata\": {\n      \"intentId\": \"b89e6c2a-3925-4cd5-89c1-5e77b3a0ac37\",\n      \"webhookUsed\": \"false\",\n      \"webhookForSlotFillingUsed\": \"false\",\n      \"intentName\": \"summoners/show\"\n    },\n    \"fulfillment\": {\n      \"speech\": \"\",\n      \"messages\": [\n        {\n          \"type\": 0,\n          \"speech\": \"\"\n        }\n      ]\n    },\n    \"score\": 1\n  },\n  \"status\": {\n    \"code\": 200,\n    \"errorType\": \"success\"\n  },\n  \"sessionId\": \"19a23ebb-39ff-407c-9654-fe4b6eac9815\"\n}"
 			},
 			"parameters": [],
 			"headers": [
@@ -587,7 +587,7 @@
 		{
 			"_id": "req_adbd92c820914d2ca5dd48b7ce602752",
 			"parentId": "wrk_6d555102de1a469aa75025d23e488d2b",
-			"modified": 1510371907280,
+			"modified": 1510526215410,
 			"created": 1509909890439,
 			"url": "{{ url }}",
 			"name": "summoners/champion_performance_summary",
@@ -595,7 +595,7 @@
 			"method": "POST",
 			"body": {
 				"mimeType": "application/json",
-				"text": "{\n  \"id\": \"df89b7c1-846a-44c1-b784-f939a4fc1aba\",\n  \"timestamp\": \"2017-11-05T19:30:36.515Z\",\n  \"lang\": \"en\",\n  \"result\": {\n    \"source\": \"agent\",\n    \"resolvedQuery\": \"how is StaRxPAuL's shyvana?\",\n    \"action\": \"summoners/champion_performance_summary\",\n    \"actionIncomplete\": false,\n    \"parameters\": {\n      \"champion\": \"Tristana\",\n      \"role\": \"DUO_CARRY\",\n      \"name\": \"Elekktric\",\n      \"region\": \"NA1\"\n    },\n    \"contexts\": [\n      {\n        \"name\": \"summoner_champion_performance_summary\",\n        \"parameters\": {\n          \"name.original\": \"StaRxPAuL\",\n          \"lane.original\": \"\",\n          \"name\": \"StaRxPAuL\",\n          \"region.original\": \"\",\n          \"region\": \"NA1\",\n          \"champion.original\": \"shyvana\",\n          \"lane\": \"\",\n          \"champion\": \"Shyvana\"\n        },\n        \"lifespan\": 1\n      }\n    ],\n    \"metadata\": {\n      \"intentId\": \"26ec6722-a7b6-41ed-aa1d-bb3911ad15ca\",\n      \"webhookUsed\": \"true\",\n      \"webhookForSlotFillingUsed\": \"false\",\n      \"intentName\": \"summoner/champion_performance_summary\"\n    },\n    \"fulfillment\": {\n      \"speech\": \"\",\n      \"messages\": [\n        {\n          \"type\": 0,\n          \"speech\": \"\"\n        }\n      ]\n    },\n    \"score\": 1\n  },\n  \"status\": {\n    \"code\": 206,\n    \"errorType\": \"partial_content\",\n    \"errorDetails\": \"Webhook call failed. Error: 404 Not Found\"\n  },\n  \"sessionId\": \"30b972fb-1b3b-40b1-8d8f-82ab5b1ddf4a\"\n}"
+				"text": "{\n  \"id\": \"df89b7c1-846a-44c1-b784-f939a4fc1aba\",\n  \"timestamp\": \"2017-11-05T19:30:36.515Z\",\n  \"lang\": \"en\",\n  \"result\": {\n    \"source\": \"agent\",\n    \"resolvedQuery\": \"how is StaRxPAuL's shyvana?\",\n    \"action\": \"summoners/champion_performance_summary\",\n    \"actionIncomplete\": false,\n    \"parameters\": {\n      \"champion\": \"Kindred\",\n      \"role\": \"\",\n      \"name\": \"wingilote\",\n      \"region\": \"NA1\"\n    },\n    \"contexts\": [\n      {\n        \"name\": \"summoner_champion_performance_summary\",\n        \"parameters\": {\n          \"name.original\": \"StaRxPAuL\",\n          \"lane.original\": \"\",\n          \"name\": \"StaRxPAuL\",\n          \"region.original\": \"\",\n          \"region\": \"NA1\",\n          \"champion.original\": \"shyvana\",\n          \"lane\": \"\",\n          \"champion\": \"Shyvana\"\n        },\n        \"lifespan\": 1\n      }\n    ],\n    \"metadata\": {\n      \"intentId\": \"26ec6722-a7b6-41ed-aa1d-bb3911ad15ca\",\n      \"webhookUsed\": \"true\",\n      \"webhookForSlotFillingUsed\": \"false\",\n      \"intentName\": \"summoner/champion_performance_summary\"\n    },\n    \"fulfillment\": {\n      \"speech\": \"\",\n      \"messages\": [\n        {\n          \"type\": 0,\n          \"speech\": \"\"\n        }\n      ]\n    },\n    \"score\": 1\n  },\n  \"status\": {\n    \"code\": 206,\n    \"errorType\": \"partial_content\",\n    \"errorDetails\": \"Webhook call failed. Error: 404 Not Found\"\n  },\n  \"sessionId\": \"30b972fb-1b3b-40b1-8d8f-82ab5b1ddf4a\"\n}"
 			},
 			"parameters": [],
 			"headers": [
@@ -645,7 +645,7 @@
 		{
 			"_id": "req_58468147d11440609e75f7af6b9ef8ab",
 			"parentId": "wrk_6d555102de1a469aa75025d23e488d2b",
-			"modified": 1510445669676,
+			"modified": 1510522148521,
 			"created": 1510437793207,
 			"url": "{{ url }}",
 			"name": "summoners/champion_performance_ranking",
@@ -653,7 +653,7 @@
 			"method": "POST",
 			"body": {
 				"mimeType": "application/json",
-				"text": "{\n  \"id\": \"a495cde2-1b6b-4e2e-a2c9-62c3e06b4e08\",\n  \"timestamp\": \"2017-11-11T22:06:06.888Z\",\n  \"lang\": \"en\",\n  \"result\": {\n    \"source\": \"agent\",\n    \"resolvedQuery\": \"chips and dip2 top 3 champions\",\n    \"action\": \"summoners/champion_performance_ranking\",\n    \"actionIncomplete\": false,\n    \"parameters\": {\n      \"list_order\": \"highest\",\n      \"list_position\": \"1\",\n      \"list_size\": 3,\n      \"metric\": \"\",\n      \"name\": \"StaRxPAuL\",\n      \"position_details\": \"turrets_killed\",\n      \"region\": \"NA1\",\n      \"role\": \"JUNGLE\"\n    },\n    \"contexts\": [\n      {\n        \"name\": \"summoners_champion_performance_ranking\",\n        \"parameters\": {\n          \"name.original\": \"chips and dip2\",\n          \"role\": \"\",\n          \"list_position.original\": \"\",\n          \"region.original\": \"\",\n          \"position_details\": \"\",\n          \"list_size\": 3,\n          \"position_details.original\": \"\",\n          \"list_order.original\": \"top\",\n          \"list_position\": \"1\",\n          \"metric\": \"\",\n          \"metric.original\": \"\",\n          \"name\": \"chips and dip2\",\n          \"list_order\": \"highest\",\n          \"role.original\": \"\",\n          \"list_size.original\": \"3\",\n          \"region\": \"NA1\"\n        },\n        \"lifespan\": 1\n      }\n    ],\n    \"metadata\": {\n      \"intentId\": \"750901ac-403f-4c0d-a9c6-f3aa5b250194\",\n      \"webhookUsed\": \"true\",\n      \"webhookForSlotFillingUsed\": \"false\",\n      \"intentName\": \"summoners/champion_performance_ranking\"\n    },\n    \"fulfillment\": {\n      \"speech\": \"\",\n      \"messages\": [\n        {\n          \"type\": 0,\n          \"speech\": \"\"\n        }\n      ]\n    },\n    \"score\": 1\n  },\n  \"status\": {\n    \"code\": 206,\n    \"errorType\": \"partial_content\",\n    \"errorDetails\": \"Webhook call failed. Error: 404 Not Found\"\n  },\n  \"sessionId\": \"dde95941-4b56-4c19-928f-b94cd966644b\"\n}"
+				"text": "{\n  \"id\": \"a495cde2-1b6b-4e2e-a2c9-62c3e06b4e08\",\n  \"timestamp\": \"2017-11-11T22:06:06.888Z\",\n  \"lang\": \"en\",\n  \"result\": {\n    \"source\": \"agent\",\n    \"resolvedQuery\": \"chips and dip2 top 3 champions\",\n    \"action\": \"summoners/champion_performance_ranking\",\n    \"actionIncomplete\": false,\n    \"parameters\": {\n      \"list_order\": \"highest\",\n      \"list_position\": \"1\",\n      \"list_size\": 3,\n      \"metric\": \"\",\n      \"name\": \"Mordequess\",\n      \"position_details\": \"\",\n      \"region\": \"NA1\",\n      \"role\": \"\"\n    },\n    \"contexts\": [\n      {\n        \"name\": \"summoners_champion_performance_ranking\",\n        \"parameters\": {\n          \"name.original\": \"chips and dip2\",\n          \"role\": \"\",\n          \"list_position.original\": \"\",\n          \"region.original\": \"\",\n          \"position_details\": \"\",\n          \"list_size\": 3,\n          \"position_details.original\": \"\",\n          \"list_order.original\": \"top\",\n          \"list_position\": \"1\",\n          \"metric\": \"\",\n          \"metric.original\": \"\",\n          \"name\": \"chips and dip2\",\n          \"list_order\": \"highest\",\n          \"role.original\": \"\",\n          \"list_size.original\": \"3\",\n          \"region\": \"NA1\"\n        },\n        \"lifespan\": 1\n      }\n    ],\n    \"metadata\": {\n      \"intentId\": \"750901ac-403f-4c0d-a9c6-f3aa5b250194\",\n      \"webhookUsed\": \"true\",\n      \"webhookForSlotFillingUsed\": \"false\",\n      \"intentName\": \"summoners/champion_performance_ranking\"\n    },\n    \"fulfillment\": {\n      \"speech\": \"\",\n      \"messages\": [\n        {\n          \"type\": 0,\n          \"speech\": \"\"\n        }\n      ]\n    },\n    \"score\": 1\n  },\n  \"status\": {\n    \"code\": 206,\n    \"errorType\": \"partial_content\",\n    \"errorDetails\": \"Webhook call failed. Error: 404 Not Found\"\n  },\n  \"sessionId\": \"dde95941-4b56-4c19-928f-b94cd966644b\"\n}"
 			},
 			"parameters": [],
 			"headers": [
@@ -665,6 +665,35 @@
 			],
 			"authentication": {},
 			"metaSortKey": -1510437793207,
+			"settingStoreCookies": true,
+			"settingSendCookies": true,
+			"settingDisableRenderRequestBody": false,
+			"settingEncodeUrl": true,
+			"_type": "request"
+		},
+		{
+			"_id": "req_47c0a709848b47af9b16105733045820",
+			"parentId": "wrk_6d555102de1a469aa75025d23e488d2b",
+			"modified": 1510530923859,
+			"created": 1510528634618,
+			"url": "{{ url }}",
+			"name": "summoners/champion_matchup_ranking",
+			"description": "",
+			"method": "POST",
+			"body": {
+				"mimeType": "application/json",
+				"text": "{\n  \"id\": \"7207d5d5-71ad-4177-a525-c70b52d3ea82\",\n  \"timestamp\": \"2017-11-12T23:16:31.926Z\",\n  \"lang\": \"en\",\n  \"result\": {\n    \"source\": \"agent\",\n    \"resolvedQuery\": \"best counter to Mordequess's Garen\",\n    \"action\": \"summoners/champion_matchup_ranking\",\n    \"actionIncomplete\": false,\n    \"parameters\": {\n      \"champion\": \"Shyvana\",\n      \"list_order\": \"highest\",\n      \"list_position\": \"1\",\n      \"list_size\": \"1\",\n      \"matchup_role\": \"\",\n      \"name\": \"StaRxPAuL\",\n      \"position_details\": \"\",\n      \"role\": \"\",\n      \"summoner_metric\": \"\",\n\t\t\t\"region\": \"NA1\"\n    },\n    \"contexts\": [\n      {\n        \"name\": \"summoner_champion_matchup_ranking\",\n        \"parameters\": {\n          \"name.original\": \"Mordequess\",\n          \"summoner_metric.original\": \"\",\n          \"role\": \"\",\n          \"list_position.original\": \"\",\n          \"position_details\": \"\",\n          \"list_size\": \"1\",\n          \"position_details.original\": \"\",\n          \"list_order.original\": \"best\",\n          \"summoner_metric\": \"\",\n          \"list_position\": \"1\",\n          \"matchup_role.original\": \"\",\n          \"name\": \"mordequess\",\n          \"list_order\": \"highest\",\n          \"role.original\": \"\",\n          \"list_size.original\": \"\",\n          \"champion.original\": \"Garen\",\n          \"matchup_role\": \"\",\n          \"champion\": \"Garen\"\n        },\n        \"lifespan\": 1\n      }\n    ],\n    \"metadata\": {\n      \"intentId\": \"e1678442-9c8e-4cac-a776-e87f2ca0ad78\",\n      \"webhookUsed\": \"true\",\n      \"webhookForSlotFillingUsed\": \"false\",\n      \"intentName\": \"summoner/champion_matchup_ranking\"\n    },\n    \"fulfillment\": {\n      \"speech\": \"\",\n      \"messages\": [\n        {\n          \"type\": 0,\n          \"speech\": \"\"\n        }\n      ]\n    },\n    \"score\": 1\n  },\n  \"status\": {\n    \"code\": 206,\n    \"errorType\": \"partial_content\",\n    \"errorDetails\": \"Webhook call failed. Error: 404 Not Found\"\n  },\n  \"sessionId\": \"dde95941-4b56-4c19-928f-b94cd966644b\"\n}"
+			},
+			"parameters": [],
+			"headers": [
+				{
+					"name": "Content-Type",
+					"value": "application/json",
+					"id": "pair_f1f73914b9bf4dc1bdabe9869d80ac82"
+				}
+			],
+			"authentication": {},
+			"metaSortKey": -1510528634618,
 			"settingStoreCookies": true,
 			"settingSendCookies": true,
 			"settingDisableRenderRequestBody": false,
@@ -698,11 +727,11 @@
 		{
 			"_id": "env_9c6792b304f04d69aed2837dca777d01",
 			"parentId": "env_0d851fcce733473faf2afa9cce713676",
-			"modified": 1509343113835,
+			"modified": 1510521011670,
 			"created": 1509342227545,
 			"name": "New Environment",
 			"data": {
-				"url": "https://104.154.222.220"
+				"url": "https://104.197.76.80"
 			},
 			"color": null,
 			"_type": "environment"
