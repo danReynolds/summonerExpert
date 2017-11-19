@@ -22,6 +22,56 @@ class SummonersController < ApplicationController
     }
   end
 
+  def champion_build
+    champion = Champion.new(name: summoner_params[:champion])
+    metric, role = summoner_params.slice(
+      :metric, :role
+    ).values.map(&:to_sym)
+    metric = RiotApi::POSITION_METRICS[:winrate] unless metric.present?
+    filter = { champion_id: champion.id }
+    args = { name: @summoner.name, champion: champion.name }
+    filter[:role] = role if role.present?
+    summoner_performances = @summoner.summoner_performances.where(filter)
+    total_performances = summoner_performances.length
+    args[:total_performances] = "#{total_performances.to_i.en.numwords} #{'time'.pluralize(total_performances)}"
+    return does_not_play_response(args, role) if total_performances.zero?
+
+    if role.blank?
+      roles = summoner_performances.map(&:role).uniq
+      if roles.length == 1
+        role = roles.first
+      else
+        return multiple_roles_response(args, roles)
+      end
+    end
+    args[:role] = ChampionGGApi::ROLES[role.to_sym].humanize
+
+    performances_by_build = summoner_performances.select(&:full_build?).group_by do |performance|
+      performance.items.map(&:name).sort
+    end
+
+    if performances_by_build.empty?
+      namespace = dig_set(:errors, :summoner, :build, :no_complete_builds)
+      return render json: { speech: ApiResponse.get_response(namespace, args)}
+    end
+
+    build_filter = Filterable.new({
+      collection: performances_by_build,
+      sort_method: performance_ranking_sort(metric),
+      reverse: true,
+      list_size: 1
+    }.merge(summoner_params.slice(:list_order)))
+    build = build_filter.filter.first
+    filter_types = build_filter.filter_types
+    most_common_ordering = build.last.sort_by { |build| build.items }.first
+    build_names = most_common_ordering.items.map(&:name).en.conjunction(article: false)
+    args.merge!(ApiResponse.filter_args(build_filter))
+    args.merge!({ build: build_names, metric: metric })
+
+    namespace = dig_set(:summoners, :champion_build, *filter_types.values)
+    render json: { speech: ApiResponse.get_response(namespace, args) }
+  end
+
   def champion_matchup_ranking
     champion = Champion.new(name: summoner_params[:champion])
     metric, position_details, role = summoner_params.slice(
@@ -34,7 +84,7 @@ class SummonersController < ApplicationController
     summoner_performances = @summoner.summoner_performances.where(filter)
     total_performances = summoner_performances.count
     args[:total_performances] = "#{total_performances.to_i.en.numwords} #{'time'.pluralize(total_performances)}"
-    return does_not_play_response(args, role) if summoner_performances.length.zero?
+    return does_not_play_response(args, role) if total_performances.zero?
 
     if role.blank?
       roles = summoner_performances.map(&:role).uniq
@@ -158,25 +208,25 @@ class SummonersController < ApplicationController
     case sort_type
     when :count
       ->(performance_data) do
-        champion_id, performances = performance_data
-        [performances.count, champion_id]
+        group_by_index, performances = performance_data
+        [performances.count, group_by_index]
       end
     when :KDA
       ->(performance_data) do
-        champion_id, performances = performance_data
-        [performances.map(&:kda).sum / performances.count, champion_id]
+        group_by_index, performances = performance_data
+        [performances.map(&:kda).sum / performances.count, group_by_index]
       end
     when :winrate
       ->(performance_data) do
-        champion_id, performances = performance_data
-        [performances.select(&:victorious?).count / performances.count.to_f, champion_id]
+        group_by_index, performances = performance_data
+        [performances.select(&:victorious?).count / performances.count.to_f, group_by_index]
       end
     else
       ->(performance_data) do
-        champion_id, performances = performance_data
+        group_by_index, performances = performance_data
         sort_method = performances.map { |performance| performance.send(sort_type) }
          .sum / performances.count.to_f
-       [sort_method, champion_id]
+       [sort_method, group_by_index]
       end
     end
   end

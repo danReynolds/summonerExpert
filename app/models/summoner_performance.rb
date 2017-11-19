@@ -1,4 +1,5 @@
 class SummonerPerformance < ActiveRecord::Base
+  include RiotApi
   belongs_to :team
   belongs_to :summoner
   belongs_to :match
@@ -22,6 +23,18 @@ class SummonerPerformance < ActiveRecord::Base
 
   def victorious?
     team == match.winning_team
+  end
+
+  def items
+    ids_to_names = Cache.get_collection(:items)
+    [item0_id, item1_id, item2_id, item3_id, item4_id, item5_id].compact.map do |item_id|
+      item_name = ids_to_names[item_id]
+      Item.new(name: item_name) if item_name
+    end.compact
+  end
+
+  def full_build?
+    items.length == RiotApi::COMPLETED_BUILD_SIZE && items.all?(&:complete?)
   end
 
   def opponent

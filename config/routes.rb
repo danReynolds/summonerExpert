@@ -38,5 +38,6 @@ Rails.application.routes.draw do
     post :champion_performance_position
     post :champion_performance_ranking
     post :champion_matchup_ranking
+    post :champion_build
   end
 end

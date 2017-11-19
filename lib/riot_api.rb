@@ -19,6 +19,9 @@ module RiotApi
     # Matches are based off of Ranked Solo Queue
     RANKED_QUEUE_ID = 420
 
+    # Number of items making up a completed build
+    COMPLETED_BUILD_SIZE = 6
+
     # API Error Codes
     RATE_LIMIT_EXCEEDED = 429
     INTERNAL_SERVER_ERROR = 500

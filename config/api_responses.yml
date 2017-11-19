@@ -158,6 +158,8 @@ items:
 summoners:
   performance_summary:
     - "{name} is ranked {elo} {rank} with {lp} LP in {queue}. The summoner currently has a {winrate}% win rate."
+  champion_build:
+    - "{name} has played {champion} {role} {total_performances} this pre-season and the summoner's {list_order} {metric} build is {build}."
   champion_performance_summary:
     - "{name} has played {champion} {role} {total_performances} this pre-season with a {winrate}% win rate and an overall {kills}/{deaths}/{assists} KDA."
   champion_performance_position:
@@ -259,6 +261,9 @@ summoners:
             - '{name} has only played {real_size} {real_size_champion_conjugation} so far this pre-season. The {list_position} through {filtered_position_offset} champions played by {name} with the {list_order} {position} are {champions}.'
 errors:
   summoner:
+    build:
+      no_complete_builds:
+        - '{name} does not have any complete builds playing {champion} {role} this pre-season.'
     champion:
       does_not_play:
         role_specified:

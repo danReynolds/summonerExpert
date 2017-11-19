@@ -15,6 +15,10 @@ class Item < Collection
     @data['gold'].slice('total', 'sell')
   end
 
+  def complete?
+    @data['into'].nil?
+  end
+
   def build
     @data['from'].map { |id| COLLECTION[id.to_i] }
   end
