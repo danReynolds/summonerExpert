@@ -6,10 +6,13 @@ class Summoner < ActiveRecord::Base
   validate :matchup_validator
 
   def queue(queue_name)
-    queue_data = RiotApi.get_summoner_queues(
-      id: summoner_id, region: region
-    )[queue_name]
-    RankedQueue.new(queue_data)
+    unless queue_data = Cache.get_summoner_rank(summoner_id)
+      queue_data = RiotApi.get_summoner_queues(
+        id: summoner_id, region: region
+      )
+      Cache.set_summoner_rank(summoner_id, queue_data)
+    end
+    RankedQueue.new(queue_data[queue_name])
   end
 
   def aggregate_performance(filter, metrics)

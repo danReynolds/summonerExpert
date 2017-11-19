@@ -159,43 +159,40 @@ summoners:
   performance_summary:
     - "{name} is ranked {elo} {rank} with {lp} LP in {queue}. The summoner currently has a {winrate}% win rate."
   champion_performance_summary:
-    - "{name} has played {champion} {role} {total_performances} with a {winrate}% win rate and an overall {kills}/{deaths}/{assists} KDA."
+    - "{name} has played {champion} {role} {total_performances} this pre-season with a {winrate}% win rate and an overall {kills}/{deaths}/{assists} KDA."
   champion_performance_position:
-    - "{name} has played {champion} {role} {total_performances} and averages {position_value} {position_name}."
+    - "{name} has played {champion} {role} {total_performances} this pre-season and averages {position_value} {position_name}."
   champion_matchup_ranking:
     empty:
       normal:
-        complete:
-          - 'No champions were requested.'
-        incomplete:
-          - '{name} has not played any games as {champion} {role} this season in ranked solo queue.'
+        - '{name} has not played any games as {champion} {role} this pre-season in ranked solo queue.'
       offset:
         complete:
           - 'No champions were requested.'
         incomplete:
-          - '{name} has only played against {real_size} {real_size_champion_conjugation} playing as {champion} {role} so far this season.'
+          - '{name} has only played against {real_size} {real_size_champion_conjugation} playing as {champion} {role} so far this pre-season.'
     single:
       normal:
         complete:
           - 'The champion with the {list_order} {position} playing against {name} as {champion} {role} is {champions}.'
         incomplete:
-          - '{name} has not played as {champion} {role} so far this season.'
+          - '{name} has only played against {real_size} {real_size_champion_conjugation} so far this pre-season as {champion} {role}. The champion with the {list_order} {position} playing against {name} as {champion} {role} is {champions}.'
       offset:
         complete:
           - 'The champion with the {list_position} {list_order} {position} playing against {name} as {champion} {role} is {champions}.'
         incomplete:
-          - '{name} has only played against {real_size} different {real_size_champion_conjugation} so far this season as {champion} {role}. The champion with the {list_position} {list_order} {position} playing against {name} as {champion} {role} is {champions}.'
+          - '{name} has only played against {real_size} different {real_size_champion_conjugation} so far this pre-season as {champion} {role}. The champion with the {list_position} {list_order} {position} playing against {name} as {champion} {role} is {champions}.'
     multiple:
       normal:
         complete:
           - "The champions with the {list_order} {position} against {name} playing {champion} {role} are {champions}."
         incomplete:
-          - "{name} has only played against {real_size} different {real_size_champion_conjugation} so far this season as {champion} {role}. The champions with the {list_order} {position} playing against {name} {role} are {champions}."
+          - "{name} has only played against {real_size} different {real_size_champion_conjugation} so far this pre-season as {champion} {role}. The champions with the {list_order} {position} playing against {name} {role} are {champions}."
       offset:
         complete:
           - 'The {list_position} through {filtered_position_offset} champions with the {list_order} {position} against {name} playing {champion} {role} are {champions}.'
         incomplete:
-          - '{name} has only played against {real_size} different {real_size_champion_conjugation} so far this season as {champion} {role}. The {list_position} through {filtered_position_offset} champions with the {list_order} {position} against {name} playing as {champion} {role} are {champions}.'
+          - '{name} has only played against {real_size} different {real_size_champion_conjugation} so far this pre-season as {champion} {role}. The {list_position} through {filtered_position_offset} champions with the {list_order} {position} against {name} playing as {champion} {role} are {champions}.'
   champion_performance_ranking:
     empty:
       normal:
@@ -203,17 +200,17 @@ summoners:
           - 'No champions were requested.'
         incomplete:
           role_specified:
-            - '{name} has not played any games as {role} this season in ranked solo queue.'
+            - '{name} has not played any games as {role} this pre-season in ranked solo queue.'
           no_role_specified:
-            - '{name} has not played any games this season in ranked solo queue.'
+            - '{name} has not played any games this pre-season in ranked solo queue.'
       offset:
         complete:
           - 'No champions were requested.'
         incomplete:
           role_specified:
-            - '{name} has only played {real_size} {real_size_champion_conjugation} as {role} so far this season.'
+            - '{name} has only played {real_size} {real_size_champion_conjugation} as {role} so far this pre-season.'
           no_role_specified:
-            - '{name} has only played {real_size} {real_size_champion_conjugation} so far this season.'
+            - '{name} has only played {real_size} {real_size_champion_conjugation} so far this pre-season.'
     single:
       normal:
         complete:
@@ -223,9 +220,9 @@ summoners:
             - 'The champion played by {name} with the {list_order} {position} is {champions}.'
         incomplete:
           role_specified:
-            - '{name} has only played {real_size} {real_size_champion_conjugation} as {role} so far this season.'
+            - '{name} has only played {real_size} {real_size_champion_conjugation} as {role} so far this pre-season.'
           no_role_specified:
-            - '{name} has only played {real_size} {real_size_champion_conjugation} so far this season.'
+            - '{name} has only played {real_size} {real_size_champion_conjugation} so far this pre-season.'
       offset:
         complete:
           role_specified:
@@ -234,9 +231,9 @@ summoners:
             - 'The champion played by {name} with the {list_position} {list_order} {position} is {champions}.'
         incomplete:
           role_specified:
-            - '{name} has only played {real_size} {real_size_champion_conjugation} so far this season as {role}. The champion played by {name} with the {list_position} {list_order} {position} as {role} is {champions}.'
+            - '{name} has only played {real_size} {real_size_champion_conjugation} so far this pre-season as {role}. The champion played by {name} with the {list_position} {list_order} {position} as {role} is {champions}.'
           no_role_specified:
-            - '{name} has only played {real_size} {real_size_champion_conjugation} so far this season. The champion played by {name} with the {list_position} {list_order} {position} is {champions}.'
+            - '{name} has only played {real_size} {real_size_champion_conjugation} so far this pre-season. The champion played by {name} with the {list_position} {list_order} {position} is {champions}.'
     multiple:
       normal:
         complete:
@@ -246,9 +243,9 @@ summoners:
             - "The champions played by {name} with the summoner's {list_order} {position} are {champions}."
         incomplete:
           role_specified:
-            - "{name} has only played {real_size} {real_size_champion_conjugation} so far this season as {role}. The champions played by {name} with the summoner's {list_order} {position} as {role} are {champions}."
+            - "{name} has only played {real_size} {real_size_champion_conjugation} so far this pre-season as {role}. The champions played by {name} with the summoner's {list_order} {position} as {role} are {champions}."
           no_role_specified:
-            - "{name} has only played {real_size} {real_size_champion_conjugation} so far this season. The champions played by {name} with the summoner's {list_order} {position} are {champions}."
+            - "{name} has only played {real_size} {real_size_champion_conjugation} so far this pre-season. The champions played by {name} with the summoner's {list_order} {position} are {champions}."
       offset:
         complete:
           role_specified:
@@ -257,21 +254,21 @@ summoners:
             - 'The {list_position} through {filtered_position_offset} champions played by {name} with the {list_order} {position} are {champions}.'
         incomplete:
           role_specified:
-            - '{name} has only played {real_size} {real_size_champion_conjugation} so far this season as {role}. The {list_position} through {filtered_position_offset} champions played by {name} with the {list_order} {position} as {role} are {champions}.'
+            - '{name} has only played {real_size} {real_size_champion_conjugation} so far this pre-season as {role}. The {list_position} through {filtered_position_offset} champions played by {name} with the {list_order} {position} as {role} are {champions}.'
           no_role_specified:
-            - '{name} has only played {real_size} {real_size_champion_conjugation} so far this season. The {list_position} through {filtered_position_offset} champions played by {name} with the {list_order} {position} are {champions}.'
+            - '{name} has only played {real_size} {real_size_champion_conjugation} so far this pre-season. The {list_position} through {filtered_position_offset} champions played by {name} with the {list_order} {position} are {champions}.'
 errors:
   summoner:
     champion:
       does_not_play:
         role_specified:
-          - '{name} has not played any games this season as {champion} {role}.'
+          - '{name} has not played any games this pre-season as {champion} {role}.'
         no_role_specified:
-          - '{name} has not played any games this season as {champion}.'
+          - '{name} has not played any games this pre-season as {champion}.'
       multiple_roles:
-        - '{name} has played {champion} {total_performances} across {roles}. Which role do you want to know about?'
+        - '{name} has played {champion} {total_performances} this pre-season across {roles}. Which role do you want to know about?'
     not_active:
-      - "{name} is not an active player in ranked this season."
+      - "{name} is not an active player in ranked this pre-season."
   matchups:
     duo_role_no_matchup:
       - 'I do not have any information on matchups for {name1} {role1} and {name2} {role2} playing together in {elo} division.'

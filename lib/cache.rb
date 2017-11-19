@@ -9,6 +9,12 @@ class Cache
       Rails.cache.read(:patch)
     end
 
+    # @id the id of the summoner to lookup
+    # Returns the queue information for that summoner
+    def get_summoner_rank(id)
+      Rails.cache.read(summoner: id)
+    end
+
     # Returns the current match index that has been cached up to
     def get_match_index
       Rails.cache.read(:match_index)
@@ -66,6 +72,14 @@ class Cache
     # Returns success or failure status
     def set_patch(patch_number)
       Rails.cache.write(:patch, patch_number)
+    end
+
+    # @id the id of the summoner to lookup
+    # @queue_data the queue data for the summoner in ranked
+    # Returns the queue information for that summoner
+    def set_summoner_rank(id, queue_data)
+      # Use 15 minutes as the expiration time since that is the earliest FF time
+      Rails.cache.write({ summoner: id }, queue_data, expires_in: 15.minutes)
     end
 
     # @match_index the match index that has been cached up to

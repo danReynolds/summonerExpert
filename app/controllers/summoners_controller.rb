@@ -34,7 +34,6 @@ class SummonersController < ApplicationController
     summoner_performances = @summoner.summoner_performances.where(filter)
     total_performances = summoner_performances.count
     args[:total_performances] = "#{total_performances.to_i.en.numwords} #{'time'.pluralize(total_performances)}"
-
     return does_not_play_response(args, role) if summoner_performances.length.zero?
 
     if role.blank?
