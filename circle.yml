@@ -9,8 +9,8 @@ jobs:
       - checkout
 
       - run:
-        name: Install native libraries
-        command: sudo apt-get install libssl-dev
+          name: Install native libraries
+          command: sudo apt-get install libssl-dev
 
       - run:
           name: Install dependencies
