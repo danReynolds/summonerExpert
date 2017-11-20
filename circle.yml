@@ -9,7 +9,11 @@ jobs:
       - checkout
 
       - run:
-          name: Install Dependencies
+        name: Install native libraries
+        command: sudo apt-get install libssl-dev
+
+      - run:
+          name: Install dependencies
           command: gem install bundler && bundle
 
       - run:
@@ -21,7 +25,7 @@ jobs:
           command: docker-compose -f docker-compose.test.yml run app rspec
 
       - deploy:
-          name: Deploy to Production
+          name: Deploy to production
           command: |
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
               ./deploy.sh

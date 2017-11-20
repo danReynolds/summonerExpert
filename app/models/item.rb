@@ -16,7 +16,13 @@ class Item < Collection
   end
 
   def complete?
-    @data['into'].nil?
+    ids_to_names = Cache.get_collection(:items)
+    into = @data['into']
+    # Hack to determine if an item is complete. Items that build into Ornn items
+    # can still be considered complete. Only Ornn upgrades cost > 2500 and
+    # only build from one item so use that to determine
+    into.nil? || (into.length == 1 &&
+      Item.new(name: ids_to_names[into.first.to_i]).costs['total'] > 2500)
   end
 
   def build

@@ -15,6 +15,124 @@ describe SummonersController, type: :controller do
     end
   end
 
+  describe 'POST champion_build' do
+    let(:action) { :champion_build }
+
+    let(:summoner_params) do
+      {
+        name: 'Hero man',
+        champion: 'Shyvana',
+        region: 'NA1',
+        role: 'DUO_CARRY',
+        list_order: 'highest',
+        list_size: 2,
+        metric: ''
+      }
+    end
+
+    before :each do
+      @complete_build = [3089, 3087, 3085, 3083, 2303, 3512]
+      @complete_build2 = [3089, 3089, 3085, 3083, 2303, 3512]
+      @incomplete_build = [3089, 3086, 3085, 3083, 2303, 3512]
+      @partial_build = [3083, 2303, 3512]
+      match_data = [
+        { match: { win: true }, build: @complete_build2, summoner_performance: { champion_id: 102, role: 'DUO_CARRY' } },
+        { match: { win: true }, build: @complete_build2, summoner_performance: { champion_id: 102, role: 'DUO_CARRY' } },
+        { match: { win: true }, build: @complete_build, summoner_performance: { champion_id: 102, role: 'DUO_CARRY' } },
+        { match: { win: true }, build: @complete_build, summoner_performance: { champion_id: 102, role: 'DUO_CARRY' } },
+        { match: { win: true }, build: @complete_build.reverse, summoner_performance: { champion_id: 102, role: 'DUO_CARRY' } },
+        { match: { win: false }, build: @incomplete_build, summoner_performance: { champion_id: 102, role: 'DUO_CARRY' } },
+        { match: { win: false }, build: @incomplete_build, summoner_performance: { champion_id: 102, role: 'DUO_CARRY' } },
+        { match: { win: true }, build: @partial_build, summoner_performance: { champion_id: 102, role: 'DUO_CARRY' } },
+        { match: { win: true }, build: @partial_build, summoner_performance: { champion_id: 102, role: 'DUO_CARRY' } },
+        { match: { win: true }, build: @partial_build, summoner_performance: { champion_id: 102, role: 'DUO_CARRY' } },
+        { match: { win: true }, build: @partial_build, summoner_performance: { champion_id: 102, role: 'DUO_CARRY' } },
+      ]
+      @matches = create_list(:match, match_data.length)
+      summoner = create(:summoner, name: 'Hero man')
+
+      @matches.each_with_index do |match, i|
+        summoner_performance = match.summoner_performances.first
+        opposing_team = summoner_performance.team == match.team1 ? match.team2 : match.team1
+        winning_team = match_data[i][:match][:win] ? summoner_performance.team : opposing_team
+        match.update!(winning_team: winning_team)
+        summoner_performance.update!(match_data[i][:summoner_performance].merge({ summoner_id: summoner.id }))
+        match_data[i][:build].each_with_index do |item_id, index|
+          summoner_performance.update_attribute("item#{index}_id", item_id)
+        end
+      end
+    end
+
+    context 'without a metric specified' do
+      it 'should use winrate as the default metric' do
+        post action, params: params
+        expect(speech).to eq "Hero man has played Shyvana Adc eleven times this pre-season and the summoner's highest winrate build is Rabadon's Deathcap, Statikk Shiv, Runaan's Hurricane, Warmog's Armor, Eye of the Equinox, and Zz'Rot Portal."
+      end
+    end
+
+    context 'with a winrate metric specified' do
+      before :each do
+        summoner_params[:metric] = :winrate
+      end
+
+      it 'should use winrate as the build metric' do
+        post action, params: params
+        expect(speech).to eq "Hero man has played Shyvana Adc eleven times this pre-season and the summoner's highest winrate build is Rabadon's Deathcap, Statikk Shiv, Runaan's Hurricane, Warmog's Armor, Eye of the Equinox, and Zz'Rot Portal."
+      end
+    end
+
+    context 'with a KDA metric specified' do
+      before :each do
+        summoner_params[:metric] = :KDA
+        Match.first.summoner_performances.first.update!(kills: 100000000)
+      end
+
+      it 'should use KDA as the build metric' do
+        post action, params: params
+        expect(speech).to eq "Hero man has played Shyvana Adc eleven times this pre-season and the summoner's highest KDA build is two Rabadon's Deathcaps, Runaan's Hurricane, Warmog's Armor, Eye of the Equinox, and Zz'Rot Portal."
+      end
+    end
+
+    context 'with a count metric specified' do
+      before :each do
+        summoner_params[:metric] = :count
+      end
+
+      it 'should use the frequency of the build as the metric' do
+        post action, params: params
+        expect(speech).to eq "Hero man has played Shyvana Adc eleven times this pre-season and the summoner's highest count build is Rabadon's Deathcap, Statikk Shiv, Runaan's Hurricane, Warmog's Armor, Eye of the Equinox, and Zz'Rot Portal."
+      end
+    end
+
+    context 'with only partial builds' do
+      before :each do
+        @matches.each do |match|
+          match.summoner_performances.first.update_attribute(:item0_id, nil)
+        end
+      end
+
+      it 'should indicate the summoner has never completed a build' do
+        post action, params: params
+        expect(speech).to eq 'Hero man does not have any complete builds playing Shyvana Adc this pre-season.'
+      end
+    end
+
+    context 'with multiple orders of the same build' do
+      before :each do
+        build = @complete_build.reverse
+        summoner_performance = Match.all[2].summoner_performances.first
+        build.each_with_index do |item_id, index|
+          summoner_performance.update_attribute("item#{index}_id", item_id)
+        end
+      end
+
+      it 'should use the order that appears most frequently' do
+        post action, params: params
+        expect(speech).to eq "Hero man has played Shyvana Adc eleven times this pre-season and the summoner's highest winrate build is Zz'Rot Portal, Eye of the Equinox, Warmog's Armor, Runaan's Hurricane, Statikk Shiv, and Rabadon's Deathcap."
+      end
+    end
+  end
+
   describe 'POST performance_summary' do
     let(:action) { :performance_summary }
     let(:external_response) do

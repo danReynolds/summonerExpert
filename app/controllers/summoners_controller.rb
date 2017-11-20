@@ -27,7 +27,7 @@ class SummonersController < ApplicationController
     metric, role = summoner_params.slice(
       :metric, :role
     ).values.map(&:to_sym)
-    metric = RiotApi::POSITION_METRICS[:winrate] unless metric.present?
+    metric = :winrate unless metric.present?
     filter = { champion_id: champion.id }
     args = { name: @summoner.name, champion: champion.name }
     filter[:role] = role if role.present?
@@ -52,7 +52,7 @@ class SummonersController < ApplicationController
 
     if performances_by_build.empty?
       namespace = dig_set(:errors, :summoner, :build, :no_complete_builds)
-      return render json: { speech: ApiResponse.get_response(namespace, args)}
+      return render json: { speech: ApiResponse.get_response(namespace, args) }
     end
 
     build_filter = Filterable.new({
@@ -61,12 +61,12 @@ class SummonersController < ApplicationController
       reverse: true,
       list_size: 1
     }.merge(summoner_params.slice(:list_order)))
-    build = build_filter.filter.first
+    _, performances = build_filter.filter.first
     filter_types = build_filter.filter_types
-    most_common_ordering = build.last.sort_by { |build| build.items }.first
-    build_names = most_common_ordering.items.map(&:name).en.conjunction(article: false)
+    most_common_ordering = performances.group_by { |performance| performance.items.map(&:name) }
+      .sort_by { |performance_group| performance_group.last.length * -1 }.first.first
     args.merge!(ApiResponse.filter_args(build_filter))
-    args.merge!({ build: build_names, metric: metric })
+    args.merge!({ build: most_common_ordering.en.conjunction(article: false), metric: metric })
 
     namespace = dig_set(:summoners, :champion_build, *filter_types.values)
     render json: { speech: ApiResponse.get_response(namespace, args) }
