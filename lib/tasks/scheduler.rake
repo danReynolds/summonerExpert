@@ -149,11 +149,12 @@ namespace :riot do
       .select('summoners.account_id', 'summoners.region')
 
     end_match_index = recent_players.inject(Cache.get_end_match_index) do |end_index, summoner|
-      recent_matches = RiotApi::RiotApi.get_recent_matches(
+      matches_data = RiotApi::RiotApi.get_recent_matches(
         region: summoner.region, id: summoner.account_id
       )
-      if recent_matches
-        local_max_index = recent_matches['matches'].max_by { |game| game['gameId'] }['gameId']
+      if matches_data
+        recent_matches = matches_data['matches']
+        local_max_index = recent_matches.sort_by { |game| game['gameId'] }['gameId'][recent_matches.length / 2]
         end_index = local_max_index if end_index.nil? || local_max_index > end_index
       end
       end_index
