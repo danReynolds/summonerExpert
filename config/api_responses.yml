@@ -278,7 +278,7 @@ errors:
     duo_role_no_matchup:
       - 'I do not have any information on matchups for {name1} {role1} and {name2} {role2} playing together in {elo} division.'
     solo_role_no_matchup:
-      - 'I cannot find any matchup information on {name1} and {name2} playing {role1} in {elo} division.'
+      - 'I cannot find any matchup information on {name1} and {name2} playing {matchup_role} in {elo} division.'
     multiple_shared_roles:
       - '{name1} and {name2} have matchups for multiple roles in {elo} division. Please specify roles for one or both champions.'
     no_shared_roles:
