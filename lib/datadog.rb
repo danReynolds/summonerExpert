@@ -1,5 +1,5 @@
 class DataDog
-  @client = Dogapi::Client.new(ENV['DATA_DOG_KEY'])
+  @client = Dogapi::Client.new(ENV['DATA_DOG_KEY']) if ENV['DATA_DOG_KEY']
 
   RETRY_LIMIT = 5
   HOST = 'ServerManager'
