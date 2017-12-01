@@ -193,7 +193,7 @@ class SummonersController < ApplicationController
   end
 
   def multiple_roles_response(args, collection)
-    args[:roles] = collection.map do |role|
+    args[:roles] = collection.sort.map do |role|
       ChampionGGApi::ROLES[role.to_sym].humanize
     end.en.conjunction(article: false)
     render json: {
