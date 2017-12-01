@@ -196,7 +196,7 @@ class SummonersController < ApplicationController
     args[:roles] = collection.map do |role|
       ChampionGGApi::ROLES[role.to_sym].humanize
     end.en.conjunction(article: false)
-    return render json: {
+    render json: {
       speech: ApiResponse.get_response(
         dig_set(:errors, :summoner, :champion, :multiple_roles),
         args

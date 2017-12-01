@@ -154,7 +154,7 @@ namespace :riot do
       )
       if matches_data
         recent_matches = matches_data['matches']
-        local_max_index = recent_matches.sort_by { |game| game['gameId'] }['gameId'][recent_matches.length / 2]
+        local_max_index = recent_matches.sort_by { |game| game['gameId'] }[recent_matches.length / 2]['gameId']
         end_index = local_max_index if end_index.nil? || local_max_index > end_index
       end
       end_index
