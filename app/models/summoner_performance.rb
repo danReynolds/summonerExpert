@@ -17,6 +17,23 @@ class SummonerPerformance < ActiveRecord::Base
     :sight_wards_bought, :wards_placed, :wards_killed, :neutral_minions_killed,
     :neutral_minions_killed_team_jungle, :neutral_minions_killed_enemy_jungle
 
+  class << self
+    def winrate(performances)
+      (performances.select(&:victorious?).count / performances.count.to_f * 100).round(2)
+    end
+
+    def aggregate_performance(performances, metrics)
+      performances.inject({}) do |acc, performance|
+        acc.tap do
+          metrics.each do |metric|
+            acc[metric] ||= []
+            acc[metric] << performance.send(metric)
+          end
+        end
+      end
+    end
+  end
+
   def kda
     (kills + assists) / deaths.to_f
   end

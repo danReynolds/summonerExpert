@@ -15,22 +15,6 @@ class Summoner < ActiveRecord::Base
     RankedQueue.new(queue_data[queue_name])
   end
 
-  def aggregate_performance(filter, metrics)
-    summoner_performances.where(filter).inject({}) do |acc, performance|
-      acc.tap do
-        metrics.each do |metric|
-          acc[metric] ||= []
-          acc[metric] << performance.send(metric)
-        end
-      end
-    end
-  end
-
-  def winrate(filter)
-    performances = summoner_performances.where(filter)
-    (performances.select(&:victorious?).count / performances.count.to_f * 100).round(2)
-  end
-
   def error_message
     errors.messages.values.map(&:first).en.conjunction(article: false)
   end
