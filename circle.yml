@@ -22,7 +22,7 @@ jobs:
 
       - run:
           name: Load environment variables
-          command: ./deploymanager "rake secrets:decrypt"
+          command: touch .env && ./deploymanager "rake secrets:decrypt"
 
       - run:
           name: Run Tests
