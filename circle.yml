@@ -25,6 +25,11 @@ jobs:
           command: touch .env && ./deploymanager "rake secrets:decrypt"
 
       - run:
+          name: Setup database
+          command: |
+            docker-compose -f docker-compose.test.yml run app rake db:setup
+            docker-compose -f docker-compose.test.yml run app rake db:migrate
+      - run:
           name: Run Tests
           command: docker-compose -f docker-compose.test.yml run app rspec
 
