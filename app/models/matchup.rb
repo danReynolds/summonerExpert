@@ -52,9 +52,9 @@ class Matchup < MatchupRole
         name1: @name1,
         name2: @name2,
         elo: @elo.humanize,
-        role1: @role1.humanize,
-        role2: @role2.humanize,
-        matchup_role: @matchup_role.humanize
+        role1: @role1.try(:humanize),
+        role2: @role2.try(:humanize),
+        matchup_role: @matchup_role.try(:humanize)
       }
 
       if @role1.present? && @role2.present?
