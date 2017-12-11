@@ -12,6 +12,8 @@ include ActionView::Helpers::SanitizeHelper
 # made by the client and testing
 MATCH_BATCH_SIZE = 100000
 
+END_MATCH_INDEX_THRESHOLD = 500000
+
 namespace :champion_gg do
   task all: [:cache_champion_performance, :cache_site_information]
 
@@ -119,7 +121,6 @@ namespace :champion_gg do
   end
 end
 
-
 namespace :riot do
   task daily: [:cache_champions, :cache_items]
   task hourly: [:store_matches]
@@ -168,6 +169,15 @@ namespace :riot do
 
     Cache.set_match_index(new_start_match_index)
     Cache.set_end_match_index(end_match_index)
+
+    # If the new end match index is a lot larger than expected it is probably an error
+    if end_match_index > new_start_match_index + END_MATCH_INDEX_THRESHOLD
+      DataDog.event(
+        DataDog::EVENTS[:RIOT_MATCHES_ERROR],
+        end_index: end_match_index,
+        new_start_index: new_start_match_index
+      )
+    end
 
     DataDog.event(
       DataDog::EVENTS[:RIOT_MATCHES],
