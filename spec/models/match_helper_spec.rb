@@ -239,6 +239,35 @@ RSpec.describe MatchHelper, type: :model do
       end
     end
 
+    context 'with multiple pairs of roles assigned' do
+      before :each do
+        @top_performance.update!(role: 'TOP', champion_id: Champion.new(name: 'Poppy').id)
+        @jungle_performance.update!(
+          role: 'DUO_SUPPORT', champion_id: Champion.new(name: 'Hecarim').id,
+          spell1_id: Spell.new(name: 'Smite').id, spell2_id: Spell.new(name: 'Ghost').id
+        )
+        @mid_performance.update!(
+          role: 'DUO_SUPPORT', champion_id: Champion.new(name: 'Morgana').id,
+          spell1_id: Spell.new(name: 'Exhaust').id, spell2_id: Spell.new(name: 'Flash').id
+        )
+        @adc_performance.update!(
+          role: 'DUO_CARRY', champion_id: Champion.new(name: 'Lucian').id,
+          spell1_id: Spell.new(name: 'Teleport').id, spell2_id: Spell.new(name: 'Flash').id,
+          assists: 1
+        )
+        @support_performance.update!(
+          role: 'DUO_CARRY', champion_id: Champion.new(name: 'Xayah').id,
+          spell1_id: Spell.new(name: 'Teleport').id, spell2_id: Spell.new(name: 'Flash').id,
+          assists: 1000
+        )
+      end
+
+      it 'should determine roles based on the champions' do
+        MatchHelper.fix_team_roles(@team)
+        check_roles
+      end
+    end
+
     context 'with all champions defined by their roles and spells' do
       before :each do
         @top_performance.update!(role: 'MIDDLE', champion_id: Champion.new(name: 'Renekton').id)

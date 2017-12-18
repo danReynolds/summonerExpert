@@ -1,11 +1,4 @@
 class MatchHelper
-  ROLES = ChampionGGApi::ROLES.keys.map(&:to_s)
-  SPELL_INDICATORS = {
-    JUNGLE: Spell.new(name: 'Smite').id,
-    DUO_CARRY: Spell.new(name: 'Heal').id,
-    DUO_SUPPORT: Spell.new(name: 'Exhaust').id
-  }
-
   def self.store_match(match_data)
     team1_params, team2_params = match_data['teams']
     bans = team1_params['bans'] + team2_params['bans']
@@ -135,7 +128,7 @@ class MatchHelper
     return if undetermined_performances.length == undetermined_performances.map(&:role).uniq.length
 
     undetermined_roles = []
-    performances_by_role = ROLES.inject({}) do |acc, role|
+    performances_by_role = ChampionGGApi::ROLES.keys.map(&:to_s).inject(Hash.new([])) do |acc, role|
       performances = undetermined_performances.select { |performance| performance.role == role }
       if performances.length == 1
         undetermined_performances -= [performances.first]
@@ -155,6 +148,7 @@ class MatchHelper
 
       if determined_performance
         undetermined_performances -= [determined_performance]
+        performances_by_role[determined_performance.role] -= [determined_performance]
         undetermined_roles -= [role]
         determined_performance.update!(role: role)
       end
@@ -167,6 +161,12 @@ class MatchHelper
   end
 
   def self.determine_performance_for_role(undetermined_role, possible_performances)
+    spell_indicators = {
+      JUNGLE: Spell.new(name: 'Smite').id,
+      DUO_CARRY: Spell.new(name: 'Heal').id,
+      DUO_SUPPORT: Spell.new(name: 'Exhaust').id
+    }
+
     return possible_performances.first if possible_performances.length == 1
 
     # First determine if the champion played normally plays the undetermined role
@@ -180,7 +180,7 @@ class MatchHelper
 
     # Next determine if only one performance has the role's associated summoner spell
     performances = possible_performances.select do |performance|
-      associated_spell_id = SPELL_INDICATORS[undetermined_role]
+      associated_spell_id = spell_indicators[undetermined_role.to_sym]
       associated_spell_id.nil? || (performance.spell1_id == associated_spell_id ||
         performance.spell2_id == associated_spell_id)
     end
