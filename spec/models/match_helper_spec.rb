@@ -31,8 +31,43 @@ RSpec.describe MatchHelper, type: :model do
     expect(Summoner.count).to eq 10
   end
 
+  context 'with not all lanes assigned' do
+    it 'should try fixing roles' do
+      @adc_performance.update!(role: 'BOTTOM', champion_id: Champion.new(name: 'Tristana').id)
+      expect(MatchHelper.team_roles_missing?(@team.reload.summoner_performances)).to eq true
+    end
+  end
+
+  context 'with not all lanes assigned' do
+    it 'should not try fixing roles' do
+      expect(MatchHelper.team_roles_missing?(@team.reload.summoner_performances)).to eq false
+    end
+  end
+
   context 'with one lane unassigned' do
     describe 'with an unassigned bot lane' do
+      context 'with the ADC unassigned' do
+        before :each do
+          @adc_performance.update!(role: 'BOTTOM', champion_id: Champion.new(name: 'Tristana').id)
+        end
+
+        it 'should assign the missing role to the ADC' do
+          MatchHelper.fix_team_roles(@performances)
+          check_roles
+        end
+      end
+
+      context 'with the support unassigned' do
+        before :each do
+          @support_performance.update!(role: 'BOTTOM', champion_id: Champion.new(name: 'Tristana').id)
+        end
+
+        it 'should assign the missing role to support' do
+          MatchHelper.fix_team_roles(@performances)
+          check_roles
+        end
+      end
+
       context 'with champions that normally play those roles' do
         before :each do
           @adc_performance.update!(role: 'BOTTOM', champion_id: Champion.new(name: 'Tristana').id)
@@ -40,7 +75,7 @@ RSpec.describe MatchHelper, type: :model do
         end
 
         it 'should assign the roles to the likely champions' do
-          MatchHelper.fix_team_roles(@team)
+          MatchHelper.fix_team_roles(@performances)
           check_roles
         end
       end
@@ -52,7 +87,7 @@ RSpec.describe MatchHelper, type: :model do
         end
 
         it 'should assign the roles to the likely champions' do
-          MatchHelper.fix_team_roles(@team)
+          MatchHelper.fix_team_roles(@performances)
           check_roles
         end
       end
@@ -64,7 +99,7 @@ RSpec.describe MatchHelper, type: :model do
         end
 
         it 'should assign the roles to the likely champions' do
-          MatchHelper.fix_team_roles(@team)
+          MatchHelper.fix_team_roles(@performances)
           check_roles
         end
       end
@@ -82,7 +117,7 @@ RSpec.describe MatchHelper, type: :model do
           end
 
           it 'should assign the roles based on spells' do
-            MatchHelper.fix_team_roles(@team)
+            MatchHelper.fix_team_roles(@performances)
             check_roles
           end
         end
@@ -94,7 +129,7 @@ RSpec.describe MatchHelper, type: :model do
           end
 
           it 'should assign the roles based on spells' do
-            MatchHelper.fix_team_roles(@team)
+            MatchHelper.fix_team_roles(@performances)
             check_roles
           end
         end
@@ -107,7 +142,7 @@ RSpec.describe MatchHelper, type: :model do
             end
 
             it 'should assign the roles based on assists' do
-              MatchHelper.fix_team_roles(@team)
+              MatchHelper.fix_team_roles(@performances)
               check_roles
             end
           end
@@ -119,7 +154,7 @@ RSpec.describe MatchHelper, type: :model do
             end
 
             it 'should assign the roles to the remaining undetermined performances' do
-              MatchHelper.fix_team_roles(@team)
+              MatchHelper.fix_team_roles(@performances)
               expect(@performances.reload.map(&:role).uniq.length).to eq 5
             end
           end
@@ -135,7 +170,7 @@ RSpec.describe MatchHelper, type: :model do
         end
 
         it 'should assign the role to the likely champion' do
-          MatchHelper.fix_team_roles(@team)
+          MatchHelper.fix_team_roles(@performances)
           check_roles
         end
       end
@@ -147,7 +182,7 @@ RSpec.describe MatchHelper, type: :model do
         end
 
         it 'should assign the roles to the remaining undetermined performances' do
-          MatchHelper.fix_team_roles(@team)
+          MatchHelper.fix_team_roles(@performances)
           expect(@performances.reload.map(&:role).uniq.length).to eq 5
         end
       end
@@ -161,7 +196,7 @@ RSpec.describe MatchHelper, type: :model do
         end
 
         it 'should assign the role to the likely champion' do
-          MatchHelper.fix_team_roles(@team)
+          MatchHelper.fix_team_roles(@performances)
           check_roles
         end
       end
@@ -173,7 +208,7 @@ RSpec.describe MatchHelper, type: :model do
         end
 
         it 'should assign the roles to the remaining undetermined performances' do
-          MatchHelper.fix_team_roles(@team)
+          MatchHelper.fix_team_roles(@performances)
           expect(@performances.reload.map(&:role).uniq.length).to eq 5
         end
       end
@@ -187,7 +222,7 @@ RSpec.describe MatchHelper, type: :model do
         end
 
         it 'should assign the role to the likely champion' do
-          MatchHelper.fix_team_roles(@team)
+          MatchHelper.fix_team_roles(@performances)
           check_roles
         end
       end
@@ -204,7 +239,7 @@ RSpec.describe MatchHelper, type: :model do
           end
 
           it 'should assign the role based on summoner spells' do
-            MatchHelper.fix_team_roles(@team)
+            MatchHelper.fix_team_roles(@performances)
             check_roles
           end
         end
@@ -215,7 +250,7 @@ RSpec.describe MatchHelper, type: :model do
           end
 
           it 'should assign the roles to the remaining undetermined performances' do
-            MatchHelper.fix_team_roles(@team)
+            MatchHelper.fix_team_roles(@performances)
             expect(@performances.reload.map(&:role).uniq.length).to eq 5
           end
         end
@@ -234,7 +269,7 @@ RSpec.describe MatchHelper, type: :model do
       end
 
       it 'should determine roles based on the champions' do
-        MatchHelper.fix_team_roles(@team)
+        MatchHelper.fix_team_roles(@performances)
         check_roles
       end
     end
@@ -263,7 +298,7 @@ RSpec.describe MatchHelper, type: :model do
       end
 
       it 'should determine roles based on the champions' do
-        MatchHelper.fix_team_roles(@team)
+        MatchHelper.fix_team_roles(@performances)
         check_roles
       end
     end
@@ -281,7 +316,7 @@ RSpec.describe MatchHelper, type: :model do
       end
 
       it 'should determine roles based on the champions and spells' do
-        MatchHelper.fix_team_roles(@team)
+        MatchHelper.fix_team_roles(@performances)
         check_roles
       end
     end
@@ -296,7 +331,7 @@ RSpec.describe MatchHelper, type: :model do
       end
 
       it 'should assign the roles to the remaining undetermined performances' do
-        MatchHelper.fix_team_roles(@team)
+        MatchHelper.fix_team_roles(@performances)
         expect(@performances.reload.map(&:role).uniq.length).to eq 5
       end
     end
