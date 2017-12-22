@@ -630,8 +630,8 @@ describe SummonersController, type: :controller do
     end
   end
 
-  describe 'POST champion_counter' do
-    let(:action) { :champion_counter }
+  describe 'POST champion_counters' do
+    let(:action) { :champion_counters }
     let(:summoner_params) do
       {
         name: 'Hero man',

@@ -37,8 +37,9 @@ Rails.application.routes.draw do
     post :champion_performance_summary
     post :champion_performance_position
     post :champion_performance_ranking
-    post :champion_counter
+    post :champion_counters
     post :champion_build
     post :champion_bans
+    post :champion_spells
   end
 end

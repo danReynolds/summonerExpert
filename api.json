@@ -1,7 +1,7 @@
 {
 	"_type": "export",
 	"__export_format": 3,
-	"__export_date": "2017-12-22T20:23:00.139Z",
+	"__export_date": "2017-12-22T21:13:43.009Z",
 	"__export_source": "insomnia.desktop.app:v5.5.2",
 	"resources": [
 		{
@@ -674,15 +674,15 @@
 		{
 			"_id": "req_47c0a709848b47af9b16105733045820",
 			"parentId": "wrk_6d555102de1a469aa75025d23e488d2b",
-			"modified": 1513671728599,
+			"modified": 1513977118847,
 			"created": 1510528634618,
 			"url": "{{ url }}",
-			"name": "summoners/champion_matchup_ranking",
+			"name": "summoners/champion_counters",
 			"description": "",
 			"method": "POST",
 			"body": {
 				"mimeType": "application/json",
-				"text": "{\n  \"id\": \"7207d5d5-71ad-4177-a525-c70b52d3ea82\",\n  \"timestamp\": \"2017-11-12T23:16:31.926Z\",\n  \"lang\": \"en\",\n  \"result\": {\n    \"source\": \"agent\",\n    \"resolvedQuery\": \"best counter to Mordequess's Garen\",\n    \"action\": \"summoners/champion_matchup_ranking\",\n    \"actionIncomplete\": false,\n    \"parameters\": {\n      \"champion\": \"Tristana\",\n      \"list_order\": \"highest\",\n      \"list_position\": \"1\",\n      \"list_size\": \"1\",\n      \"matchup_role\": \"\",\n      \"name\": \"Elekktric\",\n      \"position_details\": \"\",\n      \"role\": \"\",\n      \"metric\": \"\",\n\t\t\t\"region\": \"NA1\",\n\t\t\t\"recency\": \"\"\n    },\n    \"contexts\": [\n      {\n        \"name\": \"summoner_champion_matchup_ranking\",\n        \"parameters\": {\n          \"name.original\": \"Mordequess\",\n          \"summoner_metric.original\": \"\",\n          \"role\": \"\",\n          \"list_position.original\": \"\",\n          \"position_details\": \"\",\n          \"list_size\": \"1\",\n          \"position_details.original\": \"\",\n          \"list_order.original\": \"best\",\n          \"summoner_metric\": \"\",\n          \"list_position\": \"1\",\n          \"matchup_role.original\": \"\",\n          \"name\": \"mordequess\",\n          \"list_order\": \"highest\",\n          \"role.original\": \"\",\n          \"list_size.original\": \"\",\n          \"champion.original\": \"Garen\",\n          \"matchup_role\": \"\",\n          \"champion\": \"Garen\"\n        },\n        \"lifespan\": 1\n      }\n    ],\n    \"metadata\": {\n      \"intentId\": \"e1678442-9c8e-4cac-a776-e87f2ca0ad78\",\n      \"webhookUsed\": \"true\",\n      \"webhookForSlotFillingUsed\": \"false\",\n      \"intentName\": \"summoner/champion_matchup_ranking\"\n    },\n    \"fulfillment\": {\n      \"speech\": \"\",\n      \"messages\": [\n        {\n          \"type\": 0,\n          \"speech\": \"\"\n        }\n      ]\n    },\n    \"score\": 1\n  },\n  \"status\": {\n    \"code\": 206,\n    \"errorType\": \"partial_content\",\n    \"errorDetails\": \"Webhook call failed. Error: 404 Not Found\"\n  },\n  \"sessionId\": \"dde95941-4b56-4c19-928f-b94cd966644b\"\n}"
+				"text": "{\n  \"id\": \"7207d5d5-71ad-4177-a525-c70b52d3ea82\",\n  \"timestamp\": \"2017-11-12T23:16:31.926Z\",\n  \"lang\": \"en\",\n  \"result\": {\n    \"source\": \"agent\",\n    \"resolvedQuery\": \"best counter to Mordequess's Garen\",\n    \"action\": \"summoners/champion_counters\",\n    \"actionIncomplete\": false,\n    \"parameters\": {\n      \"champion\": \"Tristana\",\n      \"list_order\": \"highest\",\n      \"list_position\": \"1\",\n      \"list_size\": \"1\",\n      \"matchup_role\": \"\",\n      \"name\": \"Elekktric\",\n      \"position_details\": \"\",\n      \"role\": \"\",\n      \"metric\": \"\",\n\t\t\t\"region\": \"NA1\",\n\t\t\t\"recency\": \"\"\n    },\n    \"contexts\": [\n      {\n        \"name\": \"summoner_champion_matchup_ranking\",\n        \"parameters\": {\n          \"name.original\": \"Mordequess\",\n          \"summoner_metric.original\": \"\",\n          \"role\": \"\",\n          \"list_position.original\": \"\",\n          \"position_details\": \"\",\n          \"list_size\": \"1\",\n          \"position_details.original\": \"\",\n          \"list_order.original\": \"best\",\n          \"summoner_metric\": \"\",\n          \"list_position\": \"1\",\n          \"matchup_role.original\": \"\",\n          \"name\": \"mordequess\",\n          \"list_order\": \"highest\",\n          \"role.original\": \"\",\n          \"list_size.original\": \"\",\n          \"champion.original\": \"Garen\",\n          \"matchup_role\": \"\",\n          \"champion\": \"Garen\"\n        },\n        \"lifespan\": 1\n      }\n    ],\n    \"metadata\": {\n      \"intentId\": \"e1678442-9c8e-4cac-a776-e87f2ca0ad78\",\n      \"webhookUsed\": \"true\",\n      \"webhookForSlotFillingUsed\": \"false\",\n      \"intentName\": \"summoner/champion_matchup_ranking\"\n    },\n    \"fulfillment\": {\n      \"speech\": \"\",\n      \"messages\": [\n        {\n          \"type\": 0,\n          \"speech\": \"\"\n        }\n      ]\n    },\n    \"score\": 1\n  },\n  \"status\": {\n    \"code\": 206,\n    \"errorType\": \"partial_content\",\n    \"errorDetails\": \"Webhook call failed. Error: 404 Not Found\"\n  },\n  \"sessionId\": \"dde95941-4b56-4c19-928f-b94cd966644b\"\n}"
 			},
 			"parameters": [],
 			"headers": [

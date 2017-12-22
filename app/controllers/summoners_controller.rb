@@ -6,7 +6,7 @@ class SummonersController < ApplicationController
   before_action only: [:champion_performance_summary, :champion_performance_position] do
     process_performance_request(with_role: true, with_champion: true)
   end
-  before_action only: [:champion_build, :champion_counter, :champion_bans] do
+  before_action only: [:champion_build, :champion_counters, :champion_bans] do
     process_performance_request(with_role: true, with_champion: true, with_sorting: true)
   end
 
