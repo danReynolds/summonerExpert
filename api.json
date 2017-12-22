@@ -1,7 +1,7 @@
 {
 	"_type": "export",
 	"__export_format": 3,
-	"__export_date": "2017-12-22T21:13:43.009Z",
+	"__export_date": "2017-12-22T22:04:14.709Z",
 	"__export_source": "insomnia.desktop.app:v5.5.2",
 	"resources": [
 		{
@@ -752,6 +752,35 @@
 			],
 			"authentication": {},
 			"metaSortKey": -1513972537768,
+			"settingStoreCookies": true,
+			"settingSendCookies": true,
+			"settingDisableRenderRequestBody": false,
+			"settingEncodeUrl": true,
+			"_type": "request"
+		},
+		{
+			"_id": "req_f53d537f333a4a518f703648caaed82f",
+			"parentId": "wrk_6d555102de1a469aa75025d23e488d2b",
+			"modified": 1513979726114,
+			"created": 1513979282540,
+			"url": "{{ url }}",
+			"name": "summoners/champion_spells",
+			"description": "",
+			"method": "POST",
+			"body": {
+				"mimeType": "application/json",
+				"text": "{\n  \"id\": \"30572c60-1a95-4c44-a405-d1bfa4381ca1\",\n  \"timestamp\": \"2017-12-22T21:55:06.786Z\",\n  \"lang\": \"en\",\n  \"result\": {\n    \"source\": \"agent\",\n    \"resolvedQuery\": \"summoners spells that get wingilote the most kills playing Jax top\",\n    \"action\": \"summoners/champion_spells\",\n    \"actionIncomplete\": false,\n    \"parameters\": {\n      \"list_order\": \"highest\",\n      \"name\": \"Elekktric\",\n      \"champion\": \"Tristana\",\n      \"role\": \"\",\n      \"list_position\": \"1\",\n      \"region\": \"NA1\",\n      \"recency\": \"\",\n      \"position_details\": \"kills\",\n      \"metric\": \"\"\n    },\n    \"contexts\": [\n      {\n        \"name\": \"summoners_champion_spells\",\n        \"parameters\": {\n          \"name.original\": \"wingilote\",\n          \"role\": \"TOP\",\n          \"summoner_recency.original\": \"\",\n          \"recency.original\": \"\",\n          \"list_position.original\": \"\",\n          \"summoner_recency\": \"\",\n          \"position_details\": \"kills\",\n          \"region.original\": \"\",\n          \"position_details.original\": \"kills\",\n          \"recency\": \"\",\n          \"list_order.original\": \"most\",\n          \"list_position\": \"1\",\n          \"metric\": \"\",\n          \"metric.original\": \"\",\n          \"summoner.original\": \"mordequess\",\n          \"name\": \"wingilote\",\n          \"list_order\": \"highest\",\n          \"role.original\": \"top\",\n          \"summoner\": \"mordequess\",\n          \"region\": \"NA1\",\n          \"champion.original\": \"Jax\",\n          \"champion\": \"Jax\"\n        },\n        \"lifespan\": 1\n      }\n    ],\n    \"metadata\": {\n      \"intentId\": \"d7bf1fcf-1623-494c-9b19-3162f6e024bf\",\n      \"webhookUsed\": \"true\",\n      \"webhookForSlotFillingUsed\": \"false\",\n      \"webhookResponseTime\": 303,\n      \"intentName\": \"summoners/champion_spells\"\n    },\n    \"fulfillment\": {\n      \"speech\": \"\",\n      \"messages\": [\n        {\n          \"type\": 0,\n          \"speech\": \"\"\n        }\n      ]\n    },\n    \"score\": 1\n  },\n  \"status\": {\n    \"code\": 206,\n    \"errorType\": \"partial_content\",\n    \"errorDetails\": \"Webhook call failed. Error: 404 Not Found\",\n    \"webhookTimedOut\": false\n  },\n  \"sessionId\": \"031238e1-cb4b-4dc3-b249-62e9ef21d81d\"\n}"
+			},
+			"parameters": [],
+			"headers": [
+				{
+					"name": "Content-Type",
+					"value": "application/json",
+					"id": "pair_ce95af81da7744c380a10e6eff428fcc"
+				}
+			],
+			"authentication": {},
+			"metaSortKey": -1513979282540,
 			"settingStoreCookies": true,
 			"settingSendCookies": true,
 			"settingDisableRenderRequestBody": false,
