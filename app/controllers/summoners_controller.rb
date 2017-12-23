@@ -227,8 +227,8 @@ class SummonersController < ApplicationController
     args = @processed_request[:args]
     performances = @processed_request[:performances]
 
-    aggregate_performance = SummonerPerformance::aggregate_performance(performances, positions)
-    args[:winrate] = winrate(performances)
+    aggregate_performance = SummonerPerformance::aggregate_performance_positions(performances, positions)
+    args[:winrate] = SummonerPerformance::winrate(performances)
     positions.each do |position|
       args[position] = (aggregate_performance[position].sum / performances.count).round(2)
     end

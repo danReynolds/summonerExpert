@@ -190,7 +190,7 @@ summoners:
   champion_performance_position:
     recency:
       position:
-        - "{name} has played {champion} {role} {total_performances} recently and averages {position_value} {position_name}."
+        - "{name} has played {champion} {role} {total_performances} recently and averages {position_value} {sort_type}."
       count:
         - "{name} has played {champion} {role} {total_performances} recently."
       KDA:

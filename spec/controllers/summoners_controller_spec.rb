@@ -49,6 +49,17 @@ describe SummonersController, type: :controller do
     end
 
     context 'without recency' do
+      context 'with no games against that champion' do
+        before :each do
+          summoner_params[:champion2] = 'Bard'
+        end
+
+        it 'should indicate that the summoner has not played against that champion' do
+          post action, params: params
+          expect(speech).to eq 'I could not find any matches for Hero man playing Shyvana Jungle against Bard so far this season.'
+        end
+      end
+
       context 'with no position or metric' do
         it 'should indicte the win rate the summoner gets playing that matchup' do
           post action, params: params
@@ -106,6 +117,17 @@ describe SummonersController, type: :controller do
     context 'with recency' do
       before :each do
         summoner_params[:recency] = :recently
+      end
+
+      context 'with no games against that champion' do
+        before :each do
+          summoner_params[:champion2] = 'Bard'
+        end
+
+        it 'should indicate that the summoner has not played against that champion recently' do
+          post action, params: params
+          expect(speech).to eq 'I could not find any matches for Hero man playing Shyvana Jungle against Bard recently.'
+        end
       end
 
       context 'with no position or metric' do
