@@ -47,16 +47,6 @@ class SummonerPerformance < ActiveRecord::Base
         end
       end
     end
-
-    def aggregate_summary(performances, positions)
-      Hash.new.tap do |summary|
-        aggregate_performance = SummonerPerformance::aggregate_performance(performances, positions)
-        summary[:winrate] = winrate(performances)
-        positions.each do |position|
-          summary[position] = (aggregate_performance[position].sum / performances.count).round(2)
-        end
-      end
-    end
   end
 
   def kda

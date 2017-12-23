@@ -42,9 +42,7 @@ class SummonersController < ApplicationController
     end
 
     if performances.empty?
-      namespace = dig_set(
-        :errors, *@namespace, *dig_list(@processed_request[:namespace]), :no_matchups
-      )
+      namespace = dig_set(:errors, *@namespace, *dig_list(@processed_request[:namespace]), :no_matchups)
       return render json: { speech: ApiResponse.get_response(namespace, args) }
     end
 
@@ -158,9 +156,7 @@ class SummonersController < ApplicationController
       .compact.group_by(&:champion_id).to_a
 
     if counters.empty?
-      namespace = dig_set(
-        :errors, *@namespace, *dig_list(@processed_request[:namespace]), :no_opponents
-      )
+      namespace = dig_set(:errors, *@namespace, *dig_list(@processed_request[:namespace]), :no_opponents)
       return render json: { speech: ApiResponse.get_response(namespace, args) }
     end
 
@@ -230,7 +226,12 @@ class SummonersController < ApplicationController
     positions = [:kills, :deaths, :assists]
     args = @processed_request[:args]
     performances = @processed_request[:performances]
-    args.merge!(SummonerPerformance::aggregate_summary(performances, [:kills, :deaths, :assists]))
+
+    aggregate_performance = SummonerPerformance::aggregate_performance(performances, positions)
+    args[:winrate] = winrate(performances)
+    positions.each do |position|
+      args[position] = (aggregate_performance[position].sum / performances.count).round(2)
+    end
 
     render json: {
       speech: ApiResponse.get_response(dig_set(*@namespace, @processed_request[:namespace]), args)
@@ -281,7 +282,10 @@ class SummonersController < ApplicationController
   end
 
   def determine_position_data(sort_type, performances)
+    total_performances = performances.length
+
     Hash.new({ args: {} }). tap do |position|
+      position[:args][:total_performances] = "#{total_performances.to_i.en.numwords} #{'time'.pluralize(total_performances)}"
       if RiotApi::POSITION_METRICS.include?(sort_type)
         position[:args].merge!(SummonerPerformance::aggregate_performance_metric(performances, sort_type))
         position[:namespace] = sort_type
