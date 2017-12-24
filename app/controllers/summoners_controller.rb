@@ -39,8 +39,11 @@ class SummonersController < ApplicationController
     teammate_performances = @processed_request[:performances].inject({}) do |acc, performance|
       acc.tap do |_|
         performance.team.summoner_performances.each do |team_performance|
-          acc[team_performance.summoner_id] ||= []
-          acc[team_performance.summoner_id] << performance
+          summoner_id = team_performance.summoner_id
+          if summoner_id != @summoner.id
+            acc[summoner_id] ||= []
+            acc[summoner_id] << performance
+          end
         end
       end
     end

@@ -172,8 +172,6 @@ summoners:
         normal:
           complete:
             - 'The teammate who has helped {name} get the {list_order} {sort_type} so far this season playing {champion} {role} is {summoners}.'
-          incomplete:
-            - '{name} has only played with {real_size} {real_size_summoner_conjugation} so far this season as {champion} {role}. The summoner who has helped {name} get the {list_order} {sort_type} is {summoners}.'
         offset:
           complete:
             - 'The {list_position} teammate who has helped {name} get the {list_order} {sort_type} so far this season playing {champion} {role} is {summoners}.'
@@ -187,9 +185,9 @@ summoners:
             - '{name} has only played with {real_size} {real_size_summoner_conjugation} so far this season as {champion} {role}. The summoners who have helped {name} get the {list_order} {sort_type} are {summoners}.'
         offset:
           complete:
-            - 'The {list_position} through {filtered_position_offset} teammates who have helped {name} get the {list_order} {sort_type} so far this season playing {champion} {role} is {summoners}.'
+            - 'The {list_position} through {filtered_position_offset} teammates who have helped {name} get the {list_order} {sort_type} so far this season playing {champion} {role} are {summoners}.'
           incomplete:
-            - '{name} has only played with {real_size} {real_size_summoner_conjugation} so far this season as {champion} {role}. The {list_position} through {filtered_position_offset} summoners who have helped {name} get the {list_order} {sort_type} is {summoners}.'
+            - '{name} has only played with {real_size} {real_size_summoner_conjugation} so far this season as {champion} {role}. The {list_position} through {filtered_position_offset} summoners who have helped {name} get the {list_order} {sort_type} are {summoners}.'
     recency:
       empty:
         normal:
@@ -218,9 +216,9 @@ summoners:
             - '{name} has only played with {real_size} {real_size_summoner_conjugation} recently as {champion} {role}. The summoners who have helped {name} get the {list_order} {sort_type} are {summoners}.'
         offset:
           complete:
-            - 'The {list_position} through {filtered_position_offset} teammates who have helped {name} get the {list_order} {sort_type} recently playing {champion} {role} is {summoners}.'
+            - 'The {list_position} through {filtered_position_offset} teammates who have helped {name} get the {list_order} {sort_type} recently playing {champion} {role} are {summoners}.'
           incomplete:
-            - '{name} has only played with {real_size} {real_size_summoner_conjugation} recently as {champion} {role}. The {list_position} through {filtered_position_offset} summoners who have helped {name} get the {list_order} {sort_type} is {summoners}.'
+            - '{name} has only played with {real_size} {real_size_summoner_conjugation} recently as {champion} {role}. The {list_position} through {filtered_position_offset} summoners who have helped {name} get the {list_order} {sort_type} are {summoners}.'
 
   champion_matchups:
     no_recency:
