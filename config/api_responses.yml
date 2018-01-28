@@ -161,86 +161,39 @@ summoners:
   performance_summary:
     - "{name} is ranked {elo} {rank} with {lp} LP in {queue}. The summoner currently has a {winrate}% win rate."
   teammates:
-    no_recency:
-      empty:
-        normal:
-          - '{name} has not played any games as {champion} {role} this season in ranked solo queue.'
-        offset:
-          complete:
-            - 'No summoners were requested.'
-          incomplete:
-            - '{name} has only played with {real_size} {real_size_summoner_conjugation} playing as {champion} {role} so far this season.'
-      single:
-        normal:
-          complete:
-            - 'The teammate who has helped {name} get the {list_order} {sort_type} so far this season playing {champion} {role} is {summoners}.'
-        offset:
-          complete:
-            - 'The {list_position} teammate who has helped {name} get the {list_order} {sort_type} so far this season playing {champion} {role} is {summoners}.'
-          incomplete:
-            - '{name} has only played with {real_size} {real_size_summoner_conjugation} so far this season as {champion} {role}. The {list_position} summoner who has helped {name} get the {list_order} {sort_type} is {summoners}.'
-      multiple:
-        normal:
-          complete:
-            - 'The teammates who have helped {name} get the {list_order} {sort_type} so far this season playing {champion} {role} are {summoners}.'
-          incomplete:
-            - '{name} has only played with {real_size} {real_size_summoner_conjugation} so far this season as {champion} {role}. The summoners who have helped {name} get the {list_order} {sort_type} are {summoners}.'
-        offset:
-          complete:
-            - 'The {list_position} through {filtered_position_offset} teammates who have helped {name} get the {list_order} {sort_type} so far this season playing {champion} {role} are {summoners}.'
-          incomplete:
-            - '{name} has only played with {real_size} {real_size_summoner_conjugation} so far this season as {champion} {role}. The {list_position} through {filtered_position_offset} summoners who have helped {name} get the {list_order} {sort_type} are {summoners}.'
-    recency:
-      empty:
-        normal:
-          - '{name} has not played any games as {champion} {role} recently in ranked solo queue.'
-        offset:
-          complete:
-            - 'No summoners were requested.'
-          incomplete:
-            - '{name} has only played with {real_size} {real_size_summoner_conjugation} playing as {champion} {role} recently.'
-      single:
-        normal:
-          complete:
-            - 'The teammate who has helped {name} get the {list_order} {sort_type} recently playing {champion} {role} is {summoners}.'
-          incomplete:
-            - '{name} has only played with {real_size} {real_size_summoner_conjugation} recently as {champion} {role}. The summoner who has helped {name} get the {list_order} {sort_type} is {summoners}.'
-        offset:
-          complete:
-            - 'The {list_position} teammate who has helped {name} get the {list_order} {sort_type} recently playing {champion} {role} is {summoners}.'
-          incomplete:
-            - '{name} has only played with {real_size} {real_size_summoner_conjugation} recently as {champion} {role}. The {list_position} summoner who has helped {name} get the {list_order} {sort_type} is {summoners}.'
-      multiple:
-        normal:
-          complete:
-            - 'The teammates who have helped {name} get the {list_order} {sort_type} recently playing {champion} {role} are {summoners}.'
-          incomplete:
-            - '{name} has only played with {real_size} {real_size_summoner_conjugation} recently as {champion} {role}. The summoners who have helped {name} get the {list_order} {sort_type} are {summoners}.'
-        offset:
-          complete:
-            - 'The {list_position} through {filtered_position_offset} teammates who have helped {name} get the {list_order} {sort_type} recently playing {champion} {role} are {summoners}.'
-          incomplete:
-            - '{name} has only played with {real_size} {real_size_summoner_conjugation} recently as {champion} {role}. The {list_position} through {filtered_position_offset} summoners who have helped {name} get the {list_order} {sort_type} are {summoners}.'
-
+    empty:
+      normal:
+        - '{summoner} has not played any games as {champion} {role} {recency} in ranked solo queue.'
+      offset:
+        complete:
+          - 'No summoners were requested.'
+        incomplete:
+          - '{summoner} has played with {real_size} {real_size_summoner_conjugation} as {champion} {role} {recency}.'
+    single:
+      complete:
+        - 'The teammate who has helped {summoner} get the {list_position} {list_order} {sort_type} {recency} playing {champion} {role} is {summoners}.'
+      incomplete:
+        - '{summoner} has only played with {real_size} {real_size_summoner_conjugation} {recency} as {champion} {role}. The summoner who has helped {summoner} get the {list_position} {list_order} {sort_type} {recency} is {summoners}.'
+    multiple:
+      normal:
+        complete:
+          - 'The teammates who have helped {summoner} get the {list_order} {sort_type} {recency} playing {champion} {role} are {summoners}.'
+        incomplete:
+          - '{summoner} has only played with {real_size} {real_size_summoner_conjugation} {recency} as {champion} {role}. The summoners who have helped {summoner} get the {list_order} {sort_type} are {summoners}.'
+      offset:
+        complete:
+          - 'The teammates who have helped {summoner} get the {list_position} through {filtered_position_offset} {list_order} {sort_type} {recency} playing {champion} {role} are {summoners}.'
+        incomplete:
+          - '{summoner} has only played with {real_size} {real_size_summoner_conjugation} {recency} as {champion} {role}. The summoners who have helped {summoner} get the {list_position} through {filtered_position_offset} {list_order} {sort_type} are {summoners}.'
   champion_matchups:
-    no_recency:
-      position:
-        - "{name} has played {champion} {role} {total_performances} against {champion2} this season and averages {position_value} {sort_type}."
-      count:
-        - "{name} has played {champion} {role} {total_performances} against {champion2} this season."
-      winrate:
-        - "{name} has played {champion} {role} {total_performances} against {champion2} this season with a {winrate}% {sort_type}."
-      KDA:
-        - "{name} has played {champion} {role} {total_performances} against {champion2} this season with an overall {kills}/{deaths}/{assists} {sort_type}."
-    recency:
-      position:
-        - "{name} has played {champion} {role} {total_performances} against {champion2} recently and averages {position_value} {sort_type}."
-      count:
-        - "{name} has played {champion} {role} {total_performances} against {champion2} recently."
-      winrate:
-        - "{name} has played {champion} {role} {total_performances} against {champion2} recently with a {winrate}% {sort_type}."
-      KDA:
-        - "{name} has played {champion} {role} {total_performances} against {champion2} recently with an overall {kills}/{deaths}/{assists} {sort_type}."
+    position:
+      - "{summoner} has played {champion} {role} {total_performances} against {champion2} {recency} and averages {position_value} {sort_type}."
+    count:
+      - "{summoner} has played {champion} {role} {total_performances} against {champion2} {recency}."
+    winrate:
+      - "{summoner} has played {champion} {role} {total_performances} against {champion2} {recency} with a {winrate}% {sort_type}."
+    KDA:
+      - "{summoner} has played {champion} {role} {total_performances} against {champion2} {recency} with an overall {kills}/{deaths}/{assists} {sort_type}."
   champion_build:
     no_recency:
       - "{name} has played {champion} {role} {total_performances} this season and the summoner's {list_order} {sort_type} build is {build}."
@@ -562,12 +515,8 @@ errors:
         - 'Well I do not believe {name} does actually build from anything.'
   summoners:
     champion_matchups:
-      no_recency:
-        no_matchups:
-          - 'I could not find any matches for {name} playing {champion} {role} against {champion2} so far this season. It would be interesting to see though.'
-      recency:
-        no_matchups:
-          - 'I could not find any matches for {name} playing {champion} {role} against {champion2} recently.'
+      no_matchups:
+        - 'I could not find any matches for {summoner} playing {champion} {role} against {champion2} {recency}. It would be interesting to see though.'
     champion_counters:
       no_recency:
         no_opponents:

@@ -25,5 +25,8 @@ shared_context 'determinate speech' do
     allow(ApiResponse).to receive(:random_response) do |responses|
       responses.first
     end
+    allow(Entities).to receive(:random_response) do |responses|
+      responses.first
+    end
   end
 end

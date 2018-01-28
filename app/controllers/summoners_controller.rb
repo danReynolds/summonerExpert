@@ -1,16 +1,22 @@
 class SummonersController < ApplicationController
   include RiotApi
   include Utils
+
   before_action :load_summoner, :load_namespace
   before_action only: [:champion_performance_ranking] { process_performance_request(with_sorting: true) }
   before_action only: [:champion_performance_summary] do
-    process_performance_request(with_role: true, with_champion: true)
+    process_performance_request(with_champion: true)
   end
   before_action only: [
-  :champion_build, :champion_counters, :champion_bans, :champion_spells,
-  :champion_matchups, :champion_performance_position, :teammates
+    :champion_matchups
   ] do
-    process_performance_request(with_role: true, with_champion: true, with_sorting: true)
+    process_performance_request(with_champion: true, with_sorting: true, role_required: true)
+  end
+  before_action only: [
+    :champion_build, :champion_counters, :champion_bans, :champion_spells,
+    :champion_performance_position, :teammates
+  ] do
+    process_performance_request(with_champion: true, with_sorting: true)
   end
 
   def performance_summary
@@ -68,10 +74,10 @@ class SummonersController < ApplicationController
     end
 
     args.merge!({
-      summoners: teammates.en.conjunction(article: false),
+      summoners: teammates,
       real_size_summoner_conjugation: 'summoner'.en.pluralize(teammate_filter.real_size)
     })
-    namespace = dig_set(*@namespace, *@processed_request[:namespace], *filter_types.values)
+    namespace = dig_set(*@namespace, *filter_types.values)
     render json: { speech: ApiResponse.get_response(namespace, args) }
   end
 
@@ -85,7 +91,7 @@ class SummonersController < ApplicationController
     end
 
     if performances.empty?
-      namespace = dig_set(:errors, *@namespace, *dig_list(@processed_request[:namespace]), :no_matchups)
+      namespace = dig_set(:errors, *@namespace, :no_matchups)
       return render json: { speech: ApiResponse.get_response(namespace, args) }
     end
 
@@ -94,7 +100,7 @@ class SummonersController < ApplicationController
 
     render json: {
       speech: ApiResponse.get_response(
-        dig_set(*@namespace, @processed_request[:namespace], position_data[:namespace]),
+        dig_set(*@namespace, position_data[:namespace]),
         args
       )
     }
@@ -326,7 +332,7 @@ class SummonersController < ApplicationController
 
   def determine_position_data(sort_type, performances)
     total_performances = performances.length
-    Hash.new({ args: {} }). tap do |position|
+    { args: {} }. tap do |position|
       position[:args][:total_performances] = "#{total_performances.to_i.en.numwords} #{'time'.pluralize(total_performances)}"
       if RiotApi::POSITION_METRICS.include?(sort_type)
         position[:args].merge!(SummonerPerformance::aggregate_performance_metric(performances, sort_type))
@@ -381,11 +387,22 @@ class SummonersController < ApplicationController
   def process_performance_request(options = {})
     role = summoner_params[:role].to_sym
     recency = summoner_params[:recency].to_sym
-
-    args = { name: @summoner.name }
-    namespace = {}
+    args = { summoner: @summoner.name }
     filter = {}
-    filter[:role] = role if role.present?
+
+    unless role.present?
+      roles = summoner_performances.map(&:role).uniq & ChampionGGApi::ROLES.keys.map(&:to_s)
+      if roles.length == 1
+        role = roles.first
+      elsif options[:role_required]
+        return multiple_roles_response(args, roles, recency)
+      end
+    end
+
+    if role.present?
+      args[:role] = ChampionGGApi::ROLES[role.to_sym].humanize
+      filter[:role] = role
+    end
 
     if options[:with_champion]
       champion = Champion.new(name: summoner_params[:champion])
@@ -410,10 +427,10 @@ class SummonersController < ApplicationController
     end
 
     summoner_performances = if recency.present?
-      namespace = dig_set(:recency)
+      args[:recency] = true
       @summoner.summoner_performances.where(filter).where('created_at > ?', 1.month.ago)
     else
-      namespace = dig_set(:no_recency)
+      args[:recency] = false
       @summoner.summoner_performances.where(filter)
     end
 
@@ -421,23 +438,10 @@ class SummonersController < ApplicationController
     return does_not_play_response(args, role, recency, champion) if total_performances.zero?
     args[:total_performances] = "#{total_performances.to_i.en.numwords} #{'time'.pluralize(total_performances)}"
 
-    if options[:with_role]
-      unless role.present?
-        roles = summoner_performances.map(&:role).uniq & ChampionGGApi::ROLES.keys.map(&:to_s)
-        if roles.length == 1
-          role = roles.first
-        else
-          return multiple_roles_response(args, roles, recency)
-        end
-      end
-    end
-    args[:role] = ChampionGGApi::ROLES[role.to_sym].humanize if role.present?
-
     @processed_request = {
       args: args,
       sort_type: sort_type,
       performances: summoner_performances,
-      namespace: namespace
     }
   end
 
