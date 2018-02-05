@@ -6,9 +6,12 @@ class ApiResponse
   class << self
     def replace_response(response, args)
       replaced_response = args.inject(response) do |replaced_response, (key, val)|
-        replaced_response.gsub(/{#{key}}/, Entities.send(key, val)) rescue binding.pry
+        prefix_match = replaced_response.match(/{:(.*):#{key}}/)
+        entity_val = Entities.send(key, val)
+        entity_val = "#{prefix_match.captures.first} #{entity_val}" if prefix_match
+        replaced_response.gsub(/{(?::.*:)?#{key}}/, entity_val) rescue binding.pry
       end
-      replaced_response.gsub(/{\w+}/, '').gsub(/\s\./, '.').split(' ').join(' ')
+      replaced_response.gsub(/{(?::|\w)+}/, '').gsub(/\s\./, '.').split(' ').join(' ')
     end
 
     def get_response(namespace, args = {}, responses = API_RESPONSES)

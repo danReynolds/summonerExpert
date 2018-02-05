@@ -52,6 +52,41 @@ describe SummonersController, type: :controller do
       end
     end
 
+    context 'with no champion specified' do
+      before :each do
+        summoner_params[:champion] = ''
+      end
+
+      it 'should specify the highest win rate teammates for the summoner across champions' do
+        post action, params: params
+        expect(speech).to eq 'The teammate who has helped Hero man get the highest win rate so far this season Jungle is Teammate man.'
+      end
+
+      context 'with no role specified' do
+        before :each do
+          summoner_params[:role] = ''
+        end
+
+        context 'with one role' do
+          it 'should specify the highest win rate teammates for the summoner independent of role or champion' do
+            post action, params: params
+            expect(speech).to eq 'The teammate who has helped Hero man get the highest win rate so far this season Jungle is Teammate man.'
+          end
+        end
+
+        context 'with multiple roles' do
+          before :each do
+            @matches.first.summoner_performances.first.update(role: 'DUO_SUPPORT')
+          end
+
+          it 'should not include the roles' do
+            post action, params: params
+            expect(speech).to eq 'The teammate who has helped Hero man get the highest win rate so far this season across Jungle and Support is Teammate man.'
+          end
+        end
+      end
+    end
+
     context 'with no summoners returned' do
       context 'with no position offset' do
         before :each do
@@ -60,7 +95,7 @@ describe SummonersController, type: :controller do
 
         it 'should indicate the summoner has not played any games' do
           post action, params: params
-          expect(speech).to eq 'Inactive player is not an active player in ranked this season.'
+          expect(speech).to eq 'Inactive player is not an active player in ranked so far this season.'
         end
       end
 
@@ -71,7 +106,7 @@ describe SummonersController, type: :controller do
 
         it 'should indicate that the summoner has not played enough games' do
           post action, params: params
-          expect(speech).to eq 'Hero man has played with seventeen summoners as Shyvana so far this season.'
+          expect(speech).to eq 'Hero man has played with seventeen summoners as Shyvana Jungle so far this season.'
         end
 
         context 'with a role' do
@@ -92,7 +127,7 @@ describe SummonersController, type: :controller do
 
           it 'should indicate that the summoner has not played enough games recently' do
             post action, params: params
-            expect(speech).to eq 'Hero man has played with seventeen summoners as Shyvana recently.'
+            expect(speech).to eq 'Hero man has played with seventeen summoners as Shyvana Jungle recently.'
           end
         end
       end
@@ -106,7 +141,7 @@ describe SummonersController, type: :controller do
       context 'with complete results' do
         it 'should return the single teammate' do
           post action, params: params
-          expect(speech).to eq 'The teammate who has helped Hero man get the highest win rate so far this season playing Shyvana is Teammate man.'
+          expect(speech).to eq 'The teammate who has helped Hero man get the highest win rate so far this season playing Shyvana Jungle is Teammate man.'
         end
 
         context 'with a position offset' do
@@ -116,11 +151,11 @@ describe SummonersController, type: :controller do
 
           it 'should return the offset single teammate' do
             post action, params: params
-            expect(speech).to eq 'The teammate who has helped Hero man get the second highest win rate so far this season playing Shyvana is Other man.'
+            expect(speech).to eq 'The teammate who has helped Hero man get the second highest win rate so far this season playing Shyvana Jungle is Other man.'
           end
         end
 
-        context 'with a role' do
+        context 'with a role specified' do
           before :each do
             summoner_params[:role] = 'JUNGLE'
           end
@@ -138,7 +173,7 @@ describe SummonersController, type: :controller do
 
           it 'should return the single teammate' do
             post action, params: params
-            expect(speech).to eq 'The teammate who has helped Hero man get the highest win rate recently playing Shyvana is Teammate man.'
+            expect(speech).to eq 'The teammate who has helped Hero man get the highest win rate recently playing Shyvana Jungle is Teammate man.'
           end
         end
       end
@@ -151,7 +186,7 @@ describe SummonersController, type: :controller do
 
         it 'should return the single teammate' do
           post action, params: params
-          expect(speech).to start_with 'Hero man has only played with seventeen summoners so far this season as Shyvana. The summoner who has helped Hero man get the seventeenth highest win rate so far this season is '
+          expect(speech).to start_with 'Hero man has only played with seventeen summoners so far this season as Shyvana Jungle. The summoner who has helped Hero man get the seventeenth highest win rate so far this season is '
         end
 
         context 'with a role' do
@@ -172,7 +207,7 @@ describe SummonersController, type: :controller do
 
           it 'should return the single teammate' do
             post action, params: params
-            expect(speech).to start_with 'Hero man has only played with seventeen summoners recently as Shyvana. The summoner who has helped Hero man get the seventeenth highest win rate recently is '
+            expect(speech).to start_with 'Hero man has only played with seventeen summoners recently as Shyvana Jungle. The summoner who has helped Hero man get the seventeenth highest win rate recently is '
           end
         end
       end
@@ -187,7 +222,7 @@ describe SummonersController, type: :controller do
         context 'with complete results' do
           it 'should determine the best teammates' do
             post action, params: params
-            expect(speech).to eq 'The teammates who have helped Hero man get the highest win rate so far this season playing Shyvana are Teammate man and Other man.'
+            expect(speech).to eq 'The teammates who have helped Hero man get the highest win rate so far this season playing Shyvana Jungle are Teammate man and Other man.'
           end
 
           context 'with a role' do
@@ -208,7 +243,7 @@ describe SummonersController, type: :controller do
 
             it 'should filter teammates by champion recency' do
               post action, params: params
-              expect(speech).to eq 'The teammates who have helped Hero man get the highest win rate recently playing Shyvana are Teammate man and Other man.'
+              expect(speech).to eq 'The teammates who have helped Hero man get the highest win rate recently playing Shyvana Jungle are Teammate man and Other man.'
             end
           end
         end
@@ -220,7 +255,7 @@ describe SummonersController, type: :controller do
 
           it 'should return the teammates, indicating that the list is incomplete' do
             post action, params: params
-            expect(speech).to start_with 'Hero man has only played with seventeen summoners so far this season as Shyvana. The summoners who have helped Hero man get the highest win rate are '
+            expect(speech).to start_with 'Hero man has only played with seventeen summoners so far this season as Shyvana Jungle. The summoners who have helped Hero man get the highest win rate are '
           end
 
           context 'with a role' do
@@ -241,7 +276,7 @@ describe SummonersController, type: :controller do
 
             it 'should filter teammates by champion recency' do
               post action, params: params
-              expect(speech).to start_with 'Hero man has only played with seventeen summoners recently as Shyvana. The summoners who have helped'
+              expect(speech).to start_with 'Hero man has only played with seventeen summoners recently as Shyvana Jungle. The summoners who have helped'
             end
           end
         end
@@ -255,7 +290,7 @@ describe SummonersController, type: :controller do
         context 'with complete results' do
           it 'should return the summoners at the offset' do
             post action, params: params
-            expect(speech).to start_with 'The teammates who have helped Hero man get the second through third highest win rate so far this season playing Shyvana are Other man'
+            expect(speech).to start_with 'The teammates who have helped Hero man get the second through third highest win rate so far this season playing Shyvana Jungle are Other man'
           end
 
           context 'with a role' do
@@ -276,7 +311,7 @@ describe SummonersController, type: :controller do
 
             it 'should filter teammates by champion recency' do
               post action, params: params
-              expect(speech).to start_with 'The teammates who have helped Hero man get the second through third highest win rate recently playing Shyvana are Other man'
+              expect(speech).to start_with 'The teammates who have helped Hero man get the second through third highest win rate recently playing Shyvana Jungle are Other man'
             end
           end
         end
@@ -288,7 +323,7 @@ describe SummonersController, type: :controller do
 
           it 'should return the summoners, indicating this is not the full list' do
             post action, params: params
-            expect(speech).to start_with 'Hero man has only played with seventeen summoners so far this season as Shyvana. The summoners who have helped Hero man get the second through seventeenth'
+            expect(speech).to start_with 'Hero man has only played with seventeen summoners so far this season as Shyvana Jungle. The summoners who have helped Hero man get the second through seventeenth'
           end
 
           context 'with a role' do
@@ -309,7 +344,7 @@ describe SummonersController, type: :controller do
 
             it 'should filter teammates by champion recency' do
               post action, params: params
-              expect(speech).to start_with 'Hero man has only played with seventeen summoners recently as Shyvana. The summoners who have helped'
+              expect(speech).to start_with 'Hero man has only played with seventeen summoners recently as Shyvana Jungle. The summoners who have helped'
             end
           end
         end
@@ -353,6 +388,17 @@ describe SummonersController, type: :controller do
         )
         opposing_team.summoner_performances.first
           .update!(match_data[i][:opponent].merge({ role: match_data[i][:summoner_performance][:role] }))
+      end
+    end
+
+    context 'with no own champion specified' do
+      before :each do
+        summoner_params[:champion] = ''
+      end
+
+      it 'should determine the matchup for the summoner against that champion in general' do
+        post action, params: params
+        expect(speech).to eq 'Hero man has played Jungle one time against Udyr so far this season with a 100.0% win rate.'
       end
     end
 
@@ -514,6 +560,17 @@ describe SummonersController, type: :controller do
       end
     end
 
+    context 'with no champion specified' do
+      before :each do
+        summoner_params[:champion] = ''
+      end
+
+      it 'should determine the spells for the summoner in general' do
+        post action, params: params
+        expect(speech).to eq 'The spell combination used by Hero man so far this season that gives the summoner playing Adc the highest win rate is Exhaust and Flash.'
+      end
+    end
+
     context 'without recency' do
       context 'with no spell combinations' do
         context 'with no position offset' do
@@ -523,7 +580,7 @@ describe SummonersController, type: :controller do
 
           it 'should indicate the summoner never plays that champion' do
             post action, params: params
-            expect(speech).to eq 'inactive player is not an active player in ranked this season.'
+            expect(speech).to eq 'inactive player is not an active player in ranked so far this season.'
           end
         end
 
@@ -534,7 +591,7 @@ describe SummonersController, type: :controller do
 
           it 'should indicate that no spell combinations were requested' do
             post action, params: params
-            expect(speech).to eq 'Hero man only has used two spell combinations playing as Shyvana Adc so far this season.'
+            expect(speech).to eq 'Hero man only has used two spell combinations playing as Shyvana Adc so far this season this season.'
           end
         end
       end
@@ -543,7 +600,7 @@ describe SummonersController, type: :controller do
         context 'with no position offset' do
           it 'should determine the single spell combination' do
             post action, params: params
-            expect(speech).to eq 'The spell combination used by Hero man that gives the summoner playing Shyvana Adc the highest win rate is Exhaust and Flash.'
+            expect(speech).to eq 'The spell combination used by Hero man so far this season that gives the summoner playing Shyvana Adc the highest win rate is Exhaust and Flash.'
           end
         end
 
@@ -554,7 +611,7 @@ describe SummonersController, type: :controller do
 
           it 'should determine the single spell combination at that offset' do
             post action, params: params
-            expect(speech).to eq 'The spell combination used by Hero man that gives the summoner playing Shyvana Adc the second highest win rate is Flash and Ghost.'
+            expect(speech).to eq 'The spell combination used by Hero man so far this season that gives the summoner playing as Shyvana Adc the second highest win rate is Flash and Ghost.'
           end
         end
       end
@@ -593,7 +650,7 @@ describe SummonersController, type: :controller do
         context 'with no position offset' do
           it 'should determine the single spell combination' do
             post action, params: params
-            expect(speech).to eq 'The spell combination used by Hero man that gives the summoner playing Shyvana Adc the highest win rate is Exhaust and Flash.'
+            expect(speech).to eq 'The spell combination used by Hero man recently that gives the summoner playing Shyvana Adc the highest win rate is Exhaust and Flash.'
           end
         end
 
@@ -604,7 +661,7 @@ describe SummonersController, type: :controller do
 
           it 'should determine the single spell combination at that offset' do
             post action, params: params
-            expect(speech).to eq 'The spell combination used by Hero man that gives the summoner playing Shyvana Adc the second highest win rate is Flash and Ghost.'
+            expect(speech).to eq 'The spell combination used by Hero man recently that gives the summoner playing as Shyvana Adc the second highest win rate is Flash and Ghost.'
           end
         end
       end
@@ -655,6 +712,41 @@ describe SummonersController, type: :controller do
       end
     end
 
+    context 'with no champion specified' do
+      before :each do
+        summoner_params[:champion] = ''
+      end
+
+      it 'should determine the best ban for the summoner in the given role for any champion' do
+        post action, params: params
+        expect(speech).to eq 'The ban by Hero man Adc that gives the summoner the highest win rate so far this season is Corki.'
+      end
+
+      context 'with no role specified' do
+        before :each do
+          summoner_params[:role] = ''
+        end
+
+        context 'with a single role played' do
+          it 'should determine the best ban for the summoner in their only played role' do
+            post action, params: params
+            expect(speech).to eq 'The ban by Hero man Adc that gives the summoner the highest win rate so far this season is Corki.'
+          end
+        end
+
+        context 'with multiple roles played' do
+          before :each do
+            @matches.first.summoner_performances.first.update(role: 'DUO_SUPPORT')
+          end
+
+          it 'should determine the best ban for the summoner regardless of role' do
+            post action, params: params
+            expect(speech).to eq 'The ban by Hero man across Adc and Support that gives the summoner the highest win rate so far this season is Corki.'
+          end
+        end
+      end
+    end
+
     context 'without recency' do
       context 'with no champions returned' do
         context 'with no position offset' do
@@ -664,7 +756,7 @@ describe SummonersController, type: :controller do
 
           it 'should indicate the summoner has not played any games as that champion this season' do
             post action, params: params
-            expect(speech).to eq 'inactive player is not an active player in ranked this season.'
+            expect(speech).to eq 'inactive player is not an active player in ranked so far this season.'
           end
         end
 
@@ -698,7 +790,7 @@ describe SummonersController, type: :controller do
           context 'with complete results' do
             it 'should specify the a ban' do
               post action, params: params
-              expect(speech).to eq 'The ban by Hero man playing Shyvana Adc that gives the summoner the highest win rate is Corki.'
+              expect(speech).to eq 'The ban by Hero man playing Shyvana Adc that gives the summoner the highest win rate so far this season is Corki.'
             end
           end
 
@@ -709,7 +801,7 @@ describe SummonersController, type: :controller do
 
             it 'should indicate that the summoner has not played that champion this season' do
               post action, params: params
-              expect(speech).to eq 'inactive player is not an active player in ranked this season.'
+              expect(speech).to eq 'inactive player is not an active player in ranked so far this season.'
             end
           end
         end
@@ -748,7 +840,7 @@ describe SummonersController, type: :controller do
           context 'with complete results' do
             it 'should specify the bans' do
               post action, params: params
-              expect(speech).to eq 'The bans by Hero man playing Shyvana Adc that give the summoner the highest win rate are Corki and Veigar.'
+              expect(speech).to eq 'The bans by Hero man playing Shyvana Adc that give the summoner the highest win rate so far this season are Corki and Veigar.'
             end
           end
 
@@ -759,7 +851,7 @@ describe SummonersController, type: :controller do
 
             it 'should return the bans indicating it is incomplete' do
               post action, params: params
-              expect(speech).to eq 'Hero man has only played against three different champions so far this season as Shyvana Adc. The bans by Hero man that give the summoner the highest win rate are Corki, Veigar, and Gangplank.'
+              expect(speech).to eq 'Hero man has only played against three different champions so far this season as Shyvana Adc. The bans that give the summoner the highest win rate are Corki, Veigar, and Gangplank.'
             end
           end
         end
@@ -772,7 +864,7 @@ describe SummonersController, type: :controller do
           context 'with complete results' do
             it 'should specify all the bans' do
               post action, params: params
-              expect(speech).to eq 'The second through third bans that give Hero man playing Shyvana Adc the highest win rate are Veigar and Gangplank.'
+              expect(speech).to eq 'The second through third bans that give Hero man playing Shyvana Adc the highest win rate so far this season are Veigar and Gangplank.'
             end
           end
 
@@ -783,7 +875,7 @@ describe SummonersController, type: :controller do
 
             it 'should return the bans indicating that it is incomplete' do
               post action, params: params
-              expect(speech).to eq 'Hero man has only played against three different champions so far this season as Shyvana Adc. The second through third bans that give Hero man the highest win rate are Veigar and Gangplank.'
+              expect(speech).to eq 'Hero man has only played against three different champions so far this season as Shyvana Adc. The second through third bans that give the highest win rate are Veigar and Gangplank.'
             end
           end
         end
@@ -837,7 +929,7 @@ describe SummonersController, type: :controller do
           context 'with complete results' do
             it 'should specify the a ban' do
               post action, params: params
-              expect(speech).to eq 'The ban by Hero man playing Shyvana Adc that gives the summoner the highest win rate is Corki.'
+              expect(speech).to eq 'The ban by Hero man playing Shyvana Adc that gives the summoner the highest win rate recently is Corki.'
             end
           end
 
@@ -887,7 +979,7 @@ describe SummonersController, type: :controller do
           context 'with complete results' do
             it 'should specify the bans' do
               post action, params: params
-              expect(speech).to eq 'The bans by Hero man playing Shyvana Adc that give the summoner the highest win rate are Corki and Veigar.'
+              expect(speech).to eq 'The bans by Hero man playing Shyvana Adc that give the summoner the highest win rate recently are Corki and Veigar.'
             end
           end
 
@@ -898,7 +990,7 @@ describe SummonersController, type: :controller do
 
             it 'should return the bans indicating it is incomplete' do
               post action, params: params
-              expect(speech).to eq 'Hero man has only played against three different champions recently as Shyvana Adc. The bans by Hero man that give the summoner the highest win rate are Corki, Veigar, and Gangplank.'
+              expect(speech).to eq 'Hero man has only played against three different champions recently as Shyvana Adc. The bans that give the summoner the highest win rate are Corki, Veigar, and Gangplank.'
             end
           end
         end
@@ -911,7 +1003,7 @@ describe SummonersController, type: :controller do
           context 'with complete results' do
             it 'should specify all the bans' do
               post action, params: params
-              expect(speech).to eq 'The second through third bans that give Hero man playing Shyvana Adc the highest win rate are Veigar and Gangplank.'
+              expect(speech).to eq 'The second through third bans that give Hero man playing Shyvana Adc the highest win rate recently are Veigar and Gangplank.'
             end
           end
 
@@ -922,7 +1014,7 @@ describe SummonersController, type: :controller do
 
             it 'should return the bans indicating that it is incomplete' do
               post action, params: params
-              expect(speech).to eq 'Hero man has only played against three different champions recently as Shyvana Adc. The second through third bans that give Hero man the highest win rate are Veigar and Gangplank.'
+              expect(speech).to eq 'Hero man has only played against three different champions recently as Shyvana Adc. The second through third bans that give the highest win rate are Veigar and Gangplank.'
             end
           end
         end
@@ -987,7 +1079,7 @@ describe SummonersController, type: :controller do
       context 'with a single role played' do
         it 'should determine builds for the single role' do
           post action, params: params
-          expect(speech).to eq "Hero man has played Shyvana Adc eleven times this season and the summoner's highest win rate build is Rabadon's Deathcap, Statikk Shiv, Runaan's Hurricane, Warmog's Armor, Eye of the Equinox, and Zz'Rot Portal."
+          expect(speech).to eq "Hero man has played Shyvana Adc eleven times so far this season and the summoner's highest win rate build is Rabadon's Deathcap, Statikk Shiv, Runaan's Hurricane, Warmog's Armor, Eye of the Equinox, and Zz'Rot Portal."
         end
       end
 
@@ -998,7 +1090,7 @@ describe SummonersController, type: :controller do
 
         it 'should indicate that the summoner has played the champion in multiple roles' do
           post action, params: params
-          expect(speech).to eq "Hero man has played Shyvana eleven times this season across Adc and Jungle. Which role do you want to know about?"
+          expect(speech).to eq "Hero man has played Shyvana across Adc and Jungle eleven times so far this season and the summoner's highest win rate build is Rabadon's Deathcap, Statikk Shiv, Runaan's Hurricane, Warmog's Armor, Eye of the Equinox, and Zz'Rot Portal."
         end
       end
     end
@@ -1017,23 +1109,23 @@ describe SummonersController, type: :controller do
       end
     end
 
-    context 'when the champion has not been played this season' do
+    context 'when the champion has not been played so far this season' do
       before :each do
         @matches.each do |match|
           match.summoner_performances.first.update_attribute(:champion_id, 101)
         end
       end
 
-      it 'should indicate that the summoner has not played the champion this season' do
+      it 'should indicate that the summoner has not played the champion so far this season' do
         post action, params: params
-        expect(speech).to eq "Hero man has not played any games this season as Shyvana Adc."
+        expect(speech).to eq "Hero man has not played any games so far this season as Shyvana Adc."
       end
     end
 
     context 'without recency specified' do
       it 'should determine builds from all games' do
         post action, params: params
-        expect(speech).to eq "Hero man has played Shyvana Adc eleven times this season and the summoner's highest win rate build is Rabadon's Deathcap, Statikk Shiv, Runaan's Hurricane, Warmog's Armor, Eye of the Equinox, and Zz'Rot Portal."
+        expect(speech).to eq "Hero man has played Shyvana Adc eleven times so far this season and the summoner's highest win rate build is Rabadon's Deathcap, Statikk Shiv, Runaan's Hurricane, Warmog's Armor, Eye of the Equinox, and Zz'Rot Portal."
       end
     end
 
@@ -1054,7 +1146,7 @@ describe SummonersController, type: :controller do
     context 'without a metric or position details specified' do
       it 'should use winrate as the default metric' do
         post action, params: params
-        expect(speech).to eq "Hero man has played Shyvana Adc eleven times this season and the summoner's highest win rate build is Rabadon's Deathcap, Statikk Shiv, Runaan's Hurricane, Warmog's Armor, Eye of the Equinox, and Zz'Rot Portal."
+        expect(speech).to eq "Hero man has played Shyvana Adc eleven times so far this season and the summoner's highest win rate build is Rabadon's Deathcap, Statikk Shiv, Runaan's Hurricane, Warmog's Armor, Eye of the Equinox, and Zz'Rot Portal."
       end
     end
 
@@ -1066,7 +1158,7 @@ describe SummonersController, type: :controller do
 
       it 'should use the position details to determine the build' do
         post action, params: params
-        expect(speech).to eq "Hero man has played Shyvana Adc eleven times this season and the summoner's highest penta kills build is two Rabadon's Deathcaps, Runaan's Hurricane, Warmog's Armor, Eye of the Equinox, and Zz'Rot Portal."
+        expect(speech).to eq "Hero man has played Shyvana Adc eleven times so far this season and the summoner's highest penta kills build is two Rabadon's Deathcaps, Runaan's Hurricane, Warmog's Armor, Eye of the Equinox, and Zz'Rot Portal."
       end
     end
 
@@ -1077,7 +1169,7 @@ describe SummonersController, type: :controller do
 
       it 'should return the worst build' do
         post action, params: params
-        expect(speech).to eq "Hero man has played Shyvana Adc eleven times this season and the summoner's lowest win rate build is two Rabadon's Deathcaps, Runaan's Hurricane, Warmog's Armor, Eye of the Equinox, and Zz'Rot Portal."
+        expect(speech).to eq "Hero man has played Shyvana Adc eleven times so far this season and the summoner's lowest win rate build is two Rabadon's Deathcaps, Runaan's Hurricane, Warmog's Armor, Eye of the Equinox, and Zz'Rot Portal."
       end
     end
 
@@ -1088,7 +1180,7 @@ describe SummonersController, type: :controller do
 
       it 'should use winrate as the build metric' do
         post action, params: params
-        expect(speech).to eq "Hero man has played Shyvana Adc eleven times this season and the summoner's highest win rate build is Rabadon's Deathcap, Statikk Shiv, Runaan's Hurricane, Warmog's Armor, Eye of the Equinox, and Zz'Rot Portal."
+        expect(speech).to eq "Hero man has played Shyvana Adc eleven times so far this season and the summoner's highest win rate build is Rabadon's Deathcap, Statikk Shiv, Runaan's Hurricane, Warmog's Armor, Eye of the Equinox, and Zz'Rot Portal."
       end
     end
 
@@ -1101,7 +1193,7 @@ describe SummonersController, type: :controller do
       context 'with all valid KDA performances' do
         it 'should use KDA as the build metric' do
           post action, params: params
-          expect(speech).to eq "Hero man has played Shyvana Adc eleven times this season and the summoner's highest KDA build is two Rabadon's Deathcaps, Runaan's Hurricane, Warmog's Armor, Eye of the Equinox, and Zz'Rot Portal."
+          expect(speech).to eq "Hero man has played Shyvana Adc eleven times so far this season and the summoner's highest KDA build is two Rabadon's Deathcaps, Runaan's Hurricane, Warmog's Armor, Eye of the Equinox, and Zz'Rot Portal."
         end
       end
 
@@ -1112,7 +1204,7 @@ describe SummonersController, type: :controller do
 
         it 'should filter out zero performances' do
           post action, params: params
-          expect(speech).to eq "Hero man has played Shyvana Adc eleven times this season and the summoner's highest KDA build is Rabadon's Deathcap, Statikk Shiv, Runaan's Hurricane, Warmog's Armor, Eye of the Equinox, and Zz'Rot Portal."
+          expect(speech).to eq "Hero man has played Shyvana Adc eleven times so far this season and the summoner's highest KDA build is Rabadon's Deathcap, Statikk Shiv, Runaan's Hurricane, Warmog's Armor, Eye of the Equinox, and Zz'Rot Portal."
         end
       end
 
@@ -1123,7 +1215,7 @@ describe SummonersController, type: :controller do
 
         it 'should filter out zero performances' do
           post action, params: params
-          expect(speech).to eq "Hero man has played Shyvana Adc eleven times this season and the summoner's highest KDA build is Rabadon's Deathcap, Statikk Shiv, Runaan's Hurricane, Warmog's Armor, Eye of the Equinox, and Zz'Rot Portal."
+          expect(speech).to eq "Hero man has played Shyvana Adc eleven times so far this season and the summoner's highest KDA build is Rabadon's Deathcap, Statikk Shiv, Runaan's Hurricane, Warmog's Armor, Eye of the Equinox, and Zz'Rot Portal."
         end
       end
     end
@@ -1135,7 +1227,7 @@ describe SummonersController, type: :controller do
 
       it 'should use the frequency of the build as the metric' do
         post action, params: params
-        expect(speech).to eq "Hero man has played Shyvana Adc eleven times this season and the summoner's highest games played build is Rabadon's Deathcap, Statikk Shiv, Runaan's Hurricane, Warmog's Armor, Eye of the Equinox, and Zz'Rot Portal."
+        expect(speech).to eq "Hero man has played Shyvana Adc eleven times so far this season and the summoner's highest games played build is Rabadon's Deathcap, Statikk Shiv, Runaan's Hurricane, Warmog's Armor, Eye of the Equinox, and Zz'Rot Portal."
       end
     end
 
@@ -1163,7 +1255,7 @@ describe SummonersController, type: :controller do
 
       it 'should use the build that is done most frequently' do
         post action, params: params
-        expect(speech).to eq "Hero man has played Shyvana Adc eleven times this season and the summoner's highest win rate build is two Rabadon's Deathcaps, Runaan's Hurricane, Warmog's Armor, Eye of the Equinox, and Zz'Rot Portal."
+        expect(speech).to eq "Hero man has played Shyvana Adc eleven times so far this season and the summoner's highest win rate build is two Rabadon's Deathcaps, Runaan's Hurricane, Warmog's Armor, Eye of the Equinox, and Zz'Rot Portal."
       end
     end
 
@@ -1178,7 +1270,7 @@ describe SummonersController, type: :controller do
 
       it 'should use the order that appears most frequently' do
         post action, params: params
-        expect(speech).to eq "Hero man has played Shyvana Adc eleven times this season and the summoner's highest win rate build is Zz'Rot Portal, Eye of the Equinox, Warmog's Armor, Runaan's Hurricane, Statikk Shiv, and Rabadon's Deathcap."
+        expect(speech).to eq "Hero man has played Shyvana Adc eleven times so far this season and the summoner's highest win rate build is Zz'Rot Portal, Eye of the Equinox, Warmog's Armor, Runaan's Hurricane, Statikk Shiv, and Rabadon's Deathcap."
       end
     end
   end
@@ -1227,7 +1319,7 @@ describe SummonersController, type: :controller do
 
       it 'should indicate that the summoner does not play in that queue' do
         post action, params: params
-        expect(speech).to eq 'inactive player is not an active player in ranked this season.'
+        expect(speech).to eq 'inactive player is not an active player in ranked so far this season.'
       end
     end
 
@@ -1287,6 +1379,28 @@ describe SummonersController, type: :controller do
       end
     end
 
+    context 'with no role specified' do
+      before :each do
+        summoner_params[:role] = ''
+      end
+
+      it 'should ask for a role' do
+        post action, params: params
+        expect(speech).to eq 'Hero man has played Shyvana so far this season this season across Adc, Jungle, and Middle. Which role do you want to know about?'
+      end
+    end
+
+    context 'with no champion specified' do
+      before :each do
+        summoner_params[:champion] = ''
+      end
+
+      it 'should determine counters for the summoner in the provided role' do
+        post action, params: params
+        expect(speech).to eq 'The champions with the highest win rate against Hero man so far this season playing Middle are Swain and Elise.'
+      end
+    end
+
     context 'with no opponents' do
       before :each do
         @matches.each do |match|
@@ -1310,7 +1424,7 @@ describe SummonersController, type: :controller do
       context 'without recency' do
         it 'should indicate that there have been no opponents this season' do
           post action, params: params
-          expect(speech).to eq 'I could not find any games for Hero man playing Shyvana Middle this season. A shame, I enjoy watching Shyvana play.'
+          expect(speech).to eq 'I could not find any matches for Hero man playing Shyvana Middle so far this season this season. A shame, I enjoy watching Shyvana play.'
         end
       end
     end
@@ -1323,7 +1437,7 @@ describe SummonersController, type: :controller do
 
       it 'should sort the matchup rankings by metric' do
         post action, params: params
-        expect(speech).to eq 'The champions with the highest games played against Hero man playing Shyvana Middle are Elise and Swain.'
+        expect(speech).to eq 'The champions with the highest games played against Hero man so far this season playing Shyvana Middle are Elise and Swain.'
       end
     end
 
@@ -1335,7 +1449,7 @@ describe SummonersController, type: :controller do
 
         it 'should sort the matchup rankings by metric' do
           post action, params: params
-          expect(speech).to eq 'The champions with the highest games played against Hero man playing Shyvana Middle are Elise and Swain.'
+          expect(speech).to eq 'The champions with the highest games played against Hero man so far this season playing Shyvana Middle are Elise and Swain.'
         end
       end
 
@@ -1347,7 +1461,7 @@ describe SummonersController, type: :controller do
 
         it 'should sort the matchup rankings by KDA' do
           post action, params: params
-          expect(speech).to eq 'The champions with the highest KDA against Hero man playing Shyvana Middle are Swain and Elise.'
+          expect(speech).to eq 'The champions with the highest KDA against Hero man so far this season playing Shyvana Middle are Swain and Elise.'
         end
       end
 
@@ -1358,7 +1472,7 @@ describe SummonersController, type: :controller do
 
         it 'should sort the matchup rankings by winrate' do
           post action, params: params
-          expect(speech).to eq 'The champions with the highest win rate against Hero man playing Shyvana Middle are Swain and Elise.'
+          expect(speech).to eq 'The champions with the highest win rate against Hero man so far this season playing Shyvana Middle are Swain and Elise.'
         end
       end
     end
@@ -1375,7 +1489,7 @@ describe SummonersController, type: :controller do
 
       it 'should sort the matchup rankings by the specified position' do
         post action, params: params
-        expect(speech).to eq 'The champions with the highest penta kills against Hero man playing Shyvana Middle are Swain and Elise.'
+        expect(speech).to eq 'The champions with the highest penta kills against Hero man so far this season playing Shyvana Middle are Swain and Elise.'
       end
     end
 
@@ -1387,7 +1501,7 @@ describe SummonersController, type: :controller do
 
         it 'should indicate that the player is not active this season' do
           post action, params: params
-          expect(speech).to eq 'inactive player is not an active player in ranked this season.'
+          expect(speech).to eq 'inactive player is not an active player in ranked so far this season.'
         end
       end
 
@@ -1450,7 +1564,7 @@ describe SummonersController, type: :controller do
           context 'without recency' do
             it 'should return the single champion' do
               post action, params: params
-              expect(speech).to eq 'The champion with the highest win rate playing against Hero man as Shyvana Middle is Swain.'
+              expect(speech).to eq 'The champion with the highest win rate playing against Hero man so far this season as Shyvana Middle is Swain.'
             end
           end
         end
@@ -1504,7 +1618,7 @@ describe SummonersController, type: :controller do
           context 'without recency' do
             it 'should return the single champion' do
               post action, params: params
-              expect(speech).to eq 'The champion with the second highest win rate playing against Hero man as Shyvana Middle is Elise.'
+              expect(speech).to eq 'The champion with the second highest win rate playing against Hero man so far this season as Shyvana Middle is Elise.'
             end
           end
         end
@@ -1548,7 +1662,7 @@ describe SummonersController, type: :controller do
           context 'without recency' do
             it 'should return the list of champions' do
               post action, params: params
-              expect(speech).to eq 'The champions with the highest win rate against Hero man playing Shyvana Middle are Swain and Elise.'
+              expect(speech).to eq 'The champions with the highest win rate against Hero man so far this season playing Shyvana Middle are Swain and Elise.'
             end
           end
         end
@@ -1599,7 +1713,7 @@ describe SummonersController, type: :controller do
           context 'without recency' do
             it 'should return the complete list of champions' do
               post action, params: params
-              expect(speech).to eq 'The second through third champions with the highest win rate against Hero man playing Shyvana Jungle are Swain and Janna.'
+              expect(speech).to eq 'The second through third champions with the highest win rate against Hero man so far this season playing Shyvana Jungle are Swain and Janna.'
             end
           end
         end
@@ -1678,7 +1792,7 @@ describe SummonersController, type: :controller do
 
       it 'should sort the ranking by the metric' do
         post action, params: params
-        expect(speech).to eq "The champions played by Hero man with the summoner's highest games played are Tristana and Nunu."
+        expect(speech).to eq "The champions played by Hero man so far this season with the summoner's highest games played across Adc, Jungle, and Middle are Tristana and Nunu."
       end
     end
 
@@ -1690,7 +1804,7 @@ describe SummonersController, type: :controller do
 
         it 'should rank by games played' do
           post action, params: params
-          expect(speech).to eq "The champions played by Hero man with the summoner's highest games played are Tristana and Nunu."
+          expect(speech).to eq "The champions played by Hero man so far this season with the summoner's highest games played across Adc, Jungle, and Middle are Tristana and Nunu."
         end
       end
 
@@ -1702,7 +1816,7 @@ describe SummonersController, type: :controller do
 
         it 'should rank by average KDA' do
           post action, params: params
-          expect(speech).to eq "The champions played by Hero man with the summoner's highest KDA are Tristana and Nunu."
+          expect(speech).to eq "The champions played by Hero man so far this season with the summoner's highest KDA across Adc, Jungle, and Middle are Tristana and Nunu."
         end
       end
 
@@ -1713,7 +1827,7 @@ describe SummonersController, type: :controller do
 
         it 'should rank by overall winrate' do
           post action, params: params
-          expect(speech).to eq "The champions played by Hero man with the summoner's highest win rate are Nunu and Tristana."
+          expect(speech).to eq "The champions played by Hero man so far this season with the summoner's highest win rate across Adc, Jungle, and Middle are Nunu and Tristana."
         end
       end
     end
@@ -1726,7 +1840,7 @@ describe SummonersController, type: :controller do
 
       it 'should rank by the position details' do
         post action, params: params
-        expect(speech).to eq "The champions played by Hero man with the summoner's highest wards placed are Tristana and Nunu."
+        expect(speech).to eq "The champions played by Hero man so far this season with the summoner's highest wards placed across Adc, Jungle, and Middle are Tristana and Nunu."
       end
     end
 
@@ -1756,14 +1870,14 @@ describe SummonersController, type: :controller do
 
               it 'should indicate that the summoner has not played in that role recently' do
                 post action, params: params
-                expect(speech).to eq 'Hero man has not played any games recently as Top in ranked solo queue.'
+                expect(speech).to eq 'Hero man has not played any games recently Top.'
               end
             end
 
             context 'without recency' do
               it 'should indicate that the summoner has not played in that role' do
                 post action, params: params
-                expect(speech).to eq 'Hero man has not played any games this season as Top in ranked solo queue.'
+                expect(speech).to eq 'Hero man has not played any games so far this season Top.'
               end
             end
           end
@@ -1787,7 +1901,7 @@ describe SummonersController, type: :controller do
             context 'without recency' do
               it 'should indicate that the summoner has not played this season.' do
                 post action, params: params
-                expect(speech).to eq 'inactive player is not an active player in ranked this season.'
+                expect(speech).to eq 'inactive player is not an active player in ranked so far this season.'
               end
             end
           end
@@ -1823,14 +1937,14 @@ describe SummonersController, type: :controller do
 
               it 'should indicate that the summoner has not played offset champions recently in that role' do
                 post action, params: params
-                expect(speech).to eq 'Hero man has only played two champions as Jungle recently.'
+                expect(speech).to eq 'Hero man has only played two champions Jungle recently.'
               end
             end
 
             context 'without recency' do
               it 'should indicate that the summoner has not played offset champions this season in that role' do
                 post action, params: params
-                expect(speech).to eq 'Hero man has only played two champions as Jungle so far this season.'
+                expect(speech).to eq 'Hero man has only played two champions Jungle so far this season.'
               end
             end
           end
@@ -1843,14 +1957,14 @@ describe SummonersController, type: :controller do
 
               it 'should indicate that the summoner has not played offset champions recently' do
                 post action, params: params
-                expect(speech).to eq 'Hero man has only played two champions recently.'
+                expect(speech).to eq 'Hero man has only played two champions across Adc, Jungle, and Middle recently.'
               end
             end
 
             context 'without recency' do
               it 'should indicate that the summoner has not played offset champions this season' do
                 post action, params: params
-                expect(speech).to eq 'Hero man has only played two champions so far this season.'
+                expect(speech).to eq 'Hero man has only played two champions across Adc, Jungle, and Middle so far this season.'
               end
             end
           end
@@ -1877,14 +1991,14 @@ describe SummonersController, type: :controller do
 
               it 'should return the single highest ranking for that role recently' do
                 post action, params: params
-                expect(speech).to eq 'The champion played by Hero man recently with the highest win rate in Middle is Nunu.'
+                expect(speech).to eq 'The champion played by Hero man recently with the highest win rate Middle is Nunu.'
               end
             end
 
             context 'without recency' do
               it 'should return the single highest ranking for that role' do
                 post action, params: params
-                expect(speech).to eq 'The champion played by Hero man with the highest win rate in Middle is Nunu.'
+                expect(speech).to eq 'The champion played by Hero man so far this season with the highest win rate Middle is Nunu.'
               end
             end
           end
@@ -1897,14 +2011,14 @@ describe SummonersController, type: :controller do
 
               it 'should return the single highest ranking for any role recently' do
                 post action, params: params
-                expect(speech).to eq 'The champion played by Hero man recently with the highest win rate is Nunu.'
+                expect(speech).to eq 'The champion played by Hero man recently with the highest win rate across Adc, Jungle, and Middle is Nunu.'
               end
             end
 
             context 'without recency' do
               it 'should return the single highest ranking for any role' do
                 post action, params: params
-                expect(speech).to eq 'The champion played by Hero man with the highest win rate is Nunu.'
+                expect(speech).to eq 'The champion played by Hero man so far this season with the highest win rate across Adc, Jungle, and Middle is Nunu.'
               end
             end
           end
@@ -1934,7 +2048,7 @@ describe SummonersController, type: :controller do
             context 'without recency' do
               it 'should indicate that the player is inactive this season' do
                 post action, params: params
-                expect(speech).to eq 'inactive player is not an active player in ranked this season.'
+                expect(speech).to eq 'inactive player is not an active player in ranked so far this season.'
               end
             end
           end
@@ -1954,7 +2068,7 @@ describe SummonersController, type: :controller do
             context 'without recency' do
               it 'should indicate that the player is inactive this season' do
                 post action, params: params
-                expect(speech).to eq 'inactive player is not an active player in ranked this season.'
+                expect(speech).to eq 'inactive player is not an active player in ranked so far this season.'
               end
             end
           end
@@ -1979,14 +2093,14 @@ describe SummonersController, type: :controller do
 
               it 'should return the offset highest champion for that role recently' do
                 post action, params: params
-                expect(speech).to eq 'The champion played by Hero man recently with the second highest win rate in Middle is Tristana.'
+                expect(speech).to eq 'The champion played by Hero man recently with the second highest win rate Middle is Tristana.'
               end
             end
 
             context 'with no recency' do
               it 'should return the offset highest champion for that role' do
                 post action, params: params
-                expect(speech).to eq 'The champion played by Hero man with the second highest win rate in Middle is Tristana.'
+                expect(speech).to eq 'The champion played by Hero man so far this season with the second highest win rate Middle is Tristana.'
               end
             end
           end
@@ -1999,14 +2113,14 @@ describe SummonersController, type: :controller do
 
               it 'should return the offset highest champion for any role recently' do
                 post action, params: params
-                expect(speech).to eq 'The champion played by Hero man recently with the second highest win rate is Tristana.'
+                expect(speech).to eq 'The champion played by Hero man recently with the second highest win rate across Adc, Jungle, and Middle is Tristana.'
               end
             end
 
             context 'without recency' do
               it 'should return the offset highest champion for any role' do
                 post action, params: params
-                expect(speech).to eq 'The champion played by Hero man with the second highest win rate is Tristana.'
+                expect(speech).to eq 'The champion played by Hero man so far this season with the second highest win rate across Adc, Jungle, and Middle is Tristana.'
               end
             end
           end
@@ -2029,14 +2143,14 @@ describe SummonersController, type: :controller do
 
               it 'should indicate the results are incomplete and return the one champion for that role recently' do
                 post action, params: params
-                expect(speech).to eq 'Hero man has only played two champions recently as Middle. The champion played by Hero man with the second highest win rate as Middle is Tristana.'
+                expect(speech).to eq 'Hero man has only played two champions recently Middle. The champion played by Hero man with the second highest win rate is Tristana.'
               end
             end
 
             context 'without recency' do
               it 'should indicate the results are incomplete and return the one champion for that role' do
                 post action, params: params
-                expect(speech).to eq 'Hero man has only played two champions so far this season as Middle. The champion played by Hero man with the second highest win rate as Middle is Tristana.'
+                expect(speech).to eq 'Hero man has only played two champions so far this season Middle. The champion played by Hero man with the second highest win rate is Tristana.'
               end
             end
           end
@@ -2049,14 +2163,14 @@ describe SummonersController, type: :controller do
 
               it 'should indicate the results are incomplete and return the one recent champion' do
                 post action, params: params
-                expect(speech).to eq 'Hero man has only played two champions recently. The champion played by Hero man with the second highest win rate is Tristana.'
+                expect(speech).to eq 'Hero man has only played two champions recently across Adc, Jungle, and Middle. The champion played by Hero man with the second highest win rate is Tristana.'
               end
             end
 
             context 'without recency' do
               it 'should indicate the results are incomplete and return the one champion' do
                 post action, params: params
-                expect(speech).to eq 'Hero man has only played two champions so far this season. The champion played by Hero man with the second highest win rate is Tristana.'
+                expect(speech).to eq 'Hero man has only played two champions so far this season across Adc, Jungle, and Middle. The champion played by Hero man with the second highest win rate is Tristana.'
               end
             end
           end
@@ -2079,14 +2193,14 @@ describe SummonersController, type: :controller do
 
               it 'should provide rankings for the champions in that role recently' do
                 post action, params: params
-                expect(speech).to eq "The champions played by Hero man recently with the summoner's highest win rate in Middle are Nunu and Tristana."
+                expect(speech).to eq "The champions played by Hero man recently with the summoner's highest win rate Middle are Nunu and Tristana."
               end
             end
 
             context 'without recency' do
               it 'should provide rankings for the champions in that role' do
                 post action, params: params
-                expect(speech).to eq "The champions played by Hero man with the summoner's highest win rate in Middle are Nunu and Tristana."
+                expect(speech).to eq "The champions played by Hero man so far this season with the summoner's highest win rate Middle are Nunu and Tristana."
               end
             end
           end
@@ -2099,14 +2213,14 @@ describe SummonersController, type: :controller do
 
               it 'should provide rankings for the champions in any role recently' do
                 post action, params: params
-                expect(speech).to eq "The champions played by Hero man recently with the summoner's highest win rate are Nunu and Tristana."
+                expect(speech).to eq "The champions played by Hero man recently with the summoner's highest win rate across Adc, Jungle, and Middle are Nunu and Tristana."
               end
             end
 
             context 'without recency' do
               it 'should provide rankings for the champions in any role' do
                 post action, params: params
-                expect(speech).to eq "The champions played by Hero man with the summoner's highest win rate are Nunu and Tristana."
+                expect(speech).to eq "The champions played by Hero man so far this season with the summoner's highest win rate across Adc, Jungle, and Middle are Nunu and Tristana."
               end
             end
           end
@@ -2129,14 +2243,14 @@ describe SummonersController, type: :controller do
 
               it 'should return an incomplete ranking of champions in that role recently' do
                 post action, params: params
-                expect(speech).to eq "Hero man has only played two champions recently as Middle. The champions played by Hero man with the summoner's highest win rate as Middle are Nunu and Tristana."
+                expect(speech).to eq "Hero man has only played two champions recently Middle. The champions played by Hero man with the summoner's highest win rate are Nunu and Tristana."
               end
             end
 
             context 'without recency' do
               it 'should return an incomplete ranking of champions in that role' do
                 post action, params: params
-                expect(speech).to eq "Hero man has only played two champions so far this season as Middle. The champions played by Hero man with the summoner's highest win rate as Middle are Nunu and Tristana."
+                expect(speech).to eq "Hero man has only played two champions so far this season Middle. The champions played by Hero man with the summoner's highest win rate are Nunu and Tristana."
               end
             end
           end
@@ -2149,14 +2263,14 @@ describe SummonersController, type: :controller do
 
               it 'should return an incomplete ranking of champions in any role recently' do
                 post action, params: params
-                expect(speech).to eq "Hero man has only played two champions recently. The champions played by Hero man with the summoner's highest win rate are Nunu and Tristana."
+                expect(speech).to eq "Hero man has only played two champions recently across Adc, Jungle, and Middle. The champions played by Hero man with the summoner's highest win rate are Nunu and Tristana."
               end
             end
 
             context 'without recency' do
               it 'should return an incomplete ranking of champions in any role' do
                 post action, params: params
-                expect(speech).to eq "Hero man has only played two champions so far this season. The champions played by Hero man with the summoner's highest win rate are Nunu and Tristana."
+                expect(speech).to eq "Hero man has only played two champions so far this season across Adc, Jungle, and Middle. The champions played by Hero man with the summoner's highest win rate are Nunu and Tristana."
               end
             end
           end
@@ -2182,14 +2296,14 @@ describe SummonersController, type: :controller do
 
               it 'should return a complete ranking with champions from that role recently' do
                 post action, params: params
-                expect(speech).to eq 'The second through third champions played by Hero man recently with the highest win rate in Middle are Karthus and Tristana.'
+                expect(speech).to eq 'The second through third champions played by Hero man recently with the highest win rate Middle are Karthus and Tristana.'
               end
             end
 
             context 'without recency' do
               it 'should return a complete ranking with champions from that role' do
                 post action, params: params
-                expect(speech).to eq 'The second through third champions played by Hero man with the highest win rate in Middle are Karthus and Tristana.'
+                expect(speech).to eq 'The second through third champions played by Hero man so far this season with the highest win rate Middle are Karthus and Tristana.'
               end
             end
           end
@@ -2202,14 +2316,14 @@ describe SummonersController, type: :controller do
 
               it 'should return a complete ranking with recent champions from all roles' do
                 post action, params: params
-                expect(speech).to eq 'The second through third champions played by Hero man recently with the highest win rate are Tristana and Karthus.'
+                expect(speech).to eq 'The second through third champions played by Hero man recently with the highest win rate across Adc, Jungle, and Middle are Tristana and Karthus.'
               end
             end
 
             context 'without recency' do
               it 'should return a complete ranking with champions from all roles' do
                 post action, params: params
-                expect(speech).to eq 'The second through third champions played by Hero man with the highest win rate are Tristana and Karthus.'
+                expect(speech).to eq 'The second through third champions played by Hero man so far this season with the highest win rate across Adc, Jungle, and Middle are Tristana and Karthus.'
               end
             end
           end
@@ -2232,14 +2346,14 @@ describe SummonersController, type: :controller do
 
               it 'should return incomplete rankings for that role recently' do
                 post action, params: params
-                expect(speech).to eq 'Hero man has only played three champions recently as Middle. The second through third champions played by Hero man with the highest win rate as Middle are Karthus and Tristana.'
+                expect(speech).to eq 'Hero man has only played three champions recently Middle. The second through third champions played by Hero man with the highest win rate are Karthus and Tristana.'
               end
             end
 
             context 'without recency' do
               it 'should return incomplete rankings for that role' do
                 post action, params: params
-                expect(speech).to eq 'Hero man has only played three champions so far this season as Middle. The second through third champions played by Hero man with the highest win rate as Middle are Karthus and Tristana.'
+                expect(speech).to eq 'Hero man has only played three champions so far this season Middle. The second through third champions played by Hero man with the highest win rate are Karthus and Tristana.'
               end
             end
           end
@@ -2252,14 +2366,14 @@ describe SummonersController, type: :controller do
 
               it 'should return incomplete rankings across all roles recently' do
                 post action, params: params
-                expect(speech).to eq 'Hero man has only played three champions recently. The second through third champions played by Hero man with the highest win rate are Tristana and Karthus.'
+                expect(speech).to eq 'Hero man has only played three champions recently across Adc, Jungle, and Middle. The second through third champions played by Hero man with the highest win rate are Tristana and Karthus.'
               end
             end
 
             context 'without recency' do
               it 'should return incomplete rankings across all roles' do
                 post action, params: params
-                expect(speech).to eq 'Hero man has only played three champions so far this season. The second through third champions played by Hero man with the highest win rate are Tristana and Karthus.'
+                expect(speech).to eq 'Hero man has only played three champions so far this season across Adc, Jungle, and Middle. The second through third champions played by Hero man with the highest win rate are Tristana and Karthus.'
               end
             end
           end
@@ -2313,7 +2427,7 @@ describe SummonersController, type: :controller do
         context 'without recency' do
           it 'should indicate that the summoner has not played the champion in that role' do
             post action, params: params
-            expect(speech).to eq 'Hero man has not played any games this season as Tristana Top.'
+            expect(speech).to eq 'Hero man has not played any games so far this season as Tristana Top.'
           end
         end
       end
@@ -2331,14 +2445,14 @@ describe SummonersController, type: :controller do
 
           it 'should indicate that the summoner has not played the champion recently' do
             post action, params: params
-            expect(speech).to eq 'Hero man has not played any games recently as Zed. I would pay to see it though.'
+            expect(speech).to eq 'Hero man has not played any games recently as Zed.'
           end
         end
 
         context 'without recency' do
           it 'should indicate that the summoner has not played the champion this season' do
             post action, params: params
-            expect(speech).to eq 'Hero man has not played any games this season as Zed. I wonder if the two had a falling out.'
+            expect(speech).to eq 'Hero man has not played any games so far this season as Zed.'
           end
         end
       end
@@ -2360,7 +2474,7 @@ describe SummonersController, type: :controller do
         context 'without recency' do
           it 'should determine the win rate and KDA for the specified role' do
             post action, params: params
-            expect(speech).to eq 'Hero man has played Tristana Adc two times this season with a 100.0% win rate and an overall 2.0/3.0/7.0 KDA.'
+            expect(speech).to eq 'Hero man has played Tristana Adc two times so far this season with a 100.0% win rate and an overall 2.0/3.0/7.0 KDA.'
           end
         end
       end
@@ -2385,7 +2499,7 @@ describe SummonersController, type: :controller do
           context 'without recency' do
             it 'should determine the win rate and KDA for the one role' do
               post action, params: params
-              expect(speech).to eq 'Hero man has played Tristana Adc two times this season with a 100.0% win rate and an overall 2.0/3.0/7.0 KDA.'
+              expect(speech).to eq 'Hero man has played Tristana Adc two times so far this season with a 100.0% win rate and an overall 2.0/3.0/7.0 KDA.'
             end
           end
         end
@@ -2395,9 +2509,9 @@ describe SummonersController, type: :controller do
             @match2.summoner_performances.first.update(role: 'DUO_SUPPORT')
           end
 
-          it 'should prompt to specify a role' do
+          it 'should indicate the value is aggregated over multiple roles' do
             post action, params: params
-            expect(speech).to eq 'Hero man has played Tristana two times this season across Adc and Support. Which role do you want to know about?'
+            expect(speech).to eq 'Hero man has played Tristana across Adc and Support two times so far this season with a 100.0% win rate and an overall 2.0/3.0/7.0 KDA.'
           end
         end
       end
@@ -2431,6 +2545,52 @@ describe SummonersController, type: :controller do
       )
     end
 
+    context 'with no role specified' do
+      before :each do
+        summoner_params[:role] = ''
+      end
+
+      context 'with a single role played' do
+        it 'should determine the position value for the summoner' do
+          post action, params: params
+          expect(speech).to eq 'Hero man has played Tristana Adc two times so far this season and averages 2.0 kills.'
+        end
+      end
+
+      context 'with multiple roles played' do
+        before :each do
+          @match1.summoner_performances.first.update(role: 'DUO_SUPPORT')
+        end
+
+        it 'should determine the position value for the summoner across multiple roles' do
+          post action, params: params
+          expect(speech).to eq 'Hero man has played Tristana across Adc and Support two times so far this season and averages 2.0 kills.'
+        end
+
+        context 'with no champion specified' do
+          before :each do
+            summoner_params[:champion] = ''
+          end
+
+          it 'should determine the value in the given role regardless of champion and role' do
+            post action, params: params
+            expect(speech).to eq 'Hero man has played across Adc and Support two times so far this season and averages 2.0 kills.'
+          end
+        end
+      end
+    end
+
+    context 'with no champion specified' do
+      before :each do
+        summoner_params[:champion] = ''
+      end
+
+      it 'should determine the value in the given role regardless of champion' do
+        post action, params: params
+        expect(speech).to eq 'Hero man has played Adc two times so far this season and averages 2.0 kills.'
+      end
+    end
+
     context 'with a winrate metric specified' do
       before :each do
         summoner_params[:metric] = :winrate
@@ -2438,7 +2598,7 @@ describe SummonersController, type: :controller do
 
       it 'should indicate the winrate for the summoner playing that champion' do
         post action, params: params
-        expect(speech).to eq 'Hero man has played Tristana Adc two times this season and has a 100.0% overall win rate.'
+        expect(speech).to eq 'Hero man has played Tristana Adc two times so far this season and has a 100.0% overall win rate.'
       end
     end
 
@@ -2449,7 +2609,7 @@ describe SummonersController, type: :controller do
 
       it 'should indicate the count for the summoner playing that champion' do
         post action, params: params
-        expect(speech).to eq 'Hero man has played Tristana Adc two times this season.'
+        expect(speech).to eq 'Hero man has played Tristana Adc two times so far this season.'
       end
     end
 
@@ -2460,7 +2620,7 @@ describe SummonersController, type: :controller do
 
       it 'should indicate the KDA for the summoner playing that champion' do
         post action, params: params
-        expect(speech).to eq 'Hero man has played Tristana Adc two times this season and averages a 2.0/3.0/7.0 KDA.'
+        expect(speech).to eq 'Hero man has played Tristana Adc two times so far this season and averages a 2.0/3.0/7.0 KDA.'
       end
     end
 
@@ -2484,7 +2644,7 @@ describe SummonersController, type: :controller do
         context 'without recency' do
           it 'should indicate that the summoner has not played the champion in that role' do
             post action, params: params
-            expect(speech).to eq 'Hero man has not played any games this season as Tristana Top.'
+            expect(speech).to eq 'Hero man has not played any games so far this season as Tristana Top.'
           end
         end
       end
@@ -2502,14 +2662,14 @@ describe SummonersController, type: :controller do
 
           it 'should indicate that the summoner has not played the champion this season recently' do
             post action, params: params
-            expect(speech).to eq 'Hero man has not played any games recently as Zed. I would pay to see it though.'
+            expect(speech).to eq 'Hero man has not played any games recently as Zed.'
           end
         end
 
         context 'without recency' do
           it 'should indicate that the summoner has not played the champion this season' do
             post action, params: params
-            expect(speech).to eq 'Hero man has not played any games this season as Zed. I wonder if the two had a falling out.'
+            expect(speech).to eq 'Hero man has not played any games so far this season as Zed.'
           end
         end
       end
@@ -2531,7 +2691,7 @@ describe SummonersController, type: :controller do
         context 'without recency' do
           it 'should determine the position performance for that role' do
             post action, params: params
-            expect(speech).to eq 'Hero man has played Tristana Adc two times this season and averages 2.0 kills.'
+            expect(speech).to eq 'Hero man has played Tristana Adc two times so far this season and averages 2.0 kills.'
           end
         end
       end
@@ -2556,7 +2716,7 @@ describe SummonersController, type: :controller do
           context 'without recency' do
             it 'should determine the position performance for the one role' do
               post action, params: params
-              expect(speech).to eq 'Hero man has played Tristana Adc two times this season and averages 2.0 kills.'
+              expect(speech).to eq 'Hero man has played Tristana Adc two times so far this season and averages 2.0 kills.'
             end
           end
         end
@@ -2571,16 +2731,16 @@ describe SummonersController, type: :controller do
               summoner_params[:recency] = :recently
             end
 
-            it 'should prompt to specify a role recently' do
+            it 'should indicate that the value is aggregated across multiple roles' do
               post action, params: params
-              expect(speech).to eq 'Hero man has played Tristana two times recently this season across Adc and Support. Which role do you want to know about?'
+              expect(speech).to eq 'Hero man has played Tristana across Adc and Support two times recently and averages 2.0 kills.'
             end
           end
 
           context 'without recency' do
-            it 'should prompt to specify a role' do
+            it 'should indicate the value is aggregated across muliples roles' do
               post action, params: params
-              expect(speech).to eq 'Hero man has played Tristana two times this season across Adc and Support. Which role do you want to know about?'
+              expect(speech).to eq 'Hero man has played Tristana across Adc and Support two times so far this season and averages 2.0 kills.'
             end
           end
         end

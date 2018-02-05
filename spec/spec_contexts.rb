@@ -1,5 +1,12 @@
 # Setup controller tests with data from the API
 shared_context 'spec setup' do
+  # Limit before test output should truncate
+  TRUNCATE_LIMIT = 500
+
+  before :each do
+    RSpec::Support::ObjectFormatter.default_instance.max_formatted_output_length = TRUNCATE_LIMIT
+  end
+
   let(:resources) do
     JSON.parse(File.read('api.json')).with_indifferent_access[:resources]
   end
