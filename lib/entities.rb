@@ -1,3 +1,5 @@
+include ActionView::Helpers::DateHelper
+
 class Entities
   relay_entities = [
     :summoner, :champion, :sort_type, :total_performances,
@@ -17,22 +19,6 @@ class Entities
   end
 
   class << self
-    def recency(recent_value)
-      if recent_value
-        return random_response([
-          'recently',
-          'lately',
-          'of late'
-        ])
-      else
-        return random_response([
-          'so far this season',
-          'this season',
-          'as of this season'
-        ])
-      end
-    end
-
     def role(role)
       if role.class == Array
         roles = role.map { |role| ChampionGGApi::ROLES[role.to_sym].try(:humanize) || role.humanize }.compact
@@ -40,6 +26,14 @@ class Entities
       else
         ChampionGGApi::ROLES[role.to_sym].try(:humanize) || role.humanize
       end
+    end
+
+    def starting_time(time)
+      "from #{time.strftime("%a %b %e %R")}"
+    end
+
+    def ending_time(time)
+      "to #{time.strftime("%a %b %e %R")}"
     end
 
     def summoners(summoners)

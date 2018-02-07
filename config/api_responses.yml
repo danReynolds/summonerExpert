@@ -163,163 +163,163 @@ summoners:
   teammates:
     empty:
       normal:
-        - '{summoner} has not played any games {:as:champion} {role} {recency} in ranked solo queue.'
+        - '{summoner} has not played any games {:as:champion} {role} {starting_time} {ending_time} in ranked solo queue.'
       offset:
         complete:
           - 'No summoners were requested.'
         incomplete:
-          - '{summoner} has played with {real_size} {real_size_summoner_conjugation} {:as:champion} {role} {recency}.'
+          - '{summoner} has played with {real_size} {real_size_summoner_conjugation} {:as:champion} {role} {starting_time} {ending_time}.'
     single:
       complete:
-        - 'The teammate who has helped {summoner} get the {list_position} {list_order} {sort_type} {recency} {:playing:champion} {role} is {summoners}.'
+        - 'The teammate who has helped {summoner} get the {list_position} {list_order} {sort_type} {starting_time} {ending_time} {:playing:champion} {role} is {summoners}.'
       incomplete:
-        - '{summoner} has only played with {real_size} {real_size_summoner_conjugation} {recency} {:as:champion} {role}. The summoner who has helped {summoner} get the {list_position} {list_order} {sort_type} {recency} is {summoners}.'
+        - '{summoner} has only played with {real_size} {real_size_summoner_conjugation} {starting_time} {ending_time} {:as:champion} {role}. The summoner who has helped {summoner} get the {list_position} {list_order} {sort_type} {starting_time} {ending_time} is {summoners}.'
     multiple:
       normal:
         complete:
-          - 'The teammates who have helped {summoner} get the {list_order} {sort_type} {recency} {:playing:champion} {role} are {summoners}.'
+          - 'The teammates who have helped {summoner} get the {list_order} {sort_type} {starting_time} {ending_time} {:playing:champion} {role} are {summoners}.'
         incomplete:
-          - '{summoner} has only played with {real_size} {real_size_summoner_conjugation} {recency} {:as:champion} {role}. The summoners who have helped {summoner} get the {list_order} {sort_type} are {summoners}.'
+          - '{summoner} has only played with {real_size} {real_size_summoner_conjugation} {starting_time} {ending_time} {:as:champion} {role}. The summoners who have helped {summoner} get the {list_order} {sort_type} are {summoners}.'
       offset:
         complete:
-          - 'The teammates who have helped {summoner} get the {list_position} through {filtered_position_offset} {list_order} {sort_type} {recency} {:playing:champion} {role} are {summoners}.'
+          - 'The teammates who have helped {summoner} get the {list_position} through {filtered_position_offset} {list_order} {sort_type} {starting_time} {ending_time} {:playing:champion} {role} are {summoners}.'
         incomplete:
-          - '{summoner} has only played with {real_size} {real_size_summoner_conjugation} {recency} {:as:champion} {role}. The summoners who have helped {summoner} get the {list_position} through {filtered_position_offset} {list_order} {sort_type} are {summoners}.'
+          - '{summoner} has only played with {real_size} {real_size_summoner_conjugation} {starting_time} {ending_time} {:as:champion} {role}. The summoners who have helped {summoner} get the {list_position} through {filtered_position_offset} {list_order} {sort_type} are {summoners}.'
   champion_matchups:
     position:
-      - "{summoner} has played {champion} {role} {total_performances} against {champion2} {recency} and averages {position_value} {sort_type}."
+      - "{summoner} has played {champion} {role} {total_performances} against {champion2} {starting_time} {ending_time} and averages {position_value} {sort_type}."
     count:
-      - "{summoner} has played {champion} {role} {total_performances} against {champion2} {recency}."
+      - "{summoner} has played {champion} {role} {total_performances} against {champion2} {starting_time} {ending_time}."
     winrate:
-      - "{summoner} has played {champion} {role} {total_performances} against {champion2} {recency} with a {winrate}% {sort_type}."
+      - "{summoner} has played {champion} {role} {total_performances} against {champion2} {starting_time} {ending_time} with a {winrate}% {sort_type}."
     KDA:
-      - "{summoner} has played {champion} {role} {total_performances} against {champion2} {recency} with an overall {kills}/{deaths}/{assists} {sort_type}."
+      - "{summoner} has played {champion} {role} {total_performances} against {champion2} {starting_time} {ending_time} with an overall {kills}/{deaths}/{assists} {sort_type}."
   champion_build:
-    - "{summoner} has played {champion} {role} {total_performances} {recency} and the summoner's {list_order} {sort_type} build is {build}."
+    - "{summoner} has played {champion} {role} {total_performances} {starting_time} {ending_time} and the summoner's {list_order} {sort_type} build is {build}."
   champion_performance_summary:
-    - "{summoner} has played {champion} {role} {total_performances} {recency} with a {winrate}% win rate and an overall {kills}/{deaths}/{assists} KDA."
+    - "{summoner} has played {champion} {role} {total_performances} {starting_time} {ending_time} with a {winrate}% win rate and an overall {kills}/{deaths}/{assists} KDA."
   champion_performance_position:
     position:
-      - "{summoner} has played {champion} {role} {total_performances} {recency} and averages {position_value} {sort_type}."
+      - "{summoner} has played {champion} {role} {total_performances} {starting_time} {ending_time} and averages {position_value} {sort_type}."
     count:
-      - "{summoner} has played {champion} {role} {total_performances} {recency}."
+      - "{summoner} has played {champion} {role} {total_performances} {starting_time} {ending_time}."
     KDA:
-      - "{summoner} has played {champion} {role} {total_performances} {recency} and averages a {kills}/{deaths}/{assists} {sort_type}."
+      - "{summoner} has played {champion} {role} {total_performances} {starting_time} {ending_time} and averages a {kills}/{deaths}/{assists} {sort_type}."
     winrate:
-      - "{summoner} has played {champion} {role} {total_performances} {recency} and has a {winrate}% overall {sort_type}."
+      - "{summoner} has played {champion} {role} {total_performances} {starting_time} {ending_time} and has a {winrate}% overall {sort_type}."
   champion_spells:
     empty:
       normal:
-        - '{summoner} has not played any games as {champion} {role} {recency} in ranked solo queue.'
+        - '{summoner} has not played any games as {champion} {role} {starting_time} {ending_time} in ranked solo queue.'
       offset:
-        - '{summoner} only has used {real_size} spell {real_size_combination_conjugation} playing as {champion} {role} {recency} this season.'
+        - '{summoner} only has used {real_size} spell {real_size_combination_conjugation} playing as {champion} {role} {starting_time} {ending_time} this season.'
     single:
       normal:
         complete:
-          - 'The spell combination used by {summoner} {recency} that gives the summoner playing {champion} {role} the {list_order} {sort_type} is {spells}.'
+          - 'The spell combination used by {summoner} {starting_time} {ending_time} that gives the summoner playing {champion} {role} the {list_order} {sort_type} is {spells}.'
         incomplete:
-          - '{summoner} has only used {real_size} spell {real_size_combination_conjugation} {recency} as {champion} {role}. The spell combo with the {list_order} {sort_type} playing as {champion} {role} is {spells}.'
+          - '{summoner} has only used {real_size} spell {real_size_combination_conjugation} {starting_time} {ending_time} as {champion} {role}. The spell combo with the {list_order} {sort_type} playing as {champion} {role} is {spells}.'
       offset:
         complete:
-          - 'The spell combination used by {summoner} {recency} that gives the summoner playing as {champion} {role} the {list_position} {list_order} {sort_type} is {spells}.'
+          - 'The spell combination used by {summoner} {starting_time} {ending_time} that gives the summoner playing as {champion} {role} the {list_position} {list_order} {sort_type} is {spells}.'
         incomplete:
-          - '{summoner} has only used {real_size} different spell {real_size_combination_conjugation} {recency} as {champion} {role}. The spell combo used by that gives gives the {list_position} {list_order} {sort_type} is {spells}.'
+          - '{summoner} has only used {real_size} different spell {real_size_combination_conjugation} {starting_time} {ending_time} as {champion} {role}. The spell combo used by that gives gives the {list_position} {list_order} {sort_type} is {spells}.'
   champion_bans:
     empty:
       normal:
-        - '{summoner} has not played any games as {champion} {role} {recency} in ranked solo queue.'
+        - '{summoner} has not played any games as {champion} {role} {starting_time} {ending_time} in ranked solo queue.'
       offset:
         complete:
           - 'No bans were requested.'
         incomplete:
-          - '{summoner} has only banned {real_size} {real_size_champion_conjugation} playing as {champion} {role} {recency}.'
+          - '{summoner} has only banned {real_size} {real_size_champion_conjugation} playing as {champion} {role} {starting_time} {ending_time}.'
     single:
       normal:
         complete:
-          - 'The ban by {summoner} {:playing:champion} {role} that gives the summoner the {list_order} {sort_type} {recency} is {champions}.'
+          - 'The ban by {summoner} {:playing:champion} {role} that gives the summoner the {list_order} {sort_type} {starting_time} {ending_time} is {champions}.'
         incomplete:
-          - '{summoner} has only played against {real_size} {real_size_champion_conjugation} {recency} {:as:champion} {role}. The ban that gives the {list_order} {sort_type} is {champions}.'
+          - '{summoner} has only played against {real_size} {real_size_champion_conjugation} {starting_time} {ending_time} {:as:champion} {role}. The ban that gives the {list_order} {sort_type} is {champions}.'
       offset:
         complete:
           - 'The ban by {summoner} that gives the summoner playing {champion} {role} the {list_position} {list_order} {sort_type} {recently} is {champions}.'
         incomplete:
-          - '{summoner} has only played against {real_size} different {real_size_champion_conjugation} {recency} {:as:champion} {role}. The ban that gives the summoner the {list_position} {list_order} {sort_type} is {champions}.'
+          - '{summoner} has only played against {real_size} different {real_size_champion_conjugation} {starting_time} {ending_time} {:as:champion} {role}. The ban that gives the summoner the {list_position} {list_order} {sort_type} is {champions}.'
     multiple:
       normal:
         complete:
-          - 'The bans by {summoner} {:playing:champion} {role} that give the summoner the {list_order} {sort_type} {recency} are {champions}.'
+          - 'The bans by {summoner} {:playing:champion} {role} that give the summoner the {list_order} {sort_type} {starting_time} {ending_time} are {champions}.'
         incomplete:
-          - '{summoner} has only played against {real_size} different {real_size_champion_conjugation} {recency} {:as:champion} {role}. The bans that give the summoner the {list_order} {sort_type} are {champions}.'
+          - '{summoner} has only played against {real_size} different {real_size_champion_conjugation} {starting_time} {ending_time} {:as:champion} {role}. The bans that give the summoner the {list_order} {sort_type} are {champions}.'
       offset:
         complete:
-          - 'The {list_position} through {filtered_position_offset} bans that give {summoner} {:playing:champion} {role} the {list_order} {sort_type} {recency} are {champions}.'
+          - 'The {list_position} through {filtered_position_offset} bans that give {summoner} {:playing:champion} {role} the {list_order} {sort_type} {starting_time} {ending_time} are {champions}.'
         incomplete:
-          - '{summoner} has only played against {real_size} different {real_size_champion_conjugation} {recency} {:as:champion} {role}. The {list_position} through {filtered_position_offset} bans that give the {list_order} {sort_type} are {champions}.'
+          - '{summoner} has only played against {real_size} different {real_size_champion_conjugation} {starting_time} {ending_time} {:as:champion} {role}. The {list_position} through {filtered_position_offset} bans that give the {list_order} {sort_type} are {champions}.'
   champion_counters:
     empty:
       normal:
-        - '{summoner} has not played any games as {champion} {role} {recency} in ranked solo queue.'
+        - '{summoner} has not played any games as {champion} {role} {starting_time} {ending_time} in ranked solo queue.'
       offset:
         complete:
           - 'No champions were requested.'
         incomplete:
-          - '{summoner} has only played against {real_size} {real_size_champion_conjugation} playing as {champion} {role} {recency}.'
+          - '{summoner} has only played against {real_size} {real_size_champion_conjugation} playing as {champion} {role} {starting_time} {ending_time}.'
     single:
       normal:
         complete:
-          - 'The champion with the {list_order} {sort_type} playing against {summoner} {recency} as {champion} {role} is {champions}.'
+          - 'The champion with the {list_order} {sort_type} playing against {summoner} {starting_time} {ending_time} as {champion} {role} is {champions}.'
         incomplete:
-          - '{summoner} has only played against {real_size} {real_size_champion_conjugation} {recency} as {champion} {role}. The champion with the {list_order} {sort_type} playing against {summoner} as {champion} {role} is {champions}.'
+          - '{summoner} has only played against {real_size} {real_size_champion_conjugation} {starting_time} {ending_time} as {champion} {role}. The champion with the {list_order} {sort_type} playing against {summoner} as {champion} {role} is {champions}.'
       offset:
         complete:
-          - 'The champion with the {list_position} {list_order} {sort_type} playing against {summoner} {recency} as {champion} {role} is {champions}.'
+          - 'The champion with the {list_position} {list_order} {sort_type} playing against {summoner} {starting_time} {ending_time} as {champion} {role} is {champions}.'
         incomplete:
-          - '{summoner} has only played against {real_size} different {real_size_champion_conjugation} {recency} as {champion} {role}. The champion with the {list_position} {list_order} {sort_type} playing against {summoner} as {champion} {role} is {champions}.'
+          - '{summoner} has only played against {real_size} different {real_size_champion_conjugation} {starting_time} {ending_time} as {champion} {role}. The champion with the {list_position} {list_order} {sort_type} playing against {summoner} as {champion} {role} is {champions}.'
     multiple:
       normal:
         complete:
-          - "The champions with the {list_order} {sort_type} against {summoner} {recency} playing {champion} {role} are {champions}."
+          - "The champions with the {list_order} {sort_type} against {summoner} {starting_time} {ending_time} playing {champion} {role} are {champions}."
         incomplete:
-          - "{summoner} has only played against {real_size} different {real_size_champion_conjugation} {recency} as {champion} {role}. The champions with the {list_order} {sort_type} playing against {summoner} {role} are {champions}."
+          - "{summoner} has only played against {real_size} different {real_size_champion_conjugation} {starting_time} {ending_time} as {champion} {role}. The champions with the {list_order} {sort_type} playing against {summoner} {role} are {champions}."
       offset:
         complete:
-          - 'The {list_position} through {filtered_position_offset} champions with the {list_order} {sort_type} against {summoner} {recency} playing {champion} {role} are {champions}.'
+          - 'The {list_position} through {filtered_position_offset} champions with the {list_order} {sort_type} against {summoner} {starting_time} {ending_time} playing {champion} {role} are {champions}.'
         incomplete:
-          - '{summoner} has only played against {real_size} different {real_size_champion_conjugation} {recency} as {champion} {role}. The {list_position} through {filtered_position_offset} champions with the {list_order} {sort_type} against {summoner} playing as {champion} {role} are {champions}.'
+          - '{summoner} has only played against {real_size} different {real_size_champion_conjugation} {starting_time} {ending_time} as {champion} {role}. The {list_position} through {filtered_position_offset} champions with the {list_order} {sort_type} against {summoner} playing as {champion} {role} are {champions}.'
   champion_performance_ranking:
     empty:
       normal:
         complete:
           - 'No champions were requested.'
         incomplete:
-          - '{summoner} has not played any games {role} {recency} in ranked solo queue.'
+          - '{summoner} has not played any games {role} {starting_time} {ending_time} in ranked solo queue.'
       offset:
         complete:
           - 'No champions were requested.'
         incomplete:
-          - '{summoner} has only played {real_size} {real_size_champion_conjugation} {role} {recency}.'
+          - '{summoner} has only played {real_size} {real_size_champion_conjugation} {role} {starting_time} {ending_time}.'
     single:
       normal:
         complete:
-          - 'The champion played by {summoner} {recency} with the {list_order} {sort_type} {role} is {champions}.'
+          - 'The champion played by {summoner} {starting_time} {ending_time} with the {list_order} {sort_type} {role} is {champions}.'
         incomplete:
-          - '{summoner} has only played {real_size} {real_size_champion_conjugation} {role} {recency}.'
+          - '{summoner} has only played {real_size} {real_size_champion_conjugation} {role} {starting_time} {ending_time}.'
       offset:
         complete:
-          - 'The champion played by {summoner} {recency} with the {list_position} {list_order} {sort_type} {role} is {champions}.'
+          - 'The champion played by {summoner} {starting_time} {ending_time} with the {list_position} {list_order} {sort_type} {role} is {champions}.'
         incomplete:
-          - '{summoner} has only played {real_size} {real_size_champion_conjugation} {recency} {role}. The champion played by {summoner} with the {list_position} {list_order} {sort_type} is {champions}.'
+          - '{summoner} has only played {real_size} {real_size_champion_conjugation} {starting_time} {ending_time} {role}. The champion played by {summoner} with the {list_position} {list_order} {sort_type} is {champions}.'
     multiple:
       normal:
         complete:
-          - "The champions played by {summoner} {recency} with the summoner's {list_order} {sort_type} {role} are {champions}."
+          - "The champions played by {summoner} {starting_time} {ending_time} with the summoner's {list_order} {sort_type} {role} are {champions}."
         incomplete:
-          - "{summoner} has only played {real_size} {real_size_champion_conjugation} {recency} {role}. The champions played by {summoner} with the summoner's {list_order} {sort_type} are {champions}."
+          - "{summoner} has only played {real_size} {real_size_champion_conjugation} {starting_time} {ending_time} {role}. The champions played by {summoner} with the summoner's {list_order} {sort_type} are {champions}."
       offset:
         complete:
-          - 'The {list_position} through {filtered_position_offset} champions played by {summoner} {recency} with the {list_order} {sort_type} {role} are {champions}.'
+          - 'The {list_position} through {filtered_position_offset} champions played by {summoner} {starting_time} {ending_time} with the {list_order} {sort_type} {role} are {champions}.'
         incomplete:
-          - '{summoner} has only played {real_size} {real_size_champion_conjugation} {recency} {role}. The {list_position} through {filtered_position_offset} champions played by {summoner} with the {list_order} {sort_type} are {champions}.'
+          - '{summoner} has only played {real_size} {real_size_champion_conjugation} {starting_time} {ending_time} {role}. The {list_position} through {filtered_position_offset} champions played by {summoner} with the {list_order} {sort_type} are {champions}.'
 errors:
   items:
     build:
@@ -329,29 +329,29 @@ errors:
   summoners:
     champion_matchups:
       no_matchups:
-        - 'I could not find any matches for {summoner} playing {champion} {role} against {champion2} {recency}. It would be interesting to see though.'
+        - 'I could not find any matches for {summoner} playing {champion} {role} against {champion2} {starting_time} {ending_time}. It would be interesting to see though.'
     champion_counters:
       no_opponents:
-        - 'I could not find any matches for {summoner} playing {champion} {role} {recency} this season. A shame, I enjoy watching {champion} play.'
-        - "Hmph, I don't believe {summoner} has played {champion} {role} {recency}."
-        - '{summoner} has not played {champion} {role} {recency}.'
+        - 'I could not find any matches for {summoner} playing {champion} {role} {starting_time} {ending_time} this season. A shame, I enjoy watching {champion} play.'
+        - "Hmph, I don't believe {summoner} has played {champion} {role} {starting_time} {ending_time}."
+        - '{summoner} has not played {champion} {role} {starting_time} {ending_time}.'
     champion_build:
       no_complete_builds:
         - '{summoner} does not have any complete builds playing {champion} {role} this season.'
         - '{summoner} does not have any full builds playing {champion} {role} this season, perhaps the summoner just wins too quickly.'
         - '{summoner} does not have any full builds playing {champion} {role} this season, I think we both know what that means.'
     does_not_play:
-      - '{summoner} has not played any games {recency} {:as:champion} {role}.'
-      - '{summoner} has not played any matches {recency} {:as:champion} {role}.'
+      - '{summoner} has not played any games {starting_time} {ending_time} {:as:champion} {role}.'
+      - '{summoner} has not played any matches {starting_time} {ending_time} {:as:champion} {role}.'
       - "{summoner} has not played any games recently {:as:champion}. I would pay to see it though."
-      - "{summoner} has not played any matches {recency} {:as:champion} {role}. I would like to see it happen though."
+      - "{summoner} has not played any matches {starting_time} {ending_time} {:as:champion} {role}. I would like to see it happen though."
     multiple_roles:
-      - '{summoner} has played {champion} {total_performances} {recency} this season {role}. Which role do you want to know about?'
-      - '{summoner} has tried {champion} {total_performances} {recency} this season {role}. Which one do you want to know about in particular?'
+      - '{summoner} has played {champion} {total_performances} {starting_time} {ending_time} this season {role}. Which role do you want to know about?'
+      - '{summoner} has tried {champion} {total_performances} {starting_time} {ending_time} this season {role}. Which one do you want to know about in particular?'
     not_active:
-      - "{summoner} is not an active player in ranked {recency}."
-      - "{summoner} is not an active player in ranked {recency}. Maybe they are taking a break, I know I'd be tired after carrying that much."
-      - "{summoner} has not been an active player in ranked {recency}. I hope we didn't lose another one to that other game."
+      - "{summoner} is not an active player in ranked {starting_time} {ending_time}."
+      - "{summoner} is not an active player in ranked {starting_time} {ending_time}. Maybe they are taking a break, I know I'd be tired after carrying that much."
+      - "{summoner} has not been an active player in ranked {starting_time} {ending_time}. I hope we didn't lose another one to that other game."
     performance_summary:
       no_queue_data:
         - 'I could not find any information on {summoner} from the Riot overlords in ranked solo queue. The summoner may not have played enough games or there may be something going on with the system. Sorry about that, try again later.'

@@ -11,7 +11,7 @@ class ApiResponse
         entity_val = "#{prefix_match.captures.first} #{entity_val}" if prefix_match
         replaced_response.gsub(/{(?::.*:)?#{key}}/, entity_val) rescue binding.pry
       end
-      replaced_response.gsub(/{(?::|\w)+}/, '').gsub(/\s\./, '.').split(' ').join(' ')
+      replaced_response.gsub(/{(?::|\w)+}/, '').split(' ').join(' ').gsub(/\s\./, '.')
     end
 
     def get_response(namespace, args = {}, responses = API_RESPONSES)

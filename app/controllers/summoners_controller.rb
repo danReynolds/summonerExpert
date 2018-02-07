@@ -288,7 +288,7 @@ class SummonersController < ApplicationController
   def summoner_params
     params.require(:result).require(:parameters).permit(
       :name, :region, :champion, :queue, :role, :position_details, :metric,
-      :list_order, :list_size, :list_position, :recency, :champion2
+      :list_order, :list_size, :list_position, :champion2, :time
     )
   end
 
@@ -362,9 +362,9 @@ class SummonersController < ApplicationController
   end
 
   def process_performance_request(options = {})
+    starting_time, ending_time = summoner_params[:time].split('/').map { |time| DateTime.parse(time) }
     role = summoner_params[:role].to_sym
     champion = summoner_params[:champion]
-    recency = summoner_params[:recency].to_sym
     args = { summoner: @summoner.name }
     filter = {}
     filter[:role] = role if role.present?
@@ -391,11 +391,18 @@ class SummonersController < ApplicationController
       end
     end
 
-    summoner_performances = if recency.present?
-      args[:recency] = true
-      @summoner.summoner_performances.where(filter).where('created_at > ?', 1.month.ago)
+    summoner_performances = if starting_time.present? && ending_time.present?
+      args[:starting_time] = starting_time
+      args[:ending_time] = ending_time
+      @summoner.summoner_performances.where(filter).where('created_at > ?', starting_time)
+        .where('created_at <= ?', ending_time)
+    elsif starting_time.present?
+      args[:starting_time] = starting_time
+      @summoner.summoner_performances.where(filter).where('created_at > ?', starting_time)
+    elsif ending_time.present?
+      args[:ending_time] = ending_time
+      @summoner.summoner_performances.where(filter).where('created_at <= ?', ending_time)
     else
-      args[:recency] = false
       @summoner.summoner_performances.where(filter)
     end
 
@@ -435,7 +442,7 @@ class SummonersController < ApplicationController
     unless @summoner.try(:valid?)
       speech = @summoner ? @summoner.error_message : ApiResponse.get_response(
         dig_set(:errors, :summoners, :not_active),
-        { summoner: summoner_params[:name], recency: summoner_params[:recency].present? }
+        { summoner: summoner_params[:name] }
       )
       render json: { speech: speech }
       return false
