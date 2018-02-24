@@ -29,11 +29,20 @@ class Entities
     end
 
     def starting_time(time)
-      "from #{time.strftime("%a %b %e %R")}"
+      "from #{time_format(time)}"
     end
 
     def ending_time(time)
-      "to #{time.strftime("%a %b %e %R")}"
+      "to #{time_format(time)}"
+    end
+
+    def time_format(time)
+      format = '%a %b %e at'
+      if time.minute.zero?
+        time.strftime("#{format} %l%P")
+      else
+        time.strftime("#{format} %l:%M%P")
+      end
     end
 
     def summoners(summoners)

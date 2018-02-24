@@ -2,7 +2,8 @@ class SummonersController < ApplicationController
   include RiotApi
   include Utils
 
-  before_action :load_summoner, :load_namespace
+  before_action :load_summoner, except: [:summoner_matchups]
+  before_action :load_namespace
   before_action only: [:champion_performance_ranking] { process_performance_request(with_sorting: true) }
   before_action only: [:champion_performance_summary] do
     process_performance_request(with_champion: true)
@@ -283,12 +284,29 @@ class SummonersController < ApplicationController
     }
   end
 
+  def summoner_matchups
+    render plain: StrategyEngine.run(
+      summoner: Summoner.find_by(
+        name: summoner_params[:summoner].strip,
+        region: RiotApi::NA
+      ),
+      summoner2: Summoner.find_by(
+        name: summoner_params[:summoner2].strip,
+        region: RiotApi::NA
+      ),
+      champion: Champion.new(name: summoner_params[:champion]),
+      champion2: Champion.new(name: summoner_params[:champion2]),
+      role: summoner_params[:role]
+    ).to_s
+  end
+
   private
 
   def summoner_params
     params.require(:result).require(:parameters).permit(
       :name, :region, :champion, :queue, :role, :position_details, :metric,
-      :list_order, :list_size, :list_position, :champion2, :time
+      :list_order, :list_size, :list_position, :champion2, :time, :summoner,
+      :summoner2
     )
   end
 
@@ -441,8 +459,12 @@ class SummonersController < ApplicationController
   end
 
   def load_summoner
+    name = summoner_params[:name].strip
     @summoner = Summoner.find_by(
-      name: summoner_params[:name].strip,
+      name: name,
+      region: RiotApi::NA
+    ) || Summoner.find_by(
+      name: name.downcase == name ? name.capitalize : name.downcase,
       region: RiotApi::NA
     )
 
