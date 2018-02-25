@@ -262,7 +262,7 @@ class SummonersController < ApplicationController
 
     render json: {
       speech: ApiResponse.get_response(
-        dig_set(*@namespace, @processed_request[:namespace], position_data[:namespace]),
+        dig_set(*@namespace, position_data[:namespace]),
         args
       )
     }
@@ -280,24 +280,49 @@ class SummonersController < ApplicationController
     end
 
     render json: {
-      speech: ApiResponse.get_response(dig_set(*@namespace, @processed_request[:namespace]), args)
+      speech: ApiResponse.get_response(dig_set(*@namespace), args)
     }
   end
 
   def summoner_matchups
-    render plain: StrategyEngine.run(
-      summoner: Summoner.find_by(
-        name: summoner_params[:summoner].strip,
-        region: RiotApi::NA
-      ),
-      summoner2: Summoner.find_by(
-        name: summoner_params[:summoner2].strip,
-        region: RiotApi::NA
-      ),
-      champion: Champion.new(name: summoner_params[:champion]),
-      champion2: Champion.new(name: summoner_params[:champion2]),
+    summoner = Summoner.find_by(
+      name: summoner_params[:summoner].strip,
+      region: RiotApi::NA
+    )
+    summoner2 = Summoner.find_by(
+      name: summoner_params[:summoner2].strip,
+      region: RiotApi::NA
+    )
+    champion = Champion.new(name: summoner_params[:champion])
+    champion2 = Champion.new(name: summoner_params[:champion2])
+    args = {
+      champion: champion.name,
+      champion2: champion2.name,
+      summoner: summoner.name,
+      summoner2: summoner2.name
+    }
+    rating = StrategyEngine.run(
+      summoner: summoner,
+      summoner2: summoner2,
+      champion: champion,
+      champion2: champion2,
       role: summoner_params[:role]
-    ).to_s
+    )
+    args.merge!(rating)
+
+    even_type = if rating[:own_rating] > rating[:opposing_rating] + StrategyEngine::RATING_THRESHOLD
+      args[:favored] = summoner.name
+      :uneven
+    elsif rating[:own_rating] < rating[:opposing_rating] - StrategyEngine::RATING_THRESHOLD
+      args[:favored] = summoner2.name
+      :uneven
+    else
+      :even
+    end
+
+    render json: {
+      speech: ApiResponse.get_response(dig_set(*@namespace, even_type), args)
+    }
   end
 
   private
