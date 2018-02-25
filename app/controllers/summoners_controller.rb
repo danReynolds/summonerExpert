@@ -408,7 +408,7 @@ class SummonersController < ApplicationController
     starting_time, ending_time = summoner_params[:time].split('/').map { |time| DateTime.parse(time) }
     role = summoner_params[:role].to_sym
     champion = summoner_params[:champion]
-    args = { summoner: @summoner.name }
+    args = { summoner: @summoner.name, starting_time: starting_time, ending_time: ending_time }
     filter = {}
     filter[:role] = role if role.present?
 
@@ -434,27 +434,8 @@ class SummonersController < ApplicationController
       end
     end
 
-    summoner_performances = if starting_time.present? && ending_time.present?
-      args[:starting_time] = starting_time
-      args[:ending_time] = ending_time
-      @summoner.summoner_performances.where(filter)
-        .where('created_at >= ?', RiotApi::SEASON_START_DATE)
-        .where('created_at >= ?', starting_time)
-        .where('created_at <= ?', ending_time)
-    elsif starting_time.present?
-      args[:starting_time] = starting_time
-      @summoner.summoner_performances.where(filter)
-        .where('created_at >= ?', RiotApi::SEASON_START_DATE)
-        .where('created_at >= ?', starting_time)
-    elsif ending_time.present?
-      args[:ending_time] = ending_time
-      @summoner.summoner_performances.where(filter)
-        .where('created_at >= ?', RiotApi::SEASON_START_DATE)
-        .where('created_at <= ?', ending_time)
-    else
-      @summoner.summoner_performances.where(filter)
-        .where('created_at >= ?', RiotApi::SEASON_START_DATE)
-    end
+    summoner_performances = @summoner.summoner_performances.joins(:match).current_season.not_remake
+      .timeframe(starting_time, ending_time).where(filter)
 
     unless role.present?
       roles = summoner_performances.map(&:role).uniq & ChampionGGApi::ROLES.keys.map(&:to_s)
