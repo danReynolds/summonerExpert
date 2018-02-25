@@ -11,6 +11,95 @@ describe SummonersController, type: :controller do
     @today = "#{Time.now.strftime("%Y-%m-%d")}/#{(Time.now + 1.day).strftime("%Y-%m-%d")}"
   end
 
+  describe 'POST summoner_matchups' do
+    let(:action) { :summoner_matchups }
+    let(:summoner_params) do
+      {
+        summoner: 'Hero man',
+        summoner2: 'Other man',
+        champion: 'Shyvana',
+        champion2: 'Warwick',
+        region: 'NA1',
+        role: 'JUNGLE'
+      }
+    end
+    let(:external_response) do
+      JSON.parse(File.read('external_response.json'))
+        .with_indifferent_access[:summoners][action]
+    end
+
+    before :each do
+      allow(RiotApi::RiotApi).to receive(:fetch_response).and_return(
+        external_response
+      )
+
+      @summoner = create(:summoner, name: 'Hero man')
+      @summoner2 = create(:summoner, name: 'Other man')
+      @champion = Champion.new(name: 'Shyvana')
+      @champion2 = Champion.new(name: 'Warwick')
+    end
+
+    context 'with strong performance on that champion' do
+      before :each do
+        @matches = create_list(:match, 5)
+        match_data = [
+          { match: { win: false }, summoner_performance: { summoner_id: @summoner.id, champion_id: @champion.id, role: 'JUNGLE' }, opponent: { champion_id: @champion2.id, summoner_id: @summoner2.id, role: 'JUNGLE' } },
+          { match: { win: true }, summoner_performance: { summoner_id: @summoner.id, champion_id: @champion.id, role: 'JUNGLE' }, opponent: { champion_id: @champion2.id, summoner_id: @summoner2.id, role: 'JUNGLE' } },
+          { match: { win: true }, summoner_performance: { summoner_id: @summoner.id, champion_id: @champion.id, role: 'JUNGLE' }, opponent: { champion_id: @champion2.id, summoner_id: @summoner2.id, role: 'JUNGLE' } },
+          { match: { win: true }, summoner_performance: { summoner_id: @summoner.id, champion_id: @champion.id, role: 'JUNGLE' }, opponent: { champion_id: @champion2.id, summoner_id: @summoner2.id, role: 'JUNGLE' } },
+          { match: { win: true }, summoner_performance: { summoner_id: @summoner.id, champion_id: @champion.id, role: 'JUNGLE' }, opponent: { champion_id: @champion2.id, summoner_id: @summoner2.id, role: 'JUNGLE' } },
+        ]
+
+        @matches.each_with_index do |match, i|
+          summoner_performance = match.summoner_performances.first
+          @opposing_team = summoner_performance.team == match.team1 ? match.team2 : match.team1
+          if match_data[i][:match][:win]
+            match.update!(winning_team: summoner_performance.team)
+          else
+            match.update!(winning_team: @opposing_team)
+          end
+          summoner_performance.update!(match_data[i][:summoner_performance])
+          @opposing_team.summoner_performances.first.update!(match_data[i][:opponent])
+        end
+      end
+
+      it 'should indicate a high confidence in victory' do
+        post action, params: params
+        expect(speech).to eq 'I would give Hero man playing Shyvana a performance rating of 96% for this matchup compared to Other man as Warwick who I would rate around 36%. My money is definitely on Hero man this time.'
+      end
+    end
+
+    context 'with even performance' do
+      before :each do
+        @matches = create_list(:match, 5)
+        match_data = [
+          { match: { win: false }, summoner_performance: { summoner_id: @summoner.id, champion_id: @champion.id, role: 'JUNGLE' }, opponent: { champion_id: @champion2.id, summoner_id: @summoner2.id, role: 'JUNGLE' } },
+          { match: { win: false }, summoner_performance: { summoner_id: @summoner.id, champion_id: @champion.id, role: 'JUNGLE' }, opponent: { champion_id: @champion2.id, summoner_id: @summoner2.id, role: 'JUNGLE' } },
+          { match: { win: false }, summoner_performance: { summoner_id: @summoner.id, champion_id: @champion.id, role: 'JUNGLE' }, opponent: { champion_id: @champion2.id, summoner_id: @summoner2.id, role: 'JUNGLE' } },
+          { match: { win: true }, summoner_performance: { summoner_id: @summoner.id, champion_id: @champion.id, role: 'JUNGLE' }, opponent: { champion_id: @champion2.id, summoner_id: @summoner2.id, role: 'JUNGLE' } },
+          { match: { win: true }, summoner_performance: { summoner_id: @summoner.id, champion_id: @champion.id, role: 'JUNGLE' }, opponent: { champion_id: @champion2.id, summoner_id: @summoner2.id, role: 'JUNGLE' } },
+        ]
+
+        @matches.each_with_index do |match, i|
+          summoner_performance = match.summoner_performances.first
+          @opposing_team = summoner_performance.team == match.team1 ? match.team2 : match.team1
+          if match_data[i][:match][:win]
+            match.update!(winning_team: summoner_performance.team)
+          else
+            match.update!(winning_team: @opposing_team)
+          end
+          summoner_performance.update!(match_data[i][:summoner_performance])
+          @opposing_team.summoner_performances.first.update!(match_data[i][:opponent])
+        end
+      end
+
+      it 'should indicate that it is unsure who to favor' do
+        post action, params: params
+        expect(speech).to eq 'This one looks fairly close, I am going to give Hero man a performance rating of 79% for this matchup versus Other man with 85%.'
+      end
+    end
+  end
+
   describe 'POST teammates' do
     let(:action) { :teammates }
     let(:summoner_params) do
