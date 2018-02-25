@@ -61,7 +61,7 @@ describe SummonersController, type: :controller do
 
       it 'should indicate that the teammates are from games in the time interval' do
         post action, params: params
-        expect(speech).to eq 'The teammate who has helped Hero man get the highest win rate from Wed Feb 7 00:00 to Thu Feb 8 00:00 playing Shyvana Jungle is Teammate man.'
+        expect(speech).to eq 'The teammate who has helped Hero man get the highest win rate from Wed Feb 7 at 12am to Thu Feb 8 at 12am playing Shyvana Jungle is Teammate man.'
       end
     end
 
@@ -334,7 +334,7 @@ describe SummonersController, type: :controller do
 
       it 'should indicate that the teammates are from games in the time interval' do
         post action, params: params
-        expect(speech).to eq 'Hero man has played Shyvana Jungle one time against Udyr from Wed Feb 7 00:00 to Thu Feb 8 00:00 with a 100.0% win rate.'
+        expect(speech).to eq 'Hero man has played Shyvana Jungle one time against Udyr from Wed Feb 7 at 12am to Thu Feb 8 at 12am with a 100.0% win rate.'
       end
     end
 
@@ -459,7 +459,7 @@ describe SummonersController, type: :controller do
 
       it 'should indicate that the teammates are from games in the time interval' do
         post action, params: params
-        expect(speech).to eq 'The spell combination used by Hero man from Wed Feb 7 00:00 to Thu Feb 8 00:00 that gives the summoner playing Shyvana Adc the highest win rate is Exhaust and Flash.'
+        expect(speech).to eq 'The spell combination used by Hero man from Wed Feb 7 at 12am to Thu Feb 8 at 12am that gives the summoner playing Shyvana Adc the highest win rate is Exhaust and Flash.'
       end
     end
 
@@ -570,7 +570,7 @@ describe SummonersController, type: :controller do
 
       it 'should indicate that the teammates are from games in the time interval' do
         post action, params: params
-        expect(speech).to eq 'The ban by Hero man playing Shyvana Adc that gives the summoner the highest win rate from Wed Feb 7 00:00 to Thu Feb 8 00:00 is Corki.'
+        expect(speech).to eq 'The ban by Hero man playing Shyvana Adc that gives the summoner the highest win rate from Wed Feb 7 at 12am to Thu Feb 8 at 12am is Corki.'
       end
     end
 
@@ -799,7 +799,8 @@ describe SummonersController, type: :controller do
 
       it 'should indicate that the teammates are from games in the time interval' do
         post action, params: params
-        expect(speech).to eq "Hero man has played Shyvana Adc eleven times from Wed Feb 7 00:00 to Thu Feb 8 00:00 and the summoner's highest win rate build is Rabadon's Deathcap, Statikk Shiv, Runaan's Hurricane, Warmog's Armor, Eye of the Equinox, and Zz'Rot Portal."
+        expect(speech).to eq "Hero man has played Shyvana Adc eleven times from Wed Feb 7 at 12am to Thu Feb 8 at 12am and the summoner's highest win rate build is Rabadon's Deathcap, Statikk Shiv, Runaan's Hurricane, Warmog$
+s Armor, Eye of the Equinox, and Zz'Rot Portal."
       end
     end
 
@@ -1083,7 +1084,7 @@ describe SummonersController, type: :controller do
 
       it 'should indicate that the teammates are from games in the time interval' do
         post action, params: params
-        expect(speech).to eq 'The champions with the highest win rate against Hero man from Wed Feb 7 00:00 to Thu Feb 8 00:00 playing Shyvana Middle are Swain and Elise.'
+        expect(speech).to eq 'The champions with the highest win rate against Hero man from Wed Feb 7 at 12am to Thu Feb 8 at 12am playing Shyvana Middle are Swain and Elise.'
       end
     end
 
@@ -1369,7 +1370,7 @@ describe SummonersController, type: :controller do
 
       it 'should indicate that the teammates are from games in the time interval' do
         post action, params: params
-        expect(speech).to eq "The champions played by Hero man from Wed Feb 7 00:00 to Thu Feb 8 00:00 with the summoner's highest win rate across Adc, Jungle, and Middle are Nunu and Tristana."
+        expect(speech).to eq "The champions played by Hero man from Wed Feb 7 at 12am to Thu Feb 8 at 12am with the summoner's highest win rate across Adc, Jungle, and Middle are Nunu and Tristana."
       end
     end
 
@@ -1743,7 +1744,7 @@ describe SummonersController, type: :controller do
 
       it 'should indicate that the teammates are from games in the time interval' do
         post action, params: params
-        expect(speech).to eq 'Hero man has played Tristana Adc two times from Wed Feb 7 00:00 to Thu Feb 8 00:00 with a 100.0% win rate and an overall 2.0/3.0/7.0 KDA.'
+        expect(speech).to eq 'Hero man has played Tristana Adc two times from Wed Feb 7 at 12am to Thu Feb 8 at 12am with a 100.0% win rate and an overall 2.0/3.0/7.0 KDA.'
       end
     end
 
@@ -1840,7 +1841,7 @@ describe SummonersController, type: :controller do
 
       it 'should indicate that the teammates are from games in the time interval' do
         post action, params: params
-        expect(speech).to eq 'Hero man has played Tristana Adc two times from Wed Feb 7 00:00 to Thu Feb 8 00:00 and averages 2.0 kills.'
+        expect(speech).to eq 'Hero man has played Tristana Adc two times from Wed Feb 7 at 12am to Thu Feb 8 at 12am and averages 2.0 kills.'
       end
     end
 

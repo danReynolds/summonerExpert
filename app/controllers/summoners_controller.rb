@@ -408,7 +408,9 @@ class SummonersController < ApplicationController
     starting_time, ending_time = summoner_params[:time].split('/').map { |time| DateTime.parse(time) }
     role = summoner_params[:role].to_sym
     champion = summoner_params[:champion]
-    args = { summoner: @summoner.name, starting_time: starting_time, ending_time: ending_time }
+    args = { summoner: @summoner.name }
+    args[:starting_time] = starting_time if starting_time
+    args[:ending_time] = ending_time if ending_time
     filter = {}
     filter[:role] = role if role.present?
 
