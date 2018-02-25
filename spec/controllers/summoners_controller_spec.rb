@@ -799,8 +799,7 @@ describe SummonersController, type: :controller do
 
       it 'should indicate that the teammates are from games in the time interval' do
         post action, params: params
-        expect(speech).to eq "Hero man has played Shyvana Adc eleven times from Wed Feb 7 at 12am to Thu Feb 8 at 12am and the summoner's highest win rate build is Rabadon's Deathcap, Statikk Shiv, Runaan's Hurricane, Warmog$
-s Armor, Eye of the Equinox, and Zz'Rot Portal."
+        expect(speech).to eq "Hero man has played Shyvana Adc eleven times from Wed Feb 7 at 12am to Thu Feb 8 at 12am and the summoner's highest win rate build is Rabadon's Deathcap, Statikk Shiv, Runaan's Hurricane, Warmog's Armor, Eye of the Equinox, and Zz'Rot Portal."
       end
     end
 
