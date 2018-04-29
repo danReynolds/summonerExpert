@@ -75,36 +75,26 @@ class MatchHelper
           team1
         elsif team2_params['firstBlood']
           team2
-        else
-          nil
         end
         first_tower_team = if team1_params['firstTower']
           team1
         elsif team2_params['firstTower']
           team2
-        else
-          nil
         end
         first_inhibitor_team = if team1_params['firstInhibitor']
           team1
         elsif team2_params['firstInhibitor']
           team2
-        else
-          nil
         end
         first_baron_team = if team1_params['firstBaron']
           team1
         elsif team2_params['firstBaron']
           team2
-        else
-          nil
         end
         first_rift_herald = if team1_params['firstRiftHerald']
           team1
         elsif team2_params['firstRiftHerald']
           team2
-        else
-          nil
         end
 
         match = Match.create!(
