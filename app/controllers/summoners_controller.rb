@@ -22,7 +22,7 @@ class SummonersController < ApplicationController
 
   # The summoner must have played at least 3 games as that champion to consider making
   # a recommendation to them based on that champion
-  MIN_CHAMPION_THRESHOLD = 0
+  MIN_CHAMPION_THRESHOLD = 3
   RECOMMENDED_CHAMPION_SIZE = 3
 
   def recommendation
