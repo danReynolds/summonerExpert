@@ -37,7 +37,45 @@ describe SummonersController, type: :controller do
 
     it 'should determine the recommendations for that summoner based on their played champions' do
       post action, params: params
-      expect(speech).to eq ''
+      expect(speech).to eq 'Given wingilote likes to play Bard Support, I recommend trying Blitzcrank, Thresh, or Janna in the current meta.'
+    end
+
+    it 'should not find similar champions for a champion the summoner has not played often' do
+      post action, params: params
+      @matches.first.summoner_performances.first.update_attribute(:champion_id, 74)
+      expect(speech).to eq 'Given wingilote likes to play Bard Support, I recommend trying Blitzcrank, Thresh, or Janna in the current meta.'
+    end
+
+    it 'should sort the similar champions by overall performance score' do
+      allow(Cache).to receive(:get_champion_similarity).and_return([
+        Champion.new(name: 'Blitcrank').id,
+        Champion.new(name: 'Janna').id,
+        Champion.new(name: 'Thresh').id
+      ])
+      post action, params: params
+      expect(speech).to eq 'Given wingilote likes to play Bard Support, I recommend trying Blitzcrank, Thresh, or Janna in the current meta.'
+    end
+
+    it 'should filter out champions that do not share the same role as the way the summoner plays the champion' do
+      allow(Cache).to receive(:get_champion_similarity).and_return([
+        Champion.new(name: 'Blitcrank').id,
+        Champion.new(name: 'Janna').id,
+        Champion.new(name: 'Ryze').id
+      ])
+      post action, params: params
+      expect(speech).to eq 'Given wingilote likes to play Bard Support, I recommend trying Blitzcrank or Janna in the current meta.'
+    end
+
+    it 'should inform the user they have not played enough games if they have no champions to base recommendations off of' do
+      @summoner.summoner_performances.destroy_all
+      post action, params: params
+      expect(speech).to eq 'wingilote has not played many games with any particular champion and I cannot make a good recommendation.'
+    end
+
+    it 'should inform the user if the summoner has not played this season' do
+      allow(RiotApi::RiotApi).to receive(:fetch_response).and_return({})
+      post action, params: params
+      expect(speech).to eq 'I could not find any information on from the Riot overlords in ranked solo queue. The summoner may not have played enough games or there may be something going on with the system. Sorry about that, try again later.'
     end
   end
 

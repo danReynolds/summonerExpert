@@ -33,7 +33,7 @@ class SummonersController < ApplicationController
 
     if performances.empty?
       return render json: {
-        speech: ApiResponse.get_response(dig_set(:errors, *namespace, :not_enough_games))
+        speech: ApiResponse.get_response(dig_set(:errors, *@namespace, :not_enough_games), args)
       }
     end
 
@@ -47,13 +47,12 @@ class SummonersController < ApplicationController
     total_performances = performances.inject(0) do |acc, (champion_id, count)|
       acc += count
     end
-
     selected_performance_index = Random.new.rand(1..total_performances)
     index = 0
-    champion_id = performances.take_while do |champion_id, count|
+    champion_id = performances.detect do |champion_id, count|
       index += count
-      index <= selected_performance_index
-    end.last.first
+      selected_performance_index <= index
+    end.first
 
     champion = Champion.new(id: champion_id)
     champion_role = @summoner.summoner_performances.group(:role).count.to_a
