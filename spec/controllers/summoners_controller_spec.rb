@@ -12,6 +12,35 @@ describe SummonersController, type: :controller do
     @today = "#{Time.now.strftime("%Y-%m-%d")}/#{(Time.now + 1.day).strftime("%Y-%m-%d")}"
   end
 
+  describe 'POST recommendation' do
+    let(:action) { :recommendation }
+    let(:summoner_params) do
+      { name: 'wingilote' }
+    end
+    let(:external_response) do
+      JSON.parse(File.read('external_response.json'))
+        .with_indifferent_access[:summoners][:performance_summary]
+    end
+
+    before :each do
+      @summoner = create(:summoner, name: 'wingilote')
+      @champion = Champion.new(name: 'Bard')
+      allow(RiotApi::RiotApi).to receive(:fetch_response).and_return(
+        external_response
+      )
+
+      @matches = create_list(:match, 5)
+      @matches.each do |match|
+        match.summoner_performances[0].update(summoner_id: @summoner.id, champion_id: @champion.id, role: 'DUO_SUPPORT')
+      end
+    end
+
+    it 'should determine the recommendations for that summoner based on their played champions' do
+      post action, params: params
+      expect(speech).to eq ''
+    end
+  end
+
   describe 'POST current_match' do
     let(:action) { :current_match }
     let(:summoner_params) do
