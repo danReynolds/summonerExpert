@@ -77,6 +77,12 @@ describe SummonersController, type: :controller do
       post action, params: params
       expect(speech).to eq 'I could not find any information on from the Riot overlords in ranked solo queue. The summoner may not have played enough games or there may be something going on with the system. Sorry about that, try again later.'
     end
+
+    it 'should default to the similar champions if there are no recommended champions by role' do
+      allow(RolePerformance).to receive(:new).and_return(RolePerformance.new)
+      post action, params: params
+      expect(speech).to eq "Given wingilote likes to play Bard Support, I recommend trying Blitzcrank, Braum, or Tahm Kench in the current meta."
+    end
   end
 
   describe 'POST current_match' do

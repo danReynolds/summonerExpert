@@ -68,11 +68,12 @@ class SummonersController < ApplicationController
 
     recommended_champions = similar_champion_performances.sort_by do |similar_champion_performance|
       similar_champion_performance.position('overallPerformanceScore')[:position]
-    end.first(RECOMMENDED_CHAMPION_SIZE).map(&:name)
+    end
+    recommended_champions = similar_champions if recommended_champions.empty?
 
     args.merge!({
       champion: champion.name,
-      recommended_champions: recommended_champions,
+      recommended_champions: recommended_champions.map(&:name).first(RECOMMENDED_CHAMPION_SIZE),
       role: champion_role
     })
 
